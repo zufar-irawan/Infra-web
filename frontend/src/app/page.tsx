@@ -1,3 +1,12 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+import { redirect } from "next/navigation";
+
+export default function Home() {
+  redirect("/main");
+=======
+>>>>>>> dev
 import Image from "next/image";
 
 export default function Home() {
@@ -100,4 +109,8 @@ export default function Home() {
       </footer>
     </div>
   );
+<<<<<<< HEAD
+=======
+>>>>>>> 6488c37 (First commit)
+>>>>>>> dev
 }

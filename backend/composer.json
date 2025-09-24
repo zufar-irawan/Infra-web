@@ -11,7 +11,14 @@
     "require": {
         "php": "^8.2",
         "laravel/framework": "^12.0",
+<<<<<<< HEAD
         "laravel/sanctum": "^4.0",
+=======
+<<<<<<< HEAD
+=======
+        "laravel/sanctum": "^4.0",
+>>>>>>> 6488c37 (First commit)
+>>>>>>> dev
         "laravel/tinker": "^2.10.1"
     },
     "require-dev": {
@@ -77,4 +84,12 @@
     },
     "minimum-stability": "stable",
     "prefer-stable": true
+<<<<<<< HEAD
 }
+=======
+<<<<<<< HEAD
+}
+=======
+}
+>>>>>>> 6488c37 (First commit)
+>>>>>>> dev
