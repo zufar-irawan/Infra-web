@@ -40,6 +40,23 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+<<<<<<< HEAD
+=======
+        'api' => [ // API bawaan Laravel pakai Sanctum untuk User biasa
+            'driver' => 'sanctum',
+            'provider' => 'users',
+        ],
+
+        // guard khusus LMS
+        'lms_web' => [
+            'driver' => 'session',
+            'provider' => 'lms_users',
+        ],
+        'lms_api' => [
+            'driver' => 'sanctum',
+            'provider' => 'lms_users',
+        ],
+>>>>>>> 6488c37 (First commit)
     ],
 
     /*
@@ -64,6 +81,13 @@ return [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\User::class),
         ],
+<<<<<<< HEAD
+=======
+        'lms_users' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\LmsUser::class,
+        ],
+>>>>>>> 6488c37 (First commit)
 
         // 'users' => [
         //     'driver' => 'database',

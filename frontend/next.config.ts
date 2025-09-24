@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   /* config options here */
 };
 
+<<<<<<< HEAD
 module.exports = {
   images: {
     domains: ["flagcdn.com"],
@@ -11,4 +12,6 @@ module.exports = {
 };
 
 
+=======
+>>>>>>> 6488c37 (First commit)
 export default nextConfig;

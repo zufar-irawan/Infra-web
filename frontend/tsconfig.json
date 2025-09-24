@@ -14,6 +14,7 @@
     "jsx": "preserve",
     "incremental": true,
     "plugins": [
+<<<<<<< HEAD
       { "name": "next" }
     ],
     "baseUrl": "src",
@@ -28,5 +29,16 @@
     "**/*.tsx",
     ".next/types/**/*.ts"
   ],
+=======
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+>>>>>>> 6488c37 (First commit)
   "exclude": ["node_modules"]
 }
