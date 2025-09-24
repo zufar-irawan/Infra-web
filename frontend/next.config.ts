@@ -1,20 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  reactStrictMode : false
 };
-
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
 module.exports = {
   images: {
     domains: ["flagcdn.com"],
   },
 };
 
-
-=======
->>>>>>> 6488c37 (First commit)
->>>>>>> dev
 export default nextConfig;
