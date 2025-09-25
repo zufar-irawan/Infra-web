@@ -11,7 +11,7 @@ export default function About() {
             <div className="relative w-full min-h-screen bg-gray-800">
                 <div className="relative z-20 w-full min-h-screen flex items-center justify-center px-4">
                     <div className="container flex flex-col items-start gap-2">
-                        hi
+                        hi, this is about section
                     </div>
                 </div>
             </div>

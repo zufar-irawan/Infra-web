@@ -57,7 +57,12 @@ const toggleDropdown = (menu: string) =>
 				</div>
 			</div>
 
-			<div className={`transition-all duration-300 px-4 py-2 ${ /* isScrolled ? "bg-white/10 backdrop-blur shadow" : "bg-orange-600" */ isScrolled ? "bg-orange-600" : "bg-transparent"}`}>
+			<div className={`transition duration-300 px-4 py-2 
+				${
+					/* isScrolled ? "bg-white/10 backdrop-blur shadow" : "bg-orange-600" */
+					isScrolled ? "bg-gradient-to-r from-orange-600 to-orange-700 shadow-lg" : "bg-gradient-to-r from-transparent to-transparent shadow-none"
+				}
+			`}>
 				<div className="container mx-auto flex items-center justify-between">
 					
 					<a href="/" className="flex items-center gap-2">
@@ -69,11 +74,11 @@ const toggleDropdown = (menu: string) =>
 						<nav className="flex items-center gap-6 text-white relative">
 							<div className="relative dropdown">
 								<button onClick={() => toggleDropdown("informasi")} className="hover:underline">
-									{lang === "id" ? "Informasi Sekolah" : "School Info"}
+									{lang === "id" ? "Informasi Sekolah" : "School Information"}
 								</button>
 								{openDropdown === "informasi" && (
 									<div className="absolute left-0 mt-2 bg-white shadow-lg rounded text-orange-600 w-48">
-										<a href="#tentang" className="block px-4 py-2 hover:bg-gray-100 transition">
+										<a href="#about-us" className="block px-4 py-2 hover:bg-gray-100 transition">
 											Tentang Kami
 										</a>
 										<a href="#visi" className="block px-4 py-2 hover:bg-gray-100 transition">
@@ -85,6 +90,9 @@ const toggleDropdown = (menu: string) =>
 										<a href="#fasilitas" className="block px-4 py-2 hover:bg-gray-100 transition">
 											Fasilitas
 										</a>
+										<a href="#testimoni" className="block px-4 py-2 hover:bg-gray-100 transition">
+											Testimoni
+										</a>
 										<a href="#faq" className="block px-4 py-2 hover:bg-gray-100 transition">
 											FAQ
 										</a>
@@ -93,39 +101,27 @@ const toggleDropdown = (menu: string) =>
 							</div>
 
 							<div className="relative dropdown">
-								<button onClick={() => toggleDropdown("kehidupan")} className="hover:underline">
+								<button onClick={() => toggleDropdown("kegiatan")} className="hover:underline">
 									{lang === "id" ? "Kegiatan Siswa" : "Student Activity"}
 								</button>
-								{openDropdown === "kehidupan" && (
+								{openDropdown === "kegiatan" && (
 									<div className="absolute left-0 mt-2 bg-white shadow-lg rounded text-orange-600 w-40">
-										<a href="#prestasi" className="block px-4 py-2 hover:bg-gray-100 transition">
-											Prestasi
-										</a>
 										<a href="#ekskul" className="block px-4 py-2 hover:bg-gray-100 transition">
 											Ekstrakurikuler
 										</a>
+										<a href="#ekskul" className="block px-4 py-2 hover:bg-gray-100 transition">
+											Acara
+										</a>
+										<a href="#prestasi" className="block px-4 py-2 hover:bg-gray-100 transition">
+											Prestasi
+										</a>
 									</div>
 								)}
 							</div>
 
-							<a href="#mitra">{lang === "id" ? "Mitra" : "Partners"}</a>
+							<a href="#dokumentasi">{lang === "id" ? "Dokumentasi" : "Documentation"}</a>
 							<a href="#berita">{lang === "id" ? "Berita" : "News"}</a>
-
-							<div className="relative dropdown">
-								<button onClick={() => toggleDropdown("penerimaan")} className="hover:underline">
-									{lang === "id" ? "Penerimaan Siswa" : "Admission"}
-								</button>
-								{openDropdown === "penerimaan" && (
-									<div className="absolute left-0 mt-2 bg-white shadow-lg rounded text-orange-600 w-48">
-										<a href="#daftar" className="block px-4 py-2 hover:bg-gray-100 transition">
-											Daftar Sekarang
-										</a>
-										<a href="#testimoni" className="block px-4 py-2 hover:bg-gray-100 transition">
-											Testimoni
-										</a>
-									</div>
-								)}
-							</div>
+							
 						</nav>
 
 						<button className="hidden md:block bg-[#243771] hover:bg-[#1b2a5a] px-4 py-2 rounded text-white font-medium">
