@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useLang } from "./LangContext";
 
-export default function footer() {
+export default function Footer() {
   const { lang } = useLang();
 
   const texts = {

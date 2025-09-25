@@ -5,6 +5,14 @@
   --foreground: #171717;
 }
 
+::selection {
+  @apply bg-blue-700 text-white;
+}
+
+img, input, br, button, textarea {
+  user-select: none;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
