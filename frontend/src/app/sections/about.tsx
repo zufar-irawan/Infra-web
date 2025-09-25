@@ -1,0 +1,18 @@
+// import Image from "next/image";
+// import { redirect } from "next/navigation";
+
+export default function Home() {
+    return (
+        <section id="home">
+            <div className="relative w-full min-h-screen bg-gray-800">
+                <div className="relative z-20 w-full min-h-screen flex items-center justify-center">
+                    <div className="container flex flex-col items-start gap-2">
+                        <p className="uppercase text-3xl font-semibold">SELAMAT DATANG DI SITUS RESMI</p>
+                        <h1 className="uppercase text-6xl bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent selection:text-white font-bold">SMK PRESTASI PRIMA</h1>
+                        <q className="uppercase italic text-xl">IF BETTER IS POSSIBLE, GOOD IS NOT ENOUGH</q>
+                    </div>
+                </div>
+            </div>
+        </section>
+    );
+}
