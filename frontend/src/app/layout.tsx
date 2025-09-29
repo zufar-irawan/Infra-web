@@ -21,9 +21,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id">
-      <body className={`${poppins.className} antialiased min-h-screen flex flex-col`}>
+      <body className={`${poppins.className} antialiased`}>
         <LangProvider>
-          <main className="flex-grow overflow-auto">{children}</main>
+          <main className="overflow-y-auto">{children}</main>
         </LangProvider>
       </body>
     </html>
