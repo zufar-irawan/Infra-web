@@ -22,7 +22,7 @@ export default function Home() {
                             IF BETTER IS POSSIBLE, GOOD IS NOT ENOUGH
                         </q>
                         <button className="bg-orange-600 hover:bg-orange-700 px-4 py-2 text-lg font-bold tracking-wide rounded-md cursor-pointer mt-5">
-                            DAFTAR SEKARANG
+                            {lang === "id" ? "DAFTAR SEKARANG" : "REGISTER NOW"}
                         </button>
                     </div>
                 </div>

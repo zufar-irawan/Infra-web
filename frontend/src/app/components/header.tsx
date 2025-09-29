@@ -3,8 +3,10 @@
 import { useEffect, useState } from "react";
 import { useLang } from "./LangContext";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 
 export default function Header() {
+  const pathname = usePathname();
   const { lang, setLang } = useLang();
   const [isScrolled, setIsScrolled] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -30,74 +32,15 @@ export default function Header() {
 
   return (
     <header className="fixed top-0 w-full z-50 select-none">
-      {/* Topbar */}
-      <div className="bg-[#243771] text-white text-sm px-4 py-2">
-        <div className="container mx-auto flex items-center justify-end gap-4">
-          <button className="hover:underline">
-            {lang === "id" ? "Berita" : "News"}
-          </button>
-
-          {/* Language Dropdown */}
-          <div className="relative dropdown">
-            <button
-              onClick={() => toggleDropdown("lang")}
-              className="flex items-center gap-2 hover:underline"
-            >
-              <Image
-                src={
-                  lang === "id"
-                    ? "https://flagcdn.com/id.svg"
-                    : "https://flagcdn.com/gb.svg"
-                }
-                alt="flag"
-                width={20}
-                height={15}
-              />
-              {lang === "id" ? "Bahasa Indonesia" : "English"}
-            </button>
-
-            {openDropdown === "lang" && (
-              <div className="absolute right-0 mt-1 w-44 bg-white shadow-lg rounded text-gray-800">
-                <button
-                  onClick={() => {
-                    setLang("id");
-                    setOpenDropdown(null);
-                  }}
-                  className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-200 transition"
-                >
-                  <Image
-                    src="https://flagcdn.com/id.svg"
-                    alt="ID Flag"
-                    width={20}
-                    height={15}
-                  />
-                  Bahasa Indonesia
-                </button>
-                <button
-                  onClick={() => {
-                    setLang("en");
-                    setOpenDropdown(null);
-                  }}
-                  className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-200 transition"
-                >
-                  <Image
-                    src="https://flagcdn.com/gb.svg"
-                    alt="EN Flag"
-                    width={20}
-                    height={15}
-                  />
-                  English
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
 
       {/* Navbar */}
       <div
         className={`transition duration-300 p-3 text-white ${
-          isScrolled ? "bg-[#243771] shadow-md" : "bg-transparent"
+          pathname === "/"
+            ? isScrolled
+              ? "bg-[#243771] shadow-md"
+              : "bg-transparent shadow-none"
+            : "bg-[#243771] shadow-md"
         }`}
       >
         <div className="container mx-auto flex items-center justify-between">
@@ -117,7 +60,7 @@ export default function Header() {
           <div className="hidden md:flex items-center gap-6">
             <nav className="flex items-center gap-6 text-white relative">
               <a    
-                href="#"
+                href={`${pathname === "/" ? "#" : "/" }`}
                 className="hover:text-yellow-400 transition cursor-pointer"
               >
                 {lang === "id" ? "Beranda" : "Home"}
@@ -230,6 +173,12 @@ export default function Header() {
                       Ekstrakurikuler
                     </a>
                     <a
+                      className="block px-4 py-2 hover:bg-gray-200 rounded-t transition"
+                      href="#osis-mpk"
+                    >
+                      OSIS & MPK
+                    </a>
+                    <a
                       className="block px-4 py-2 hover:bg-gray-200 transition"
                       href="#acara"
                     >
@@ -253,10 +202,64 @@ export default function Header() {
                 {lang === "id" ? "Berita Terkini" : "Latest News"}
               </a>
 
-              {/* Register */}
+              {/* Registration */}
               <button className="px-4 py-2 rounded bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 transition font-medium">
-                {lang === "id" ? "Pendaftaran" : "Register"}
+                {lang === "id" ? "Pendaftaran" : "Registration"}
               </button>
+
+              <div className="relative dropdown">
+                <button
+                  onClick={() => toggleDropdown("lang")}
+                  className="px-4 py-2 rounded flex cursor-pointer items-center gap-2 bg-transparent border-1 border-gray-100 hover:border-gray-300 transition font-medium"
+                >
+                  <Image
+                    src={
+                      lang === "id"
+                        ? "https://flagcdn.com/id.svg"
+                        : "https://flagcdn.com/gb.svg"
+                    }
+                    alt="flag"
+                    width={20}
+                    height={15}
+                  />
+                  {lang === "id" ? "ID" : "EN"}
+                </button>
+
+                {openDropdown === "lang" && (
+                  <div className="absolute left-0 mt-3 text-sm bg-white/90 shadow-lg rounded text-orange-600 w-36">
+                    <button
+                      onClick={() => {
+                        setLang("id");
+                        setOpenDropdown(null);
+                      }}
+                      className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-200 transition cursor-pointer rounded-t"
+                    >
+                      <Image
+                        src="https://flagcdn.com/id.svg"
+                        alt="ID Flag"
+                        width={20}
+                        height={15}
+                      />
+                      Bahasa Indonesia
+                    </button>
+                    <button
+                      onClick={() => {
+                        setLang("en");
+                        setOpenDropdown(null);
+                      }}
+                      className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-200 transition cursor-pointer rounded-b"
+                    >
+                      <Image
+                        src="https://flagcdn.com/gb.svg"
+                        alt="EN Flag"
+                        width={20}
+                        height={15}
+                      />
+                      English
+                    </button>
+                  </div>
+                )}
+              </div>
             </nav>
           </div>
 
@@ -298,7 +301,7 @@ export default function Header() {
             <a href="#study-tour">Study Tour</a>
             <a href="#berita">{lang === "id" ? "Berita" : "News"}</a>
             <button className="px-4 py-2 rounded bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 transition font-medium">
-              {lang === "id" ? "Pendaftaran" : "Register"}
+              {lang === "id" ? "Pendaftaran" : "Registration"}
             </button>
           </div>
         </div>
