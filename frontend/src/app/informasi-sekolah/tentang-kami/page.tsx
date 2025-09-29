@@ -15,7 +15,7 @@ export default function Tentang() {
       <Navbar />
 
       {/* Spacer warna orange biar ga ketiban header */}
-      <div className="h-[120px] bg-[#FE4D01]" />
+      <div className=" bg-[#FE4D01]" />
 
       {/* Breadcrumbs */}
       <section className="w-full py-4 bg-gray-100 shadow-sm">

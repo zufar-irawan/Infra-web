@@ -21,8 +21,11 @@ export default function Home() {
                         <q className="uppercase italic text-xl">
                             IF BETTER IS POSSIBLE, GOOD IS NOT ENOUGH
                         </q>
-                        <button className="bg-orange-600 hover:bg-orange-700 px-4 py-2 text-lg font-bold tracking-wide rounded-md cursor-pointer mt-5">
-                            DAFTAR SEKARANG
+                        <button className="bg-orange-600 hover:bg-orange-700 px-5 py-3 text-lg font-bold tracking-wide rounded-full cursor-pointer mt-5 flex items-center gap-2">
+                            {lang === "id" ? "DAFTAR SEKARANG" : "REGISTER NOW"}
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="min-w-5 h-5">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                            </svg>
                         </button>
                     </div>
                 </div>
