@@ -10,7 +10,7 @@ export default function Tentang() {
   const { lang } = useLang();
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-gray-100">
       {/* Navbar */}
       <Navbar />
 
@@ -68,7 +68,7 @@ export default function Tentang() {
                 <img
                   src="/pp.png"
                   alt="SMK Prestasi Prima"
-                  className="rounded-lg shadow-md w-full h-auto object-cover aspect-[4/3]"
+                  className="rounded-lg w-full h-auto object-cover aspect-[4/3]"
                 />
               </div>
 
@@ -95,6 +95,9 @@ export default function Tentang() {
 
       {/* Section Visi & Misi */}
       <VisiMisiSection />
+
+      {/* Section Manajemen */}
+      <ManajemenSection />
 
       {/* Footer */}
       <Footer />
@@ -185,7 +188,7 @@ function VisiMisiSection() {
   const { lang } = useLang();
 
   return (
-    <section className="bg-gray-50 py-16">
+    <section className="bg-gray-100 py-16">
       <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
         {/* Teks Visi & Misi */}
         <div className="space-y-10">
@@ -196,7 +199,7 @@ function VisiMisiSection() {
             </h2>
             <p className="text-gray-700 leading-relaxed text-base sm:text-lg">
               {lang === "id"
-                ? "Mewujudkan lulusan yang “unggul” dan “terpercaya” dalam mengembangkan dan mempersiapkan tenaga terampil di bidang Teknologi Informasi dan Komunikasi yang beriman, bertaqwa, cerdas, percaya diri, berwawasan global, dan berkarakter Pancasialis."
+                ? "Mewujudkan lulusan yang “unggul” dan “terpercaya” dalam mengembangkan dan mempersiapkan tenaga terampil di bidang Teknologi Informasi dan Komunikasi yang beriman, bertaqwa, cerdas, percaya diri, berwawasan global, dan berkarakter Pancasilais."
                 : "To produce graduates who are 'superior' and 'trustworthy' in developing and preparing skilled workforce in the field of Information and Communication Technology who are faithful, pious, intelligent, confident, globally minded, and have Pancasila character."}
             </p>
           </div>
@@ -212,10 +215,26 @@ function VisiMisiSection() {
                 : "Organize a quality teaching and learning process ... according to the competencies in the field of:"}
             </p>
             <ul className="list-disc list-inside text-gray-700 space-y-2 text-base sm:text-lg">
-              <li>{lang === "id" ? "Pengembangan Perangkat Lunak dan Gim (PPLG)" : "Software and Game Development (PPLG)"}</li>
-              <li>{lang === "id" ? "Teknik Jaringan Komputer dan Telekomunikasi (TJKT)" : "Computer Network and Telecommunication Engineering (TJKT)"}</li>
-              <li>{lang === "id" ? "Desain Komunikasi Visual (DKV)" : "Visual Communication Design (DKV)"}</li>
-              <li>{lang === "id" ? "Broadcasting dan Film (BCF)" : "Broadcasting and Film (BCF)"}</li>
+              <li>
+                {lang === "id"
+                  ? "Pengembangan Perangkat Lunak dan Gim (PPLG)"
+                  : "Software and Game Development (PPLG)"}
+              </li>
+              <li>
+                {lang === "id"
+                  ? "Teknik Jaringan Komputer dan Telekomunikasi (TJKT)"
+                  : "Computer Network and Telecommunication Engineering (TJKT)"}
+              </li>
+              <li>
+                {lang === "id"
+                  ? "Desain Komunikasi Visual (DKV)"
+                  : "Visual Communication Design (DKV)"}
+              </li>
+              <li>
+                {lang === "id"
+                  ? "Broadcasting dan Film (BCF)"
+                  : "Broadcasting and Film (BCF)"}
+              </li>
             </ul>
             <p className="text-gray-700 leading-relaxed text-base sm:text-lg mt-4">
               {lang === "id"
@@ -223,7 +242,7 @@ function VisiMisiSection() {
                 : "Provide 21st-century learning-based educational services ... relevant to national character."}
             </p>
             <button className="mt-6 px-6 py-3 rounded bg-[#FE4D01] text-white font-medium hover:bg-orange-700 transition">
-              {lang === "id" ? "Pelajari Lebih Lanjut" : "Learn More"}
+              {lang === "id" ? "Selengkapnya" : "More"}
             </button>
           </div>
         </div>
@@ -232,10 +251,114 @@ function VisiMisiSection() {
         <div className="flex justify-center">
           <img
             src="/pp1.png"
-            alt={lang === "id" ? "Visi Misi SMK Prestasi Prima" : "Vision & Mission of SMK Prestasi Prima"}
-            className="rounded-lg shadow-md w-full object-cover"
+            alt={
+              lang === "id"
+                ? "Visi Misi SMK Prestasi Prima"
+                : "Vision & Mission of SMK Prestasi Prima"
+            }
+            className="rounded-lg w-full object-cover"
           />
         </div>
+      </div>
+    </section>
+  );
+}
+
+/* -------------------- Manajemen Section -------------------- */
+function ManajemenSection() {
+  const { lang } = useLang();
+  const [showMore, setShowMore] = useState(false);
+
+  const manajemenAwal = [
+    {
+      img: "/man1.png",
+      nama: "Budi Santoso",
+      jabatan: lang === "id" ? "Kepala Sekolah" : "Principal",
+    },
+    {
+      img: "/man2.png",
+      nama: "Siti Aminah",
+      jabatan: lang === "id" ? "Wakil Kepala Sekolah" : "Vice Principal",
+    },
+    {
+      img: "/man3.png",
+      nama: "Andi Wijaya",
+      jabatan: lang === "id" ? "Kepala Program" : "Head of Program",
+    },
+  ];
+
+  const manajemenTambahan = [
+    {
+      img: "/man4.png",
+      nama: "Rahmat Hidayat",
+      jabatan: lang === "id" ? "Kepala TU" : "Head of Administration",
+    },
+    {
+      img: "/man5.png",
+      nama: "Dewi Lestari",
+      jabatan: lang === "id" ? "Koordinator Kesiswaan" : "Student Affairs Coordinator",
+    },
+    {
+      img: "/man6.png",
+      nama: "Agus Prabowo",
+      jabatan: lang === "id" ? "Koordinator Kurikulum" : "Curriculum Coordinator",
+    },
+  ];
+
+  return (
+    <section className="py-16 bg-gray-100">
+      <div className="container mx-auto px-4 text-center">
+        <h2 className="text-3xl sm:text-4xl font-bold text-[#243771] mb-12">
+          {lang === "id" ? "Manajemen" : "Management"}
+        </h2>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10 mb-10">
+          {manajemenAwal.map((person, i) => (
+            <div key={i} className="flex flex-col items-center space-y-4">
+              <div className="w-48 h-48 sm:w-56 sm:h-56 rounded-full overflow-hidden shadow-lg">
+                <img
+                  src={person.img}
+                  alt={person.nama}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold text-gray-800">{person.nama}</h3>
+                <p className="text-gray-600">{person.jabatan}</p>
+              </div>
+            </div>
+          ))}
+
+          {showMore &&
+            manajemenTambahan.map((person, i) => (
+              <div key={i} className="flex flex-col items-center space-y-4">
+                <div className="w-48 h-48 sm:w-56 sm:h-56 rounded-full overflow-hidden shadow-lg">
+                  <img
+                    src={person.img}
+                    alt={person.nama}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-800">{person.nama}</h3>
+                  <p className="text-gray-600">{person.jabatan}</p>
+                </div>
+              </div>
+            ))}
+        </div>
+
+        <button
+          onClick={() => setShowMore(!showMore)}
+          className="mt-6 px-6 py-3 rounded bg-[#FE4D01] text-white font-medium hover:bg-orange-700 transition"
+        >
+          {showMore
+            ? lang === "id"
+              ? "Sembunyikan"
+              : "Hide"
+            : lang === "id"
+            ? "Selengkapnya"
+            : "More"}
+        </button>
       </div>
     </section>
   );
