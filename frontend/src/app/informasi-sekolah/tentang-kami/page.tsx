@@ -93,6 +93,9 @@ export default function Tentang() {
       {/* Section Statistik */}
       <StatistikSection />
 
+      {/* Section Visi & Misi */}
+      <VisiMisiSection />
+
       {/* Footer */}
       <Footer />
     </div>
@@ -104,26 +107,10 @@ function StatistikSection() {
   const { lang } = useLang();
 
   const stats = [
-    {
-      img: "/alumni.png",
-      angka: 4000,
-      label: lang === "id" ? "Alumni" : "Alumni",
-    },
-    {
-      img: "/siswa.png",
-      angka: 2000,
-      label: lang === "id" ? "Siswa" : "Students",
-    },
-    {
-      img: "/pengajar.png",
-      angka: 3000,
-      label: lang === "id" ? "Pengajar" : "Teachers",
-    },
-    {
-      img: "/kelas.png",
-      angka: 1000,
-      label: lang === "id" ? "Kelas" : "Classes",
-    },
+    { img: "/alumni.png", angka: 4000, label: lang === "id" ? "Alumni" : "Alumni" },
+    { img: "/siswa.png", angka: 2000, label: lang === "id" ? "Siswa" : "Students" },
+    { img: "/pengajar.png", angka: 3000, label: lang === "id" ? "Pengajar" : "Teachers" },
+    { img: "/kelas.png", angka: 1000, label: lang === "id" ? "Kelas" : "Classes" },
   ];
 
   const [startCount, setStartCount] = useState(false);
@@ -148,10 +135,7 @@ function StatistikSection() {
     <section ref={sectionRef} className="w-full bg-[#243771] py-16">
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-10 text-center">
         {stats.map((item, i) => (
-          <div
-            key={i}
-            className="flex flex-col items-center text-white space-y-3"
-          >
+          <div key={i} className="flex flex-col items-center text-white space-y-3">
             <div className="w-14 h-14 flex items-center justify-center">
               <img
                 src={item.img}
@@ -178,7 +162,7 @@ function Counter({ target, start }: { target: number; start: boolean }) {
     if (!start) return;
 
     let current = 0;
-    const duration = 2000; // durasi animasi 2 detik
+    const duration = 2000;
     const stepTime = Math.max(Math.floor(duration / target), 20);
 
     const timer = setInterval(() => {
@@ -194,4 +178,65 @@ function Counter({ target, start }: { target: number; start: boolean }) {
   }, [start, target]);
 
   return <span>{count.toLocaleString()}</span>;
+}
+
+/* -------------------- Visi & Misi Section -------------------- */
+function VisiMisiSection() {
+  const { lang } = useLang();
+
+  return (
+    <section className="bg-gray-50 py-16">
+      <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+        {/* Teks Visi & Misi */}
+        <div className="space-y-10">
+          {/* Visi */}
+          <div>
+            <h2 className="text-2xl sm:text-3xl font-bold text-[#FE4D01] mb-4">
+              {lang === "id" ? "Visi" : "Vision"}
+            </h2>
+            <p className="text-gray-700 leading-relaxed text-base sm:text-lg">
+              {lang === "id"
+                ? "Mewujudkan lulusan yang “unggul” dan “terpercaya” dalam mengembangkan dan mempersiapkan tenaga terampil di bidang Teknologi Informasi dan Komunikasi yang beriman, bertaqwa, cerdas, percaya diri, berwawasan global, dan berkarakter Pancasialis."
+                : "To produce graduates who are 'superior' and 'trustworthy' in developing and preparing skilled workforce in the field of Information and Communication Technology who are faithful, pious, intelligent, confident, globally minded, and have Pancasila character."}
+            </p>
+          </div>
+
+          {/* Misi */}
+          <div>
+            <h2 className="text-2xl sm:text-3xl font-bold text-[#FE4D01] mb-4">
+              {lang === "id" ? "Misi" : "Mission"}
+            </h2>
+            <p className="text-gray-700 leading-relaxed text-base sm:text-lg mb-4">
+              {lang === "id"
+                ? "Menyelenggarakan proses belajar mengajar yang berkualitas ... sesuai dengan kompetensi yang dimiliki dalam bidang:"
+                : "Organize a quality teaching and learning process ... according to the competencies in the field of:"}
+            </p>
+            <ul className="list-disc list-inside text-gray-700 space-y-2 text-base sm:text-lg">
+              <li>{lang === "id" ? "Pengembangan Perangkat Lunak dan Gim (PPLG)" : "Software and Game Development (PPLG)"}</li>
+              <li>{lang === "id" ? "Teknik Jaringan Komputer dan Telekomunikasi (TJKT)" : "Computer Network and Telecommunication Engineering (TJKT)"}</li>
+              <li>{lang === "id" ? "Desain Komunikasi Visual (DKV)" : "Visual Communication Design (DKV)"}</li>
+              <li>{lang === "id" ? "Broadcasting dan Film (BCF)" : "Broadcasting and Film (BCF)"}</li>
+            </ul>
+            <p className="text-gray-700 leading-relaxed text-base sm:text-lg mt-4">
+              {lang === "id"
+                ? "Memberikan pelayanan pendidikan berbasis pembelajaran abad 21 ... relevan dengan karakter bangsa."
+                : "Provide 21st-century learning-based educational services ... relevant to national character."}
+            </p>
+            <button className="mt-6 px-6 py-3 rounded bg-[#FE4D01] text-white font-medium hover:bg-orange-700 transition">
+              {lang === "id" ? "Pelajari Lebih Lanjut" : "Learn More"}
+            </button>
+          </div>
+        </div>
+
+        {/* Gambar */}
+        <div className="flex justify-center">
+          <img
+            src="https://via.placeholder.com/600x400"
+            alt={lang === "id" ? "Visi Misi SMK Prestasi Prima" : "Vision & Mission of SMK Prestasi Prima"}
+            className="rounded-lg shadow-md w-full object-cover"
+          />
+        </div>
+      </div>
+    </section>
+  );
 }
