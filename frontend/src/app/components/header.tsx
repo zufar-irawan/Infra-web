@@ -63,7 +63,7 @@ export default function Header() {
                     setLang("id");
                     setOpenDropdown(null);
                   }}
-                  className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-100 transition"
+                  className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-200 transition"
                 >
                   <Image
                     src="https://flagcdn.com/id.svg"
@@ -78,7 +78,7 @@ export default function Header() {
                     setLang("en");
                     setOpenDropdown(null);
                   }}
-                  className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-100 transition"
+                  className="flex items-center gap-2 w-full text-left px-4 py-2 hover:bg-gray-200 transition"
                 >
                   <Image
                     src="https://flagcdn.com/gb.svg"
@@ -116,49 +116,82 @@ export default function Header() {
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center gap-6">
             <nav className="flex items-center gap-6 text-white relative">
+              <a    
+                href="#"
+                className="hover:text-yellow-400 transition cursor-pointer"
+              >
+                {lang === "id" ? "Beranda" : "Home"}
+              </a>
+
               {/* Informasi Dropdown */}
               <div className="relative dropdown">
                 <button
                   onClick={() => toggleDropdown("informasi")}
-                  className="hover:underline"
+                  className="flex items-center gap-1 hover:text-yellow-400 transition cursor-pointer"
                 >
                   {lang === "id" ? "Informasi Sekolah" : "School Information"}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-4 h-4"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="m19.5 8.25-7.5 7.5-7.5-7.5"
+                    />
+                  </svg>
                 </button>
                 {openDropdown === "informasi" && (
-                  <div className="absolute left-0 mt-2 bg-white shadow-lg rounded text-orange-600 w-48">
+                  <div className="absolute left-0 mt-3 text-sm bg-white/90 shadow-lg rounded text-orange-600 w-36">
                     <a
                       href="/informasi-sekolah/tentang-kami"
-                      className="block px-4 py-2 hover:bg-gray-100 transition"
+                      className="block px-4 py-2 hover:bg-gray-200 rounded-t transition"
                     >
                       Tentang Kami
                     </a>
                     <a
-                      href="#visi"
-                      className="block px-4 py-2 hover:bg-gray-100 transition"
+                      href="#visi-misi"
+                      className="block px-4 py-2 hover:bg-gray-200 transition"
                     >
                       Visi & Misi
                     </a>
                     <a
+                      href="#prestasi"
+                      className="block px-4 py-2 hover:bg-gray-200 transition"
+                    >
+                      Prestasi
+                    </a>
+                    <a
                       href="#manajemen"
-                      className="block px-4 py-2 hover:bg-gray-100 transition"
+                      className="block px-4 py-2 hover:bg-gray-200 transition"
                     >
                       Manajemen
                     </a>
                     <a
                       href="#fasilitas"
-                      className="block px-4 py-2 hover:bg-gray-100 transition"
+                      className="block px-4 py-2 hover:bg-gray-200 transition"
                     >
                       Fasilitas
                     </a>
                     <a
+                      href="#mitra"
+                      className="block px-4 py-2 hover:bg-gray-200 transition"
+                    >
+                      Mitra
+                    </a>
+                    <a
                       href="#testimoni"
-                      className="block px-4 py-2 hover:bg-gray-100 transition"
+                      className="block px-4 py-2 hover:bg-gray-200 transition"
                     >
                       Testimoni
                     </a>
                     <a
                       href="#faq"
-                      className="block px-4 py-2 hover:bg-gray-100 transition"
+                      className="block px-4 py-2 hover:bg-gray-200 rounded-b transition"
                     >
                       FAQ
                     </a>
@@ -170,7 +203,7 @@ export default function Header() {
               <div className="relative dropdown">
                 <button
                   onClick={() => toggleDropdown("kegiatan-siswa")}
-                  className="flex items-center gap-1 hover:text-yellow-400 transition"
+                  className="flex items-center gap-1 hover:text-yellow-400 transition cursor-pointer"
                 >
                   {lang === "id" ? "Kegiatan Siswa" : "Students Activity"}
                   <svg
@@ -189,21 +222,21 @@ export default function Header() {
                   </svg>
                 </button>
                 {openDropdown === "kegiatan-siswa" && (
-                  <div className="absolute left-0 mt-3 text-sm bg-white shadow-lg rounded text-orange-600 w-36">
+                  <div className="absolute left-0 mt-3 text-sm bg-white/90 shadow-lg rounded text-orange-600 w-36">
                     <a
-                      className="block px-4 py-2 hover:bg-gray-100 transition"
+                      className="block px-4 py-2 hover:bg-gray-200 rounded-t transition"
                       href="#ekstrakurikuler"
                     >
                       Ekstrakurikuler
                     </a>
                     <a
-                      className="block px-4 py-2 hover:bg-gray-100 transition"
+                      className="block px-4 py-2 hover:bg-gray-200 transition"
                       href="#acara"
                     >
                       Acara
                     </a>
                     <a
-                      className="block px-4 py-2 hover:bg-gray-100 transition"
+                      className="block px-4 py-2 hover:bg-gray-200 rounded-b transition"
                       href="#study-tour"
                     >
                       Study Tour
