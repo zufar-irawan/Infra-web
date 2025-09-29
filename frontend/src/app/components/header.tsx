@@ -30,11 +30,11 @@ const toggleDropdown = (menu: string) =>
 
 	return (
 		<header className="fixed top-0 w-full z-50 select-none">
-			<div className="bg-[#243771] text-white text-sm px-4 py-2">
+			{/* <div className="bg-[#243771] text-white text-sm px-4 py-2">
 				<div className="container mx-auto flex items-center justify-end">
-					{/* <button className="hover:underline">
+					{<button className="hover:underline">
 						{lang === "id" ? "Berita" : "News"}
-					</button> */}
+					</button>}
 
 					<div className="relative dropdown">
 						<button onClick={() => toggleDropdown("lang")} className="flex items-center gap-2 hover:underline">
@@ -55,21 +55,16 @@ const toggleDropdown = (menu: string) =>
 						)}
 					</div>
 				</div>
-			</div>
+			</div> */}
 
-			<div className={`transition duration-300 px-4 py-2 
-				${
-					/* isScrolled ? "bg-white/10 backdrop-blur shadow" : "bg-orange-600" */
-					isScrolled ? "bg-gradient-to-r from-orange-600 to-orange-700 shadow-lg" : "bg-gradient-to-r from-transparent to-transparent shadow-none"
-				}
-			`}>
+			<div className={`transition duration-300 p-4 ${isScrolled ? "bg-gray-800 shadow-lg" : "bg-transparent shadow-none"}`}>
 				<div className="container mx-auto flex items-center justify-between">
 					
 					<a href="/" className="flex items-center gap-2">
 						<Image src="/smk.png" alt="Logo" width={50} height={50} className="rounded-full" />
 						<span className="text-white font-bold tracking-wide text-2xl">SMK Prestasi Prima</span>
 					</a>
-
+	
 					<div className="flex items-center gap-6">
 						<nav className="flex items-center gap-6 text-white relative">
 							<div className="relative dropdown">
