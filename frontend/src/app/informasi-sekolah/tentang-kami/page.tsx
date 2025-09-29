@@ -231,7 +231,7 @@ function VisiMisiSection() {
         {/* Gambar */}
         <div className="flex justify-center">
           <img
-            src="https://via.placeholder.com/600x400"
+            src="/pp1.png"
             alt={lang === "id" ? "Visi Misi SMK Prestasi Prima" : "Vision & Mission of SMK Prestasi Prima"}
             className="rounded-lg shadow-md w-full object-cover"
           />
