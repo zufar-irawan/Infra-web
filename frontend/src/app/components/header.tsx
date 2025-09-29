@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useLang } from "./LangContext";
 import Image from "next/image";
+import About from "../informasi-sekolah/tentang-kami/page";
 
 export default function Header() {
 const { lang, setLang } = useLang();
@@ -30,7 +31,7 @@ const toggleDropdown = (menu: string) =>
 
 	return (
 		<header className="fixed top-0 w-full z-50 select-none">
-			{/* <div className="bg-[#243771] text-white text-sm px-4 py-2">
+			<div className="bg-[#243771] text-white text-sm px-4 py-2">
 				<div className="container mx-auto flex items-center justify-end">
 					{<button className="hover:underline">
 						{lang === "id" ? "Berita" : "News"}
@@ -55,7 +56,7 @@ const toggleDropdown = (menu: string) =>
 						)}
 					</div>
 				</div>
-			</div> */}
+			</div>
 
 			<div className={`transition duration-300 p-4 ${isScrolled ? "bg-gray-800 shadow-lg" : "bg-transparent shadow-none"}`}>
 				<div className="container mx-auto flex items-center justify-between">
@@ -73,7 +74,7 @@ const toggleDropdown = (menu: string) =>
 								</button>
 								{openDropdown === "informasi" && (
 									<div className="absolute left-0 mt-2 bg-white shadow-lg rounded text-orange-600 w-48">
-										<a href="#about-us" className="block px-4 py-2 hover:bg-gray-100 transition">
+										<a href="/informasi-sekolah/tentang-kami" className="block px-4 py-2 hover:bg-gray-100 transition">
 											Tentang Kami
 										</a>
 										<a href="#visi" className="block px-4 py-2 hover:bg-gray-100 transition">
