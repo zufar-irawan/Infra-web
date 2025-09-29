@@ -72,7 +72,7 @@ export default function Header() {
                   onClick={() => toggleDropdown("informasi")}
                   className="flex items-center gap-1 hover:text-yellow-400 transition cursor-pointer"
                 >
-                  {lang === "id" ? "Informasi Sekolah" : "School Information"}
+                  {lang === "id" ? "Profil Sekolah" : "School Profile"}
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
