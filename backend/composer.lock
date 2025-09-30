@@ -4,15 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-<<<<<<< HEAD
     "content-hash": "3edf47f2940f72ca2b2fa46189569d0f",
-=======
-<<<<<<< HEAD
-    "content-hash": "499ff201ed8537cc67e26201ae6954a0",
-=======
-    "content-hash": "3edf47f2940f72ca2b2fa46189569d0f",
->>>>>>> 6488c37 (First commit)
->>>>>>> dev
     "packages": [
         {
             "name": "brick/math",
@@ -1063,21 +1055,6 @@
         },
         {
             "name": "laravel/framework",
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-            "version": "v12.28.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/laravel/framework.git",
-                "reference": "868c1f2d3dba4df6d21e3a8d818479f094cfd942"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/868c1f2d3dba4df6d21e3a8d818479f094cfd942",
-                "reference": "868c1f2d3dba4df6d21e3a8d818479f094cfd942",
-=======
->>>>>>> dev
             "version": "v12.29.0",
             "source": {
                 "type": "git",
@@ -1088,10 +1065,6 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/laravel/framework/zipball/a9e4c73086f5ba38383e9c1d74b84fe46aac730b",
                 "reference": "a9e4c73086f5ba38383e9c1d74b84fe46aac730b",
-<<<<<<< HEAD
-=======
->>>>>>> 6488c37 (First commit)
->>>>>>> dev
                 "shasum": ""
             },
             "require": {
@@ -1119,14 +1092,7 @@
                 "monolog/monolog": "^3.0",
                 "nesbot/carbon": "^3.8.4",
                 "nunomaduro/termwind": "^2.0",
-<<<<<<< HEAD
                 "phiki/phiki": "v2.0.0",
-=======
-<<<<<<< HEAD
-=======
-                "phiki/phiki": "v2.0.0",
->>>>>>> 6488c37 (First commit)
->>>>>>> dev
                 "php": "^8.2",
                 "psr/container": "^1.1.1|^2.0.1",
                 "psr/log": "^1.0|^2.0|^3.0",
@@ -1236,15 +1202,7 @@
                 "ext-pdo": "Required to use all database features.",
                 "ext-posix": "Required to use all features of the queue worker.",
                 "ext-redis": "Required to use the Redis cache and queue drivers (^4.0|^5.0|^6.0).",
-<<<<<<< HEAD
                 "fakerphp/faker": "Required to generate fake data using the fake() helper (^1.23).",
-=======
-<<<<<<< HEAD
-                "fakerphp/faker": "Required to use the eloquent factory builder (^1.9.1).",
-=======
-                "fakerphp/faker": "Required to generate fake data using the fake() helper (^1.23).",
->>>>>>> 6488c37 (First commit)
->>>>>>> dev
                 "filp/whoops": "Required for friendly error pages in development (^2.14.3).",
                 "laravel/tinker": "Required to use the tinker console command (^2.0).",
                 "league/flysystem-aws-s3-v3": "Required to use the Flysystem S3 driver (^3.25.1).",
@@ -1313,15 +1271,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-<<<<<<< HEAD
             "time": "2025-09-16T14:15:03+00:00"
-=======
-<<<<<<< HEAD
-            "time": "2025-09-04T14:58:12+00:00"
-=======
-            "time": "2025-09-16T14:15:03+00:00"
->>>>>>> 6488c37 (First commit)
->>>>>>> dev
         },
         {
             "name": "laravel/prompts",
@@ -1383,11 +1333,6 @@
             "time": "2025-07-07T14:17:42+00:00"
         },
         {
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
->>>>>>> dev
             "name": "laravel/sanctum",
             "version": "v4.2.0",
             "source": {
@@ -1452,10 +1397,6 @@
             "time": "2025-07-09T19:45:24+00:00"
         },
         {
-<<<<<<< HEAD
-=======
->>>>>>> 6488c37 (First commit)
->>>>>>> dev
             "name": "laravel/serializable-closure",
             "version": "v2.0.4",
             "source": {
@@ -2638,11 +2579,6 @@
             "time": "2025-05-08T08:14:37+00:00"
         },
         {
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
->>>>>>> dev
             "name": "phiki/phiki",
             "version": "v2.0.0",
             "source": {
@@ -2714,10 +2650,6 @@
             "time": "2025-08-28T18:20:27+00:00"
         },
         {
-<<<<<<< HEAD
-=======
->>>>>>> 6488c37 (First commit)
->>>>>>> dev
             "name": "phpoption/phpoption",
             "version": "1.9.4",
             "source": {
@@ -6760,21 +6692,6 @@
         },
         {
             "name": "laravel/pint",
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-            "version": "v1.24.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/laravel/pint.git",
-                "reference": "0345f3b05f136801af8c339f9d16ef29e6b4df8a"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/laravel/pint/zipball/0345f3b05f136801af8c339f9d16ef29e6b4df8a",
-                "reference": "0345f3b05f136801af8c339f9d16ef29e6b4df8a",
-=======
->>>>>>> dev
             "version": "v1.25.0",
             "source": {
                 "type": "git",
@@ -6785,10 +6702,6 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/laravel/pint/zipball/595de38458c6b0ab4cae4bcc769c2e5c5d5b8e96",
                 "reference": "595de38458c6b0ab4cae4bcc769c2e5c5d5b8e96",
-<<<<<<< HEAD
-=======
->>>>>>> 6488c37 (First commit)
->>>>>>> dev
                 "shasum": ""
             },
             "require": {
@@ -6799,21 +6712,9 @@
                 "php": "^8.2.0"
             },
             "require-dev": {
-<<<<<<< HEAD
                 "friendsofphp/php-cs-fixer": "^3.87.2",
                 "illuminate/view": "^11.46.0",
                 "larastan/larastan": "^3.7.1",
-=======
-<<<<<<< HEAD
-                "friendsofphp/php-cs-fixer": "^3.82.2",
-                "illuminate/view": "^11.45.1",
-                "larastan/larastan": "^3.5.0",
-=======
-                "friendsofphp/php-cs-fixer": "^3.87.2",
-                "illuminate/view": "^11.46.0",
-                "larastan/larastan": "^3.7.1",
->>>>>>> 6488c37 (First commit)
->>>>>>> dev
                 "laravel-zero/framework": "^11.45.0",
                 "mockery/mockery": "^1.6.12",
                 "nunomaduro/termwind": "^2.3.1",
@@ -6824,15 +6725,6 @@
             ],
             "type": "project",
             "autoload": {
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-                "files": [
-                    "overrides/Runner/Parallel/ProcessFactory.php"
-                ],
-=======
->>>>>>> 6488c37 (First commit)
->>>>>>> dev
                 "psr-4": {
                     "App\\": "app/",
                     "Database\\Seeders\\": "database/seeders/",
@@ -6862,15 +6754,7 @@
                 "issues": "https://github.com/laravel/pint/issues",
                 "source": "https://github.com/laravel/pint"
             },
-<<<<<<< HEAD
             "time": "2025-09-17T01:36:44+00:00"
-=======
-<<<<<<< HEAD
-            "time": "2025-07-10T18:09:32+00:00"
-=======
-            "time": "2025-09-17T01:36:44+00:00"
->>>>>>> 6488c37 (First commit)
->>>>>>> dev
         },
         {
             "name": "laravel/sail",
