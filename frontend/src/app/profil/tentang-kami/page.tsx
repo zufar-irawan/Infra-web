@@ -375,7 +375,7 @@ function FasilitasSection() {
         </div>
 
         {/* Tombol Selengkapnya / More */}
-        <Link href="/profil/visi-misi">
+        <Link href="/profil/fasilitas">
           <button className="mt-8 px-6 py-3 rounded bg-[#FE4D01] text-white font-medium hover:bg-orange-700 transition">
             {lang === "id" ? "Selengkapnya" : "More"}
           </button>

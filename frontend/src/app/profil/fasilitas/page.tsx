@@ -52,20 +52,20 @@ function FasilitasSection() {
   const touchStartX = useRef<number | null>(null);
 
   const fasilitas = [
-    { id: "kelas", title_id: "Kelas", title_en: "Classroom", img: "/dummy.jpg" },
-    { id: "perpus", title_id: "Perpus", title_en: "Library", img: "/dummy.jpg" },
-    { id: "aula", title_id: "Aula Mora", title_en: "Mora Hall", img: "/dummy.jpg" },
-    { id: "lapangan", title_id: "Lapangan", title_en: "Field", img: "/dummy.jpg" },
-    { id: "lab-rpl", title_id: "Lab RPL", title_en: "Software Lab", img: "/dummy.jpg" },
-    { id: "lab-tjkt", title_id: "Lab TJKT", title_en: "Network Lab", img: "/dummy.jpg" },
-    { id: "lab-dkv", title_id: "Lab DKV", title_en: "Design Lab", img: "/dummy.jpg" },
-    { id: "lab-bc", title_id: "Lab BC", title_en: "Broadcasting Lab", img: "/dummy.jpg" },
-    { id: "toilet", title_id: "Toilet", title_en: "Restroom", img: "/dummy.jpg" },
-    { id: "kantin", title_id: "Kantin", title_en: "Canteen", img: "/dummy.jpg" },
-    { id: "studio-bc", title_id: "Studio BC", title_en: "Broadcasting Studio", img: "/dummy.jpg" },
-    { id: "musholla", title_id: "Musholla", title_en: "Prayer Room", img: "/dummy.jpg" },
-    { id: "iceboard", title_id: "Iceboard", title_en: "Iceboard", img: "/dummy.jpg" },
-    { id: "cctv", title_id: "CCTV", title_en: "CCTV", img: "/dummy.jpg" },
+    { title_id: "Kelas", title_en: "Classroom", img: "/dummy.jpg" },
+    { title_id: "Perpus", title_en: "Library", img: "/dummy.jpg" },
+    { title_id: "Aula Mora", title_en: "Mora Hall", img: "/dummy.jpg" },
+    { title_id: "Lapangan", title_en: "Field", img: "/dummy.jpg" },
+    { title_id: "Lab RPL", title_en: "Software Lab", img: "/dummy.jpg" },
+    { title_id: "Lab TJKT", title_en: "Network Lab", img: "/dummy.jpg" },
+    { title_id: "Lab DKV", title_en: "Design Lab", img: "/dummy.jpg" },
+    { title_id: "Lab BC", title_en: "Broadcasting Lab", img: "/dummy.jpg" },
+    { title_id: "Toilet", title_en: "Restroom", img: "/dummy.jpg" },
+    { title_id: "Kantin", title_en: "Canteen", img: "/dummy.jpg" },
+    { title_id: "Studio BC", title_en: "Broadcasting Studio", img: "/dummy.jpg" },
+    { title_id: "Musholla", title_en: "Prayer Room", img: "/dummy.jpg" },
+    { title_id: "Iceboard", title_en: "Iceboard", img: "/dummy.jpg" },
+    { title_id: "CCTV", title_en: "CCTV", img: "/dummy.jpg" },
   ];
 
   // Responsif
@@ -84,9 +84,7 @@ function FasilitasSection() {
     setCurrentIndex((prev) => (prev + 1) % fasilitas.length);
 
   const prevSlide = () =>
-    setCurrentIndex((prev) =>
-      prev === 0 ? fasilitas.length - 1 : prev - 1
-    );
+    setCurrentIndex((prev) => (prev === 0 ? fasilitas.length - 1 : prev - 1));
 
   // Swipe gesture
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -120,10 +118,10 @@ function FasilitasSection() {
               transform: `translateX(-${currentIndex * cardWidth}%)`,
             }}
           >
-            {fasilitas.map((item) => (
+            {fasilitas.map((item, i) => (
               <Link
-                key={item.id}
-                href={`/fasilitas/${item.id}`}
+                key={i}
+                href={"#"} // 🔹 Dummy link
                 className="px-2 group bg-white border rounded-xl shadow hover:shadow-xl transition transform hover:-translate-y-1"
                 style={{ flex: `0 0 ${cardWidth}%` }}
               >

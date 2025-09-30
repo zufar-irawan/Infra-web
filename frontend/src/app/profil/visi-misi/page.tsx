@@ -177,7 +177,7 @@ function FAQSection() {
     };
 
     document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("touchstart", handleClickOutside); /
+    document.addEventListener("touchstart", handleClickOutside); 
     document.addEventListener("keydown", handleEsc);
 
     return () => {
