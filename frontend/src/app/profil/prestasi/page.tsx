@@ -4,7 +4,7 @@ import Link from "next/link";
 import Navbar from "@/app/components/header";
 import Footer from "@/app/components/footer";
 import { useLang } from "../../components/LangContext";
-import { useEffect, useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 
 /* -------------------- Halaman Tentang -------------------- */
 export default function Tentang() {
@@ -34,17 +34,11 @@ export default function Tentang() {
             </Link>
             <span className="text-[#243771]">{">"}</span>
             <span className="text-[#243771]">
-              {lang === "id" ? "Visi Misi" : "Vision & Mission"}
+              {lang === "id" ? "Prestasi" : "Achievements"}
             </span>
           </nav>
         </div>
       </section>
-
-      {/* Visi & Misi Section */}
-      <VisiMisiSection />
-
-      {/* Sejarah Section */}
-      <SejarahSection />
 
       {/* FAQ Section */}
       <FAQSection />
@@ -55,94 +49,11 @@ export default function Tentang() {
   );
 }
 
-/* -------------------- Visi & Misi Section -------------------- */
-function VisiMisiSection() {
-  const { lang } = useLang();
-
-  return (
-    <section className="bg-white py-16">
-      <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-        {/* Gambar di kiri */}
-        <div className="flex justify-center md:order-1 order-1">
-          <img
-            src="/pp1.png"
-            alt={lang === "id" ? "Visi Misi" : "Vision & Mission"}
-            className="rounded-lg w-full object-cover"
-          />
-        </div>
-
-        {/* Teks di kanan */}
-        <div className="space-y-10 md:order-2 order-2">
-          <div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-[#FE4D01] mb-4">
-              {lang === "id" ? "Visi" : "Vision"}
-            </h2>
-            <p className="text-gray-700 leading-relaxed text-base sm:text-lg">
-              {lang === "id"
-                ? "Mewujudkan lulusan yang “unggul” dan “terpercaya”..."
-                : "To produce graduates who are 'superior' and 'trustworthy'..."}
-            </p>
-          </div>
-
-          <div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-[#FE4D01] mb-4">
-              {lang === "id" ? "Misi" : "Mission"}
-            </h2>
-            <p className="text-gray-700 leading-relaxed text-base sm:text-lg mb-4">
-              {lang === "id"
-                ? "Menyelenggarakan proses belajar mengajar yang berkualitas ..."
-                : "Organize a quality teaching and learning process ..."}
-            </p>
-            <ul className="list-disc list-inside text-gray-700 space-y-2 text-base sm:text-lg">
-              <li>{lang === "id" ? "Pengembangan Perangkat Lunak dan Gim (PPLG)" : "Software and Game Development (PPLG)"}</li>
-              <li>{lang === "id" ? "Teknik Jaringan Komputer dan Telekomunikasi (TJKT)" : "Computer Network and Telecommunication Engineering (TJKT)"}</li>
-              <li>{lang === "id" ? "Desain Komunikasi Visual (DKV)" : "Visual Communication Design (DKV)"}</li>
-              <li>{lang === "id" ? "Broadcasting dan Film (BCF)" : "Broadcasting and Film (BCF)"}</li>
-            </ul>
-            <p className="text-gray-700 leading-relaxed text-base sm:text-lg mt-4">
-              {lang === "id"
-                ? "Memberikan pelayanan pendidikan berbasis pembelajaran abad 21 ..."
-                : "Provide 21st-century learning-based educational services ..."}
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* -------------------- Sejarah Section -------------------- */
-function SejarahSection() {
-  const { lang } = useLang();
-  return (
-    <section className="py-16 bg-white">
-      <div className="container mx-auto px-4">
-        <h2 className="text-3xl sm:text-4xl font-bold text-[#243771] mb-6">
-          {lang === "id" ? "Sejarah" : "History"}
-        </h2>
-        <p className="text-gray-700 leading-relaxed mb-8">
-          {lang === "id"
-            ? `Sebagai dikenal, SMK Prestasi Prima adalah salah satu sekolah IT terbaik se-Jakarta Timur...
-               Jika ada yang lebih baik, baik saja tidak cukup.`
-            : `Known as one of the best IT vocational schools in East Jakarta, Prestasi Prima prepares its students...
-               If there is something better, being just good is not enough.`}
-        </p>
-        <img
-          src="/pp2.png"
-          alt="Sejarah Sekolah"
-          className="rounded-lg shadow-lg w-full"
-        />
-      </div>
-    </section>
-  );
-}
-
-/* -------------------- FAQ Section (FIX) -------------------- */
+/* -------------------- FAQ Section -------------------- */
 function FAQSection() {
   const { lang } = useLang();
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const contentRefs = useRef<Array<HTMLDivElement | null>>([]);
 
   const faq = [
     {
@@ -165,7 +76,7 @@ function FAQSection() {
     },
   ];
 
-  
+  // close jika klik luar atau tekan Escape
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent | TouchEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
@@ -177,7 +88,7 @@ function FAQSection() {
     };
 
     document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("touchstart", handleClickOutside); /
+    document.addEventListener("touchstart", handleClickOutside);
     document.addEventListener("keydown", handleEsc);
 
     return () => {
@@ -186,30 +97,6 @@ function FAQSection() {
       document.removeEventListener("keydown", handleEsc);
     };
   }, []);
-
-
-  useEffect(() => {
-    contentRefs.current.forEach((el, idx) => {
-      if (!el) return;
-      if (openIndex === idx) {
-        el.style.maxHeight = `${el.scrollHeight}px`;
-      } else {
-        el.style.maxHeight = "0px";
-      }
-      el.style.transition = "max-height 400ms ease";
-    });
-  }, [openIndex, lang]);
-
-
-  useEffect(() => {
-    const onResize = () => {
-      if (openIndex === null) return;
-      const el = contentRefs.current[openIndex];
-      if (el) el.style.maxHeight = `${el.scrollHeight}px`;
-    };
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, [openIndex]);
 
   return (
     <section className="py-16 bg-white">
@@ -236,7 +123,9 @@ function FAQSection() {
                   className="w-full flex justify-between items-center p-4 font-medium text-[#243771] focus:outline-none"
                   onClick={() => setOpenIndex(isOpen ? null : i)}
                 >
-                  <span className="text-left">{lang === "id" ? item.q_id : item.q_en}</span>
+                  <span className="text-left">
+                    {lang === "id" ? item.q_id : item.q_en}
+                  </span>
                   <span className="text-lg ml-4">{isOpen ? "−" : "+"}</span>
                 </button>
 
@@ -244,9 +133,9 @@ function FAQSection() {
                   id={`faq-content-${i}`}
                   role="region"
                   aria-labelledby={`faq-btn-${i}`}
-                  ref={(el) => (contentRefs.current[i] = el)}
-                  className="overflow-hidden"
-                  style={{ maxHeight: "0px", transition: "max-height 400ms ease" }}
+                  className={`overflow-hidden transition-[max-height] duration-500 ease-in-out ${
+                    isOpen ? "max-h-40" : "max-h-0"
+                  }`}
                 >
                   <div className="p-4 pt-0">
                     <p className="text-gray-600">

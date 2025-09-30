@@ -4,17 +4,141 @@ import Link from "next/link";
 import Navbar from "@/app/components/header";
 import Footer from "@/app/components/footer";
 import { useLang } from "../../components/LangContext";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import Image from "next/image";
+
+interface Person {
+  img: string;
+  name_id: string;
+  name_en: string;
+  jabatan_id?: string;
+  jabatan_en?: string;
+}
 
 export default function Tentang() {
   const { lang } = useLang();
+  const [isVisible, setIsVisible] = useState(false);
+  const [selected, setSelected] = useState<number | null>(null);
+
+  useEffect(() => {
+    setIsVisible(true);
+  }, []);
+
+  const manajemen: Person[] = [
+    {
+      img: "/manajemen1.jpg",
+      name_id: "Budi Santoso",
+      name_en: "Budi Santoso",
+      jabatan_id: "Direktur Penjamin Mutu",
+      jabatan_en: "Director of Quality Assurance",
+    },
+    {
+      img: "/manajemen2.jpg",
+      name_id: "Siti Aminah",
+      name_en: "Siti Aminah",
+      jabatan_id: "Ketua Yayasan",
+      jabatan_en: "Foundation Chairman",
+    },
+    {
+      img: "/manajemen3.jpg",
+      name_id: "Andi Pratama",
+      name_en: "Andi Pratama",
+      jabatan_id: "Kepala SMK",
+      jabatan_en: "Principal",
+    },
+  ];
+
+  const pengajar: Person[] = [
+    {
+      img: "/guru.jpg",
+      name_id: "Guru 1",
+      name_en: "Teacher 1",
+      jabatan_id: "Pengajar",
+      jabatan_en: "Teacher",
+    },
+    {
+      img: "/guru.jpg",
+      name_id: "Guru 2",
+      name_en: "Teacher 2",
+      jabatan_id: "Pengajar",
+      jabatan_en: "Teacher",
+    },
+    {
+      img: "/guru.jpg",
+      name_id: "Guru 3",
+      name_en: "Teacher 3",
+      jabatan_id: "Pengajar",
+      jabatan_en: "Teacher",
+    },
+  ];
+
+  const renderCard = (
+    person: Person,
+    idx: number,
+    section: "manajemen" | "pengajar"
+  ) => {
+    const isSelected = selected === idx + (section === "pengajar" ? 100 : 0);
+
+    return (
+      <div
+        key={idx}
+        onClick={() =>
+          setSelected(isSelected ? null : idx + (section === "pengajar" ? 100 : 0))
+        }
+        className={`relative cursor-pointer rounded-xl overflow-hidden shadow-lg bg-white transform transition duration-500 hover:scale-105 hover:shadow-2xl
+          ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}
+        `}
+        style={{
+          width: section === "manajemen" ? "18rem" : "11rem",
+          transitionDelay: `${idx * 120}ms`,
+        }}
+      >
+        <Image
+          src={person.img}
+          alt={lang === "id" ? person.name_id : person.name_en}
+          width={section === "manajemen" ? 288 : 176}
+          height={section === "manajemen" ? 320 : 192}
+          className={`object-cover w-full ${
+            section === "manajemen" ? "h-80" : "h-48"
+          } transition-all duration-300 ${
+            isSelected ? "brightness-50" : "brightness-100"
+          }`}
+        />
+
+        {/* Default footer */}
+        {!isSelected && (
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#243771]/95 via-[#243771]/70 to-transparent p-3">
+            <p
+              className={`text-white text-center ${
+                section === "manajemen" ? "text-base" : "text-xs sm:text-sm"
+              } font-medium`}
+            >
+              {lang === "id" ? person.name_id : person.name_en}
+            </p>
+          </div>
+        )}
+
+        {/* Overlay saat dipilih */}
+        {isSelected && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 px-2 text-center">
+            <p className="text-white font-semibold text-lg">
+              {lang === "id" ? person.name_id : person.name_en}
+            </p>
+            {person.jabatan_id && (
+              <p className="text-white text-sm mt-1">
+                {lang === "id" ? person.jabatan_id : person.jabatan_en}
+              </p>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
       {/* Navbar */}
       <Navbar />
-
-      {/* Spacer biar ga ketiban header */}
       <div className="h-[100px] bg-white" />
 
       {/* Breadcrumbs */}
@@ -33,74 +157,32 @@ export default function Tentang() {
             </Link>
             <span className="text-[#243771]">{">"}</span>
             <span className="text-[#243771]">
-              {lang === "id" ? "Tentang Kami" : "About Us"}
+              {lang === "id" ? "Manajemen" : "Management"}
             </span>
           </nav>
         </div>
       </section>
 
-      {/* Konten utama */}
-      <main className="flex-1 w-full bg-white py-16">
-        <div className="container mx-auto px-4 space-y-16">
-          {/* Judul + pembuka */}
-          <div className="text-center max-w-3xl mx-auto space-y-6">
-            <h1 className="text-4xl font-semibold text-[#243771]">
-              {lang === "id" ? "Tentang Kami" : "About Us"}
-            </h1>
-            <p className="text-gray-700 leading-relaxed text-lg">
-              {lang === "id"
-                ? "SMK Prestasi Prima adalah sekolah yang berkomitmen pada pendidikan berkualitas dan pengembangan keterampilan siswa. Kami berfokus pada membangun generasi yang siap menghadapi tantangan masa depan."
-                : "SMK Prestasi Prima is a school committed to quality education and student skill development. We focus on building a generation ready to face the challenges of the future."}
-            </p>
-          </div>
-
-          {/* Section Profil */}
-          <section className="max-w-6xl mx-auto px-4">
-            <h2 className="text-3xl sm:text-4xl font-semibold text-[#243771] text-center mb-12">
-              {lang === "id"
-                ? "Profil SMK Prestasi Prima"
-                : "Profile of SMK Prestasi Prima"}
-            </h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-              {/* Gambar */}
-              <div>
-                <img
-                  src="/pp.png"
-                  alt="SMK Prestasi Prima"
-                  className="rounded-lg w-full h-auto object-cover aspect-[4/3]"
-                />
-              </div>
-
-              {/* Teks */}
-              <div>
-                <h3 className="text-xl sm:text-2xl font-semibold text-[#243771] mb-4">
-                  {lang === "id"
-                    ? "Selamat datang di SMK Prestasi Prima!"
-                    : "Welcome to SMK Prestasi Prima!"}
-                </h3>
-                <p className="text-gray-700 leading-relaxed text-justify text-base sm:text-lg">
-                  {lang === "id"
-                    ? "Di sekolah Prestasi Prima yang unggul dan terpercaya siswa & siswi disiapkan untuk menjadi tenaga yang terampil dan mandiri. Tidak hanya itu ketakwaan dan kecerdasan pun harus dimiliki, dan percaya diri selalu terjaga dengan berkarakter Pancasila. Jika ada yang lebih baik, baik saja tidak cukup."
-                    : "At the superior and trusted Prestasi Prima school, students are prepared to become skilled and independent workforce. Not only that, piety and intelligence must be possessed, and self-confidence is always maintained with Pancasila character. If there is something better, good is not enough."}
-                </p>
-              </div>
-            </div>
-          </section>
+      {/* Manajemen */}
+      <section className="px-4 sm:px-6 py-12 bg-white">
+        <h2 className="text-center text-2xl font-bold text-[#243771] mb-10">
+          {lang === "id" ? "Manajemen" : "Management"}
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 justify-items-center mb-16">
+          {manajemen.map((person, idx) => renderCard(person, idx, "manajemen"))}
         </div>
-      </main>
 
-      {/* Section Statistik */}
-      <StatistikSection />
+        {/* Pengajar */}
+        <h2 className="text-center text-2xl font-bold text-[#243771] mb-10">
+          {lang === "id" ? "Pengajar" : "Teachers"}
+        </h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 justify-items-center">
+          {pengajar.map((person, idx) => renderCard(person, idx, "pengajar"))}
+        </div>
+      </section>
 
-      {/* Section Visi & Misi */}
-      <VisiMisiSection />
-
-      {/* Section Manajemen */}
-      <ManajemenSection />
-
-      {/* Section Fasilitas */}
-      <FasilitasSection />
+      {/* FAQ Section */}
+      <FAQSection />
 
       {/* Footer */}
       <Footer />
@@ -108,278 +190,133 @@ export default function Tentang() {
   );
 }
 
-/* -------------------- Statistik Section -------------------- */
-function StatistikSection() {
+/* -------------------- FAQ Section -------------------- */
+function FAQSection() {
   const { lang } = useLang();
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const contentRefs = useRef<Array<HTMLDivElement | null>>([]);
 
-  const stats = [
-    { img: "/alumni.png", angka: 4000, label: lang === "id" ? "Alumni" : "Alumni" },
-    { img: "/siswa.png", angka: 2000, label: lang === "id" ? "Siswa" : "Students" },
-    { img: "/pengajar.png", angka: 3000, label: lang === "id" ? "Pengajar" : "Teachers" },
-    { img: "/kelas.png", angka: 1000, label: lang === "id" ? "Kelas" : "Classes" },
-  ];
-
-  const [startCount, setStartCount] = useState(false);
-  const sectionRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          setStartCount(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.3 }
-    );
-    if (sectionRef.current) observer.observe(sectionRef.current);
-
-    return () => observer.disconnect();
-  }, []);
-
-  return (
-    <section ref={sectionRef} className="w-full bg-[#243771] py-16">
-      <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-10 text-center">
-        {stats.map((item, i) => (
-          <div key={i} className="flex flex-col items-center text-white space-y-3">
-            <div className="w-14 h-14 flex items-center justify-center">
-              <img
-                src={item.img}
-                alt={item.label}
-                className="max-w-full max-h-full object-contain"
-              />
-            </div>
-            <h3 className="text-3xl sm:text-4xl font-bold">
-              <Counter target={item.angka} start={startCount} />
-            </h3>
-            <p className="text-gray-200 text-sm sm:text-base">{item.label}</p>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-/* -------------------- Counter -------------------- */
-function Counter({ target, start }: { target: number; start: boolean }) {
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    if (!start) return;
-
-    let current = 0;
-    const duration = 2000;
-    const stepTime = Math.max(Math.floor(duration / target), 20);
-
-    const timer = setInterval(() => {
-      current += Math.ceil(target / (duration / stepTime));
-      if (current >= target) {
-        current = target;
-        clearInterval(timer);
-      }
-      setCount(current);
-    }, stepTime);
-
-    return () => clearInterval(timer);
-  }, [start, target]);
-
-  return <span>{count.toLocaleString()}</span>;
-}
-
-/* -------------------- Visi & Misi Section -------------------- */
-function VisiMisiSection() {
-  const { lang } = useLang();
-
-  return (
-    <section className="bg-white py-16">
-      <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-        {/* Teks */}
-        <div className="space-y-10">
-          <div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-[#FE4D01] mb-4">
-              {lang === "id" ? "Visi" : "Vision"}
-            </h2>
-            <p className="text-gray-700 leading-relaxed text-base sm:text-lg">
-              {lang === "id"
-                ? "Mewujudkan lulusan yang “unggul” dan “terpercaya” dalam mengembangkan dan mempersiapkan tenaga terampil di bidang Teknologi Informasi dan Komunikasi yang beriman, bertaqwa, cerdas, percaya diri, berwawasan global, dan berkarakter Pancasilais."
-                : "To produce graduates who are 'superior' and 'trustworthy' in developing and preparing skilled workforce in the field of Information and Communication Technology who are faithful, pious, intelligent, confident, globally minded, and have Pancasila character."}
-            </p>
-          </div>
-
-          <div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-[#FE4D01] mb-4">
-              {lang === "id" ? "Misi" : "Mission"}
-            </h2>
-            <p className="text-gray-700 leading-relaxed text-base sm:text-lg mb-4">
-              {lang === "id"
-                ? "Menyelenggarakan proses belajar mengajar yang berkualitas ... sesuai dengan kompetensi yang dimiliki dalam bidang:"
-                : "Organize a quality teaching and learning process ... according to the competencies in the field of:"}
-            </p>
-            <ul className="list-disc list-inside text-gray-700 space-y-2 text-base sm:text-lg">
-              <li>{lang === "id" ? "Pengembangan Perangkat Lunak dan Gim (PPLG)" : "Software and Game Development (PPLG)"}</li>
-              <li>{lang === "id" ? "Teknik Jaringan Komputer dan Telekomunikasi (TJKT)" : "Computer Network and Telecommunication Engineering (TJKT)"}</li>
-              <li>{lang === "id" ? "Desain Komunikasi Visual (DKV)" : "Visual Communication Design (DKV)"}</li>
-              <li>{lang === "id" ? "Broadcasting dan Film (BCF)" : "Broadcasting and Film (BCF)"}</li>
-            </ul>
-            <p className="text-gray-700 leading-relaxed text-base sm:text-lg mt-4">
-              {lang === "id"
-                ? "Memberikan pelayanan pendidikan berbasis pembelajaran abad 21 ... relevan dengan karakter bangsa."
-                : "Provide 21st-century learning-based educational services ... relevant to national character."}
-            </p>
-            <Link
-            href="/profil/visi-misi"
-            className="mt-6 inline-block px-6 py-3 rounded bg-[#FE4D01] text-white font-medium hover:bg-orange-700 transition text-center"
-            >
-            {lang === "id" ? "Selengkapnya" : "More"}
-            </Link>
-          </div>
-        </div>
-
-        {/* Gambar */}
-        <div className="flex justify-center">
-          <img
-            src="/pp1.png"
-            alt={lang === "id" ? "Visi Misi" : "Vision & Mission"}
-            className="rounded-lg w-full object-cover"
-          />
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* -------------------- Manajemen Section -------------------- */
-function ManajemenSection() {
-  const { lang } = useLang();
-
-  const manajemenAwal = [
-    { img: "/man3.png", nama: "Dr. Wannen Pakpahan M.M", jabatan: lang === "id" ? "Direktur Penjamin Mutu Yayasan" : "Head of Program" },
-    { img: "/man2.png", nama: "Flores Sagala, S.E.", jabatan: lang === "id" ? "Ketua Yayasan" : "Vice Principal" },
-    { img: "/man1.png", nama: "Hendry Kurniawan, S.Kom, M.I.Kom", jabatan: lang === "id" ? "Kepala Sekolah" : "Principal" },
-  ];
-
-  return (
-    <section className="py-16 bg-white">
-      <div className="container mx-auto px-4 text-center">
-        <h2 className="text-3xl sm:text-4xl font-bold text-[#243771] mb-12">
-          {lang === "id" ? "Manajemen" : "Management"}
-        </h2>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10 mb-10">
-          {manajemenAwal.map((person, i) => (
-            <div key={i} className="flex flex-col items-center space-y-4">
-              <div className="w-48 h-48 sm:w-56 sm:h-56 rounded-full overflow-hidden shadow-lg">
-                <img src={person.img} alt={person.nama} className="w-full h-full object-cover" />
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold text-gray-800">{person.nama}</h3>
-                <p className="text-gray-600">{person.jabatan}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <Link href="/profil/manajemen">
-          <button className="mt-6 px-6 py-3 rounded bg-[#FE4D01] text-white font-medium hover:bg-orange-700 transition">
-            {lang === "id" ? "Selengkapnya" : "More"}
-          </button>
-        </Link>
-      </div>
-    </section>
-  );
-}
-
-/* -------------------- Fasilitas Section (FIX) -------------------- */
-function FasilitasSection() {
-  const { lang } = useLang();
-  const [activeIndex, setActiveIndex] = useState<number | null>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  const fasilitas = [
+  const faq = [
     {
-      img: "/dummy1.png",
-      nama: lang === "id" ? "Kelas" : "Classroom",
-      deskripsi_id: "Lorem ipsum dolor sit amet, kelas nyaman untuk belajar.",
-      deskripsi_en: "Lorem ipsum dolor sit amet, comfortable classroom for learning."
+      q_id: "Dimana alamat SMK Prestasi Prima?",
+      a_id: "Alamat kami berada di Jl. Kayu Manis Timur No. 99, Jakarta Timur.",
+      q_en: "Where is SMK Prestasi Prima located?",
+      a_en: "Our address is Jl. Kayu Manis Timur No. 99, East Jakarta.",
     },
     {
-      img: "/dummy2.png",
-      nama: lang === "id" ? "Perpustakaan" : "Library",
-      deskripsi_id: "Lorem ipsum, perpustakaan lengkap dengan berbagai buku.",
-      deskripsi_en: "Lorem ipsum, library equipped with various books."
+      q_id: "Apa saja jurusan yang tersedia?",
+      a_id: "Kami memiliki jurusan RPL, TJKT, DKV, dan lainnya.",
+      q_en: "What majors are available?",
+      a_en:
+        "We offer majors such as Software Engineering, Network Engineering, Visual Communication Design, and more.",
     },
     {
-      img: "/dummy3.png",
-      nama: lang === "id" ? "Aula Mora" : "Mora Hall",
-      deskripsi_id: "Lorem ipsum, aula luas untuk acara sekolah dan seminar.",
-      deskripsi_en: "Lorem ipsum, spacious hall for school events and seminars."
-    },
-    {
-      img: "/dummy4.png",
-      nama: lang === "id" ? "Lapangan" : "Field",
-      deskripsi_id: "Lorem ipsum, lapangan hijau untuk olahraga dan kegiatan outdoor.",
-      deskripsi_en: "Lorem ipsum, green field for sports and outdoor activities."
+      q_id: "Apakah ada kegiatan ekstrakurikuler?",
+      a_id: "Ya, tersedia banyak ekstrakurikuler seperti futsal, basket, musik, dan robotik.",
+      q_en: "Are there extracurricular activities?",
+      a_en:
+        "Yes, we provide many extracurriculars such as futsal, basketball, music, and robotics.",
     },
   ];
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent | TouchEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setActiveIndex(null);
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
+        setOpenIndex(null);
       }
+    };
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpenIndex(null);
     };
 
     document.addEventListener("mousedown", handleClickOutside);
     document.addEventListener("touchstart", handleClickOutside);
+    document.addEventListener("keydown", handleEsc);
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
       document.removeEventListener("touchstart", handleClickOutside);
+      document.removeEventListener("keydown", handleEsc);
     };
   }, []);
 
+  useEffect(() => {
+    contentRefs.current.forEach((el, idx) => {
+      if (!el) return;
+      if (openIndex === idx) {
+        el.style.maxHeight = `${el.scrollHeight}px`;
+      } else {
+        el.style.maxHeight = "0px";
+      }
+      el.style.transition = "max-height 400ms ease";
+    });
+  }, [openIndex, lang]);
+
+  useEffect(() => {
+    const onResize = () => {
+      if (openIndex === null) return;
+      const el = contentRefs.current[openIndex];
+      if (el) el.style.maxHeight = `${el.scrollHeight}px`;
+    };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [openIndex]);
+
   return (
     <section className="py-16 bg-white">
-      <div className="container mx-auto px-4 text-center">
-        <h2 className="text-3xl sm:text-4xl font-bold text-[#243771] mb-12">
-          {lang === "id" ? "Fasilitas" : "Facilities"}
+      <div className="container mx-auto px-4 max-w-3xl">
+        <h2 className="text-3xl sm:text-4xl font-bold text-[#243771] text-center mb-4">
+          {lang === "id" ? "FAQ SMK Prestasi Prima" : "SMK Prestasi Prima FAQ"}
         </h2>
+        <p className="text-gray-600 text-center mb-10">
+          {lang === "id"
+            ? "Kami menyiapkan daftar pertanyaan yang sering diajukan..."
+            : "We provide a list of frequently asked questions..."}
+        </p>
 
-        {/* Ref ditempel di grid, bukan di container utama */}
-        <div
-          ref={containerRef}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"
-        >
-          {fasilitas.map((item, i) => (
-            <div
-              key={i}
-              className="flex flex-col items-center bg-gray-100 rounded-lg shadow hover:shadow-lg transition overflow-hidden cursor-pointer"
-              onClick={() => setActiveIndex(activeIndex === i ? null : i)}
-            >
-              <img src={item.img} alt={item.nama} className="w-full h-40 object-cover" />
-              <div className="p-4 w-full text-left">
-                <h3 className="text-lg font-semibold text-[#243771]">{item.nama}</h3>
+        <div className="space-y-4" ref={containerRef}>
+          {faq.map((item, i) => {
+            const isOpen = openIndex === i;
+            return (
+              <div key={i} className="border rounded-lg shadow-sm overflow-hidden">
+                <button
+                  aria-expanded={isOpen}
+                  aria-controls={`faq-content-${i}`}
+                  id={`faq-btn-${i}`}
+                  className="w-full flex justify-between items-center p-4 font-medium text-[#243771] focus:outline-none"
+                  onClick={() => setOpenIndex(isOpen ? null : i)}
+                >
+                  <span className="text-left">
+                    {lang === "id" ? item.q_id : item.q_en}
+                  </span>
+                  <span className="text-lg ml-4">{isOpen ? "−" : "+"}</span>
+                </button>
 
                 <div
-                  className={`overflow-hidden transition-[max-height] duration-500 ease-in-out ${
-                    activeIndex === i ? "max-h-40 mt-2" : "max-h-0"
-                  }`}
+                  id={`faq-content-${i}`}
+                  role="region"
+                  aria-labelledby={`faq-btn-${i}`}
+                  ref={(el) => (contentRefs.current[i] = el)}
+                  className="overflow-hidden"
+                  style={{
+                    maxHeight: "0px",
+                    transition: "max-height 400ms ease",
+                  }}
                 >
-                  <p className="text-gray-600 text-sm">
-                    {lang === "id" ? item.deskripsi_id : item.deskripsi_en}
-                  </p>
+                  <div className="p-4 pt-0">
+                    <p className="text-gray-600">
+                      {lang === "id" ? item.a_id : item.a_en}
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
-
-        {/* Tombol Selengkapnya / More */}
-        <Link href="/profil/visi-misi">
-          <button className="mt-8 px-6 py-3 rounded bg-[#FE4D01] text-white font-medium hover:bg-orange-700 transition">
-            {lang === "id" ? "Selengkapnya" : "More"}
-          </button>
-        </Link>
       </div>
     </section>
   );
