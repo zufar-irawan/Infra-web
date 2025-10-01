@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('telepon_wali');
 
             $table->foreign('rfid_id')->references('id')->on('presence_rfids')->onDelete('set null');
-            $table->foreign('kelas_id')->references('id')->on('presence_class')->onDelete('cascade');
+            $table->foreign('kelas_id')->references('id')->on('presence_classes')->onDelete('cascade');
         });
     }
 
