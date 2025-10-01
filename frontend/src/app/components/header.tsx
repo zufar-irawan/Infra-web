@@ -236,10 +236,10 @@ export default function Header() {
 
                 {/* Edukasi */}
                 <a
-                  href="/edu"
-                  className="hover:text-yellow-400 transition cursor-pointer"
+                  href="/edu" target="_blank"
+                  className="hover:text-yellow-400 transition cursor-pointer flex items-center gap-1"
                 >
-                  {lang === "id" ? "Presma Edu" : "Presma Edu"} <ExternalLink size={20} />
+                  {lang === "id" ? "Presma Edu" : "Presma Edu"} <ExternalLink size={16} />
                 </a>
 
                 {/* Registration */}
