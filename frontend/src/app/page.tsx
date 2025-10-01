@@ -4,7 +4,10 @@ import Navbar from "@/app/components/header";
 import Footer from "@/app/components/footer";
 
 import Home from "./sections/home";
-import About from "./sections/about";
+import Sekilas from "./sections/sekilas";
+import Prestasi from "./sections/prestasi";
+import Pesan from "./sections/pesan";
+
 
 export default function Main() {
 	return (
@@ -12,7 +15,9 @@ export default function Main() {
 			<Navbar />
 
 			<Home />
-			<About />
+			<Sekilas />
+			<Pesan />
+			<Prestasi />
 			
 			<Footer />
 		</div>
