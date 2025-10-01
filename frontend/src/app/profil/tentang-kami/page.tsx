@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Navbar from "@/app/components/header";
-import Footer from "@/app/components/footer";
+import Footer from "@/app/components/Footer";
 import { useLang } from "../../components/LangContext";
 import { useEffect, useRef, useState } from "react";
 
@@ -227,10 +227,10 @@ function VisiMisiSection() {
                 : "Provide 21st-century learning-based educational services ... relevant to national character."}
             </p>
             <Link
-            href="/profil/visi-misi"
-            className="mt-6 inline-block px-6 py-3 rounded bg-[#FE4D01] text-white font-medium hover:bg-orange-700 transition text-center"
+              href="/profil/visi-misi"
+              className="mt-6 inline-block px-6 py-3 rounded bg-[#FE4D01] text-white font-medium hover:bg-orange-700 transition text-center"
             >
-            {lang === "id" ? "Selengkapnya" : "More"}
+              {lang === "id" ? "Selengkapnya" : "More"}
             </Link>
           </div>
         </div>
@@ -361,9 +361,8 @@ function FasilitasSection() {
                 <h3 className="text-lg font-semibold text-[#243771]">{item.nama}</h3>
 
                 <div
-                  className={`overflow-hidden transition-[max-height] duration-500 ease-in-out ${
-                    activeIndex === i ? "max-h-40 mt-2" : "max-h-0"
-                  }`}
+                  className={`overflow-hidden transition-[max-height] duration-500 ease-in-out ${activeIndex === i ? "max-h-40 mt-2" : "max-h-0"
+                    }`}
                 >
                   <p className="text-gray-600 text-sm">
                     {lang === "id" ? item.deskripsi_id : item.deskripsi_en}

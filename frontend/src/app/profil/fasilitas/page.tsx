@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Navbar from "@/app/components/header";
-import Footer from "@/app/components/footer";
+import Footer from "@/app/components/Footer";
 import { useLang } from "../../components/LangContext";
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
@@ -241,9 +241,8 @@ function FAQSection() {
                   <span className="text-lg ml-4">{isOpen ? "−" : "+"}</span>
                 </button>
                 <div
-                  className={`overflow-hidden transition-[max-height] duration-500 ease-in-out ${
-                    isOpen ? "max-h-40" : "max-h-0"
-                  }`}
+                  className={`overflow-hidden transition-[max-height] duration-500 ease-in-out ${isOpen ? "max-h-40" : "max-h-0"
+                    }`}
                 >
                   <div className="p-4 pt-0">
                     <p className="text-gray-600">

@@ -35,13 +35,12 @@ export default function Header() {
 
       {/* Navbar */}
       <div
-        className={`transition duration-300 p-3 text-white ${
-          pathname === "/"
-            ? isScrolled
-              ? "bg-[#243771] shadow-md"
-              : "bg-transparent shadow-none"
-            : "bg-[#243771] shadow-md"
-        }`}
+        className={`transition duration-300 p-3 text-white ${pathname === "/"
+          ? isScrolled
+            ? "bg-[#243771] shadow-md"
+            : "bg-transparent shadow-none"
+          : "bg-[#243771] shadow-md"
+          }`}
       >
         <div className="container mx-auto flex items-center justify-between">
           {/* Logo */}
@@ -59,8 +58,8 @@ export default function Header() {
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center gap-6">
             <nav className="flex items-center gap-6 text-white relative">
-              <a    
-                href={`${pathname === "/" ? "#" : "/" }`}
+              <a
+                href={`${pathname === "/" ? "#" : "/"}`}
                 className="hover:text-yellow-400 transition cursor-pointer"
               >
                 {lang === "id" ? "Beranda" : "Home"}
@@ -176,20 +175,20 @@ export default function Header() {
                       className="block px-4 py-2 hover:bg-gray-200 rounded-t transition"
                       href="#osis-mpk"
                     >
-                      OSIS & MPK
+                      Prestasi
                     </a>
                     <a
                       className="block px-4 py-2 hover:bg-gray-200 transition"
                       href="#acara"
                     >
-                      Acara
+                      Mitra
                     </a>
-                    <a
+                    {/* <a
                       className="block px-4 py-2 hover:bg-gray-200 rounded-b transition"
                       href="#study-tour"
                     >
                       Study Tour
-                    </a>
+                    </a> */}
                   </div>
                 )}
               </div>

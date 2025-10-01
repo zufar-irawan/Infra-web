@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Navbar from "@/app/components/header";
-import Footer from "@/app/components/footer";
+import Footer from "@/app/components/Footer";
 import { useLang } from "../../components/LangContext";
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
@@ -105,11 +105,10 @@ function PrestasiSection() {
           {currentItems.map((img, i) => (
             <div
               key={i}
-              className={`prestasi-card bg-white rounded-[10px] overflow-hidden shadow-md transform transition-all duration-700 ease-out hover:scale-105 hover:shadow-xl ${
-                visibleItems.includes(i)
+              className={`prestasi-card bg-white rounded-[10px] overflow-hidden shadow-md transform transition-all duration-700 ease-out hover:scale-105 hover:shadow-xl ${visibleItems.includes(i)
                   ? "opacity-100 translate-y-0"
                   : "opacity-0 translate-y-8"
-              }`}
+                }`}
               style={{
                 transitionDelay: `${i * 80}ms`,
                 width: "346px",
@@ -253,9 +252,8 @@ function FAQSection() {
                   id={`faq-content-${i}`}
                   role="region"
                   aria-labelledby={`faq-btn-${i}`}
-                  className={`overflow-hidden transition-[max-height] duration-500 ease-in-out ${
-                    isOpen ? "max-h-40" : "max-h-0"
-                  }`}
+                  className={`overflow-hidden transition-[max-height] duration-500 ease-in-out ${isOpen ? "max-h-40" : "max-h-0"
+                    }`}
                 >
                   <div className="p-4 pt-0 text-gray-600">
                     {lang === "id" ? item.a_id : item.a_en}
