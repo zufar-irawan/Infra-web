@@ -91,49 +91,49 @@ export default function Header() {
                 {openDropdown === "informasi" && (
                   <div className="absolute left-0 mt-3 text-sm bg-white/90 shadow-lg rounded text-orange-600 w-36">
                     <a
-                      href="/informasi-sekolah/tentang-kami"
+                      href="/profil/tentang-kami"
                       className="block px-4 py-2 hover:bg-gray-200 rounded-t transition"
                     >
                       Tentang Kami
                     </a>
                     <a
-                      href="#visi-misi"
+                      href="/profil/visi-misi"
                       className="block px-4 py-2 hover:bg-gray-200 transition"
                     >
                       Visi & Misi
                     </a>
                     <a
-                      href="#prestasi"
+                      href="/profil/prestasi"
                       className="block px-4 py-2 hover:bg-gray-200 transition"
                     >
                       Prestasi
                     </a>
                     <a
-                      href="#manajemen"
+                      href="/profil/manajemen"
                       className="block px-4 py-2 hover:bg-gray-200 transition"
                     >
                       Manajemen
                     </a>
                     <a
-                      href="#fasilitas"
+                      href="/profil/fasilitas"
                       className="block px-4 py-2 hover:bg-gray-200 transition"
                     >
                       Fasilitas
                     </a>
                     <a
-                      href="#mitra"
+                      href="/profil/mitra"
                       className="block px-4 py-2 hover:bg-gray-200 transition"
                     >
                       Mitra
                     </a>
                     <a
-                      href="#testimoni"
+                      href="/profil/testimoni"
                       className="block px-4 py-2 hover:bg-gray-200 transition"
                     >
                       Testimoni
                     </a>
                     <a
-                      href="#faq"
+                      href="/profil/faq"
                       className="block px-4 py-2 hover:bg-gray-200 rounded-b transition"
                     >
                       FAQ
@@ -290,8 +290,8 @@ export default function Header() {
       {isMobileMenuOpen && (
         <div className="md:hidden bg-white text-orange-600 shadow-lg">
           <div className="flex flex-col px-6 py-4 space-y-3">
-            <a href="/informasi-sekolah/tentang-kami">Tentang Kami</a>
-            <a href="#visi">Visi & Misi</a>
+            <a href="/profil/tentang-kami">Tentang Kami</a>
+            <a href="/profil/visi-misi">Visi & Misi</a>
             <a href="#manajemen">Manajemen</a>
             <a href="#fasilitas">Fasilitas</a>
             <a href="#testimoni">Testimoni</a>

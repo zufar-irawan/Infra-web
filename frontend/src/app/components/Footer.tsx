@@ -15,7 +15,7 @@ export default function Footer() {
       menu_partner: "Mitra",
       menu_admission: "Penerimaan Siswa",
       menu_news: "Berita",
-      footer_text: "© 2025 Orens Solution - Versi 2.0 | orang-orang",
+      footer_text: "© 2025 SMK Prestasi Prima | Gold And Glory",
     },
     en: {
       school_name: "SMK Prestasi Prima",
@@ -25,7 +25,7 @@ export default function Footer() {
       menu_partner: "Partners",
       menu_admission: "Admission",
       menu_news: "News",
-      footer_text: "© 2025 Orens Solution - Version 2.0 | everyone",
+      footer_text: "© 2025 Prestasi Prima VSH | Gold And Glory",
     },
   };
 

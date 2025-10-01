@@ -10,15 +10,15 @@ export default function Tentang() {
   const { lang } = useLang();
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100">
+    <div className="flex flex-col min-h-screen bg-white">
       {/* Navbar */}
       <Navbar />
 
       {/* Spacer biar ga ketiban header */}
-      <div className="h-[100px] bg-gray-100" />
+      <div className="h-[100px] bg-white" />
 
       {/* Breadcrumbs */}
-      <section className="w-full py-4 bg-gray-100">
+      <section className="w-full py-4 bg-white">
         <div className="container mx-auto px-4">
           <nav className="flex items-center text-sm font-medium space-x-2">
             <Link href="/" className="text-[#FE4D01] hover:underline">
@@ -26,7 +26,7 @@ export default function Tentang() {
             </Link>
             <span className="text-[#FE4D01]">{">"}</span>
             <Link
-              href="/informasi-sekolah/tentang-kami"
+              href="/profil/tentang-kami"
               className="text-[#FE4D01] hover:underline"
             >
               {lang === "id" ? "Informasi Sekolah" : "School Information"}
@@ -40,7 +40,7 @@ export default function Tentang() {
       </section>
 
       {/* Konten utama */}
-      <main className="flex-1 w-full bg-gray-100 py-16">
+      <main className="flex-1 w-full bg-white py-16">
         <div className="container mx-auto px-4 space-y-16">
           {/* Judul + pembuka */}
           <div className="text-center max-w-3xl mx-auto space-y-6">
@@ -191,7 +191,7 @@ function VisiMisiSection() {
   const { lang } = useLang();
 
   return (
-    <section className="bg-gray-100 py-16">
+    <section className="bg-white py-16">
       <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
         {/* Teks */}
         <div className="space-y-10">
@@ -226,9 +226,12 @@ function VisiMisiSection() {
                 ? "Memberikan pelayanan pendidikan berbasis pembelajaran abad 21 ... relevan dengan karakter bangsa."
                 : "Provide 21st-century learning-based educational services ... relevant to national character."}
             </p>
-            <button className="mt-6 px-6 py-3 rounded bg-[#FE4D01] text-white font-medium hover:bg-orange-700 transition">
-              {lang === "id" ? "Selengkapnya" : "More"}
-            </button>
+            <Link
+            href="/profil/visi-misi"
+            className="mt-6 inline-block px-6 py-3 rounded bg-[#FE4D01] text-white font-medium hover:bg-orange-700 transition text-center"
+            >
+            {lang === "id" ? "Selengkapnya" : "More"}
+            </Link>
           </div>
         </div>
 
@@ -248,22 +251,15 @@ function VisiMisiSection() {
 /* -------------------- Manajemen Section -------------------- */
 function ManajemenSection() {
   const { lang } = useLang();
-  const [showMore, setShowMore] = useState(false);
 
   const manajemenAwal = [
-    { img: "/man1.png", nama: "Budi Santoso", jabatan: lang === "id" ? "Kepala Sekolah" : "Principal" },
-    { img: "/man2.png", nama: "Siti Aminah", jabatan: lang === "id" ? "Wakil Kepala Sekolah" : "Vice Principal" },
-    { img: "/man3.png", nama: "Andi Wijaya", jabatan: lang === "id" ? "Kepala Program" : "Head of Program" },
-  ];
-
-  const manajemenTambahan = [
-    { img: "/man4.png", nama: "Rahmat Hidayat", jabatan: lang === "id" ? "Kepala TU" : "Head of Administration" },
-    { img: "/man5.png", nama: "Dewi Lestari", jabatan: lang === "id" ? "Koordinator Kesiswaan" : "Student Affairs Coordinator" },
-    { img: "/man6.png", nama: "Agus Prabowo", jabatan: lang === "id" ? "Koordinator Kurikulum" : "Curriculum Coordinator" },
+    { img: "/man3.png", nama: "Dr. Wannen Pakpahan M.M", jabatan: lang === "id" ? "Direktur Penjamin Mutu Yayasan" : "Head of Program" },
+    { img: "/man2.png", nama: "Flores Sagala, S.E.", jabatan: lang === "id" ? "Ketua Yayasan" : "Vice Principal" },
+    { img: "/man1.png", nama: "Hendry Kurniawan, S.Kom, M.I.Kom", jabatan: lang === "id" ? "Kepala Sekolah" : "Principal" },
   ];
 
   return (
-    <section className="py-16 bg-gray-100">
+    <section className="py-16 bg-white">
       <div className="container mx-auto px-4 text-center">
         <h2 className="text-3xl sm:text-4xl font-bold text-[#243771] mb-12">
           {lang === "id" ? "Manajemen" : "Management"}
@@ -281,54 +277,66 @@ function ManajemenSection() {
               </div>
             </div>
           ))}
-
-          {showMore && manajemenTambahan.map((person, i) => (
-            <div key={i} className="flex flex-col items-center space-y-4">
-              <div className="w-48 h-48 sm:w-56 sm:h-56 rounded-full overflow-hidden shadow-lg">
-                <img src={person.img} alt={person.nama} className="w-full h-full object-cover" />
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold text-gray-800">{person.nama}</h3>
-                <p className="text-gray-600">{person.jabatan}</p>
-              </div>
-            </div>
-          ))}
         </div>
 
-        <button
-          onClick={() => setShowMore(!showMore)}
-          className="mt-6 px-6 py-3 rounded bg-[#FE4D01] text-white font-medium hover:bg-orange-700 transition"
-        >
-          {showMore ? (lang === "id" ? "Sembunyikan" : "Hide") : (lang === "id" ? "Selengkapnya" : "More")}
-        </button>
+        <Link href="/profil/manajemen">
+          <button className="mt-6 px-6 py-3 rounded bg-[#FE4D01] text-white font-medium hover:bg-orange-700 transition">
+            {lang === "id" ? "Selengkapnya" : "More"}
+          </button>
+        </Link>
       </div>
     </section>
   );
 }
 
-/* -------------------- Fasilitas Section -------------------- */
+/* -------------------- Fasilitas Section (FIX) -------------------- */
 function FasilitasSection() {
   const { lang } = useLang();
-  const [showMore, setShowMore] = useState(false);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const fasilitas = [
-    { img: "/dummy1.png", nama: lang === "id" ? "Kelas" : "Classroom" },
-    { img: "/dummy2.png", nama: lang === "id" ? "Perpustakaan" : "Library" },
-    { img: "/dummy3.png", nama: lang === "id" ? "Aula Mora" : "Mora Hall" },
-    { img: "/dummy4.png", nama: lang === "id" ? "Lapangan" : "Field" },
-    { img: "/dummy5.png", nama: lang === "id" ? "Lab RPL" : "Software Lab" },
-    { img: "/dummy6.png", nama: lang === "id" ? "Lab TJKT" : "Network Lab" },
-    { img: "/dummy7.png", nama: lang === "id" ? "Lab DKV" : "Design Lab" },
-    { img: "/dummy8.png", nama: lang === "id" ? "Lab BC" : "Broadcast Lab" },
-    { img: "/dummy9.png", nama: lang === "id" ? "Toilet" : "Toilet" },
-    { img: "/dummy10.png", nama: lang === "id" ? "Kantin" : "Canteen" },
-    { img: "/dummy11.png", nama: lang === "id" ? "Studio BC" : "BC Studio" },
-    { img: "/dummy12.png", nama: lang === "id" ? "Musholla" : "Prayer Room" },
-    { img: "/dummy13.png", nama: lang === "id" ? "Ice Board" : "Ice Board" },
-    { img: "/dummy14.png", nama: lang === "id" ? "CCTV" : "CCTV" },
+    {
+      img: "/dummy1.png",
+      nama: lang === "id" ? "Kelas" : "Classroom",
+      deskripsi_id: "Lorem ipsum dolor sit amet, kelas nyaman untuk belajar.",
+      deskripsi_en: "Lorem ipsum dolor sit amet, comfortable classroom for learning."
+    },
+    {
+      img: "/dummy2.png",
+      nama: lang === "id" ? "Perpustakaan" : "Library",
+      deskripsi_id: "Lorem ipsum, perpustakaan lengkap dengan berbagai buku.",
+      deskripsi_en: "Lorem ipsum, library equipped with various books."
+    },
+    {
+      img: "/dummy3.png",
+      nama: lang === "id" ? "Aula Mora" : "Mora Hall",
+      deskripsi_id: "Lorem ipsum, aula luas untuk acara sekolah dan seminar.",
+      deskripsi_en: "Lorem ipsum, spacious hall for school events and seminars."
+    },
+    {
+      img: "/dummy4.png",
+      nama: lang === "id" ? "Lapangan" : "Field",
+      deskripsi_id: "Lorem ipsum, lapangan hijau untuk olahraga dan kegiatan outdoor.",
+      deskripsi_en: "Lorem ipsum, green field for sports and outdoor activities."
+    },
   ];
 
-  const shownFasilitas = showMore ? fasilitas : fasilitas.slice(0, 4);
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setActiveIndex(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, []);
 
   return (
     <section className="py-16 bg-white">
@@ -337,28 +345,41 @@ function FasilitasSection() {
           {lang === "id" ? "Fasilitas" : "Facilities"}
         </h2>
 
-        {/* Grid fasilitas */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {shownFasilitas.map((item, i) => (
+        {/* Ref ditempel di grid, bukan di container utama */}
+        <div
+          ref={containerRef}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"
+        >
+          {fasilitas.map((item, i) => (
             <div
               key={i}
-              className="flex flex-col items-center bg-gray-50 rounded-lg shadow hover:shadow-lg transition overflow-hidden"
+              className="flex flex-col items-center bg-gray-100 rounded-lg shadow hover:shadow-lg transition overflow-hidden cursor-pointer"
+              onClick={() => setActiveIndex(activeIndex === i ? null : i)}
             >
               <img src={item.img} alt={item.nama} className="w-full h-40 object-cover" />
-              <div className="p-4">
+              <div className="p-4 w-full text-left">
                 <h3 className="text-lg font-semibold text-[#243771]">{item.nama}</h3>
+
+                <div
+                  className={`overflow-hidden transition-[max-height] duration-500 ease-in-out ${
+                    activeIndex === i ? "max-h-40 mt-2" : "max-h-0"
+                  }`}
+                >
+                  <p className="text-gray-600 text-sm">
+                    {lang === "id" ? item.deskripsi_id : item.deskripsi_en}
+                  </p>
+                </div>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Tombol Show More / Hide */}
-        <button
-          onClick={() => setShowMore(!showMore)}
-          className="mt-8 px-6 py-3 rounded bg-[#FE4D01] text-white font-medium hover:bg-orange-700 transition"
-        >
-          {showMore ? (lang === "id" ? "Sembunyikan" : "Hide") : (lang === "id" ? "Selengkapnya" : "More")}
-        </button>
+        {/* Tombol Selengkapnya / More */}
+        <Link href="/profil/fasilitas">
+          <button className="mt-8 px-6 py-3 rounded bg-[#FE4D01] text-white font-medium hover:bg-orange-700 transition">
+            {lang === "id" ? "Selengkapnya" : "More"}
+          </button>
+        </Link>
       </div>
     </section>
   );
