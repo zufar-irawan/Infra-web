@@ -2,8 +2,6 @@
 
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import Navbar from '@/components/header'
-import Footer from '@/components/footer';
 
 export default function PrestasiPage() {
     const [akademikPage, setAkademikPage] = useState(0);
@@ -123,9 +121,7 @@ export default function PrestasiPage() {
     );
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <Navbar />
-            {/* Breadcrumb */}
+        <>
             <div className="bg-white px-6 py-4 border-b mt-16">
                 <div className="max-w-7xl mx-auto">
                     <p className="text-sm text-gray-600">
@@ -186,6 +182,7 @@ export default function PrestasiPage() {
                     >
                         <ChevronLeft className="w-6 h-6" />
                     </button>
+
                     <button
                         onClick={() => setNonAkademikPage((prev) => (prev + 1) % totalNonAkademikPages)}
                         className="p-2 border-2 border-blue-900 rounded hover:bg-blue-900 hover:text-white transition-colors"
@@ -195,8 +192,7 @@ export default function PrestasiPage() {
                     </button>
                 </div>
             </div>
+        </>
 
-            <Footer />
-        </div>
     );
 }
