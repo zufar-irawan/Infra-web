@@ -38,7 +38,11 @@ export default function Ekstrakurikuler() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
                     {ekstrakurikuler.map((item, index) => (
-                        <div key={index} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow">
+                        <div
+                            key={index}
+                            className="bg-white rounded-lg shadow-md overflow-hidden 
+                                        transform transition-transform duration-300 
+                                        hover:scale-105 hover:shadow-xl">
                             <div className="relative">
                                 <div className="w-full h-48 bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
                                     <div className="text-center">
@@ -53,6 +57,7 @@ export default function Ekstrakurikuler() {
                                 </div>
                             </div>
                         </div>
+
                     ))}
                 </div>
             </div>
