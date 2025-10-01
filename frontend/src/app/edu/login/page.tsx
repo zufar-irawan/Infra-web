@@ -37,11 +37,8 @@ export default function LoginRegisterPage() {
                         </div>
                     </div>
                     <h1 className="text-2xl font-bold text-orange-500 mb-2">
-                        Situs Resmi SMK Prestasi Prima
+                        Presma EDU
                     </h1>
-                    <p className="text-gray-600 text-sm">
-                        Daftar atau masuk ke akun kamu
-                    </p>
                 </div>
 
                 <div className="bg-white rounded-2xl shadow-xl p-8">
@@ -88,7 +85,7 @@ export default function LoginRegisterPage() {
                                 value={formData.email}
                                 onChange={handleInputChange}
                                 placeholder="nama@example.com"
-                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
                             />
                         </div>
 
@@ -102,7 +99,7 @@ export default function LoginRegisterPage() {
                                 value={formData.password}
                                 onChange={handleInputChange}
                                 placeholder="Masukkan password"
-                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
                             />
                         </div>
 
