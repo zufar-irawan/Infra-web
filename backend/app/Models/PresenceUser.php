@@ -13,6 +13,7 @@ class PresenceUser extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles;
 
+    protected $guard_name = 'web';
     /**
      * The attributes that are mass assignable.
      *
@@ -23,6 +24,7 @@ class PresenceUser extends Authenticatable
         'email',
         'password',
     ];
+
 
     /**
      * The attributes that should be hidden for serialization.

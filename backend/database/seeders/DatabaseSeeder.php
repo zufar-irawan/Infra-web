@@ -22,13 +22,13 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             UserSeeder::class,
-            KelasSeeder::class,
-            SiswaSeeder::class,
-            GuruSeeder::class,
-            DeviceSeeder::class,
-            RfidSeeder::class,
-            RolePermissionSeeder::class,
-            PresenceSeeder::class,
+            // KelasSeeder::class,
+            // SiswaSeeder::class,
+            // GuruSeeder::class,
+            // DeviceSeeder::class,
+            // RfidSeeder::class,
+            // RolePermissionSeeder::class,
+            // PresenceSeeder::class,
         ]);
     }
 }
