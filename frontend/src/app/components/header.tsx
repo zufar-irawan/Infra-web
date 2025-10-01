@@ -219,12 +219,12 @@ export default function Header() {
                 </div>
 
                 {/* News */}
-                <a
+                {/* <a
                   href="#berita"
                   className="hover:text-yellow-400 transition cursor-pointer"
                 >
                   {lang === "id" ? "Berita Terkini" : "Latest News"}
-                </a>
+                </a> */}
 
                 {/* Penerimaan Siswa */}
                 <a
