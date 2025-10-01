@@ -5,104 +5,86 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use App\Models\PresenceUser as User;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
-class PresenceSeeder extends Seeder
+class UserSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        // === Permissions ===
-        $permissions = [
-            // Kelas
-            'view kelas', 'create kelas', 'edit kelas', 'delete kelas',
-            // Siswa
-            'view siswa', 'create siswa', 'edit siswa', 'delete siswa',
-            // Guru
-            'view guru', 'create guru', 'edit guru', 'delete guru',
-            // Device
-            'view device', 'create device', 'edit device', 'delete device',
-            // RFID
-            'view rfid', 'delete rfid',
-            // User
-            'view user', 'create user', 'edit user', 'delete user',
-            // Role & Permission
-            'view role permission', 'create role permission', 'edit role permission', 'delete role permission',
-            // Setting
-            'view setting', 'edit setting',
-            // Presence
-            'view presence', 'create presence',
-            'view presence by date', 'export excel presence by date', 'export pdf presence by date',
-            'view presence by siswa', 'export excel presence by siswa', 'export pdf presence by siswa',
-        ];
+        Permission::create(['name' => 'view kelas']);
+        Permission::create(['name' => 'create kelas']);
+        Permission::create(['name' => 'edit kelas']);
+        Permission::create(['name' => 'delete kelas']);
 
-        foreach ($permissions as $perm) {
-            DB::table('presence_permissions')->insert([
-                'name' => $perm,
-                'guard_name' => 'presence',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-        }
+        Permission::create(['name' => 'view siswa']);
+        Permission::create(['name' => 'create siswa']);
+        Permission::create(['name' => 'edit siswa']);
+        Permission::create(['name' => 'delete siswa']);
 
-        // === Roles ===
-        $adminRoleId = DB::table('presence_roles')->insertGetId([
-            'name' => 'admin',
-            'guard_name' => 'presence',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        Permission::create(['name' => 'view guru']);
+        Permission::create(['name' => 'create guru']);
+        Permission::create(['name' => 'edit guru']);
+        Permission::create(['name' => 'delete guru']);
 
-        $userRoleId = DB::table('presence_roles')->insertGetId([
-            'name' => 'user',
-            'guard_name' => 'presence',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        Permission::create(['name' => 'view device']);
+        Permission::create(['name' => 'create device']);
+        Permission::create(['name' => 'edit device']);
+        Permission::create(['name' => 'delete device']);
 
-        // === Users ===
-        $adminId = DB::table('presence_users')->insertGetId([
+        Permission::create(['name' => 'view rfid']);
+        Permission::create(['name' => 'delete rfid']);
+
+        Permission::create(['name' => 'view user']);
+        Permission::create(['name' => 'create user']);
+        Permission::create(['name' => 'edit user']);
+        Permission::create(['name' => 'delete user']);
+
+        Permission::create(['name' => 'view role permission']);
+        Permission::create(['name' => 'create role permission']);
+        Permission::create(['name' => 'edit role permission']);
+        Permission::create(['name' => 'delete role permission']);
+
+        Permission::create(['name' => 'view setting']);
+        Permission::create(['name' => 'edit setting']);
+
+        Permission::create(['name' => 'view presence']);
+        Permission::create(['name' => 'create presence']);
+
+        Permission::create(['name' => 'view presence by date']);
+        Permission::create(['name' => 'export excel presence by date']);
+        Permission::create(['name' => 'export pdf presence by date']);
+
+        Permission::create(['name' => 'view presence by siswa']);
+        Permission::create(['name' => 'export excel presence by siswa']);
+        Permission::create(['name' => 'export pdf presence by siswa']);
+
+        $adminRole = Role::create(['name' => 'admin']);
+        $permissions = Permission::get();
+        $adminRole->syncPermissions($permissions);
+
+        $admin = User::create([
             'name' => 'Admin Sekolah Prestasi Prima',
             'email' => 'admin@mail.com',
-            'password' => Hash::make('12345678'),
-            'created_at' => now(),
-            'updated_at' => now(),
+            'password' => bcrypt('12345678')
         ]);
 
-        $userId = DB::table('presence_users')->insertGetId([
+        $admin->assignRole($adminRole);
+
+        $userRole = Role::create(['name' => 'user']);
+        $viewPermissions = Permission::where('name', 'like', 'view%')->get();
+        $userRole->syncPermissions($viewPermissions);
+
+        $user = User::create([
             'name' => 'Guru Sekolah Prestasi Prima',
             'email' => 'user@mail.com',
-            'password' => Hash::make('12345678'),
-            'created_at' => now(),
-            'updated_at' => now(),
+            'password' => bcrypt('12345678')
         ]);
 
-        // === Assign Roles to Users ===
-        DB::table('presence_user_has_roles')->insert([
-            ['user_id' => $adminId, 'role_id' => $adminRoleId],
-            ['user_id' => $userId, 'role_id' => $userRoleId],
-        ]);
-
-        // === Assign Permissions ===
-        // Admin → semua permission
-        $allPermissions = DB::table('presence_permissions')->pluck('id');
-        foreach ($allPermissions as $permId) {
-            DB::table('presence_role_has_permissions')->insert([
-                'role_id' => $adminRoleId,
-                'permission_id' => $permId,
-            ]);
-        }
-
-        // User → hanya permission yang "view%"
-        $viewPermissions = DB::table('presence_permissions')
-            ->where('name', 'like', 'view%')
-            ->pluck('id');
-        foreach ($viewPermissions as $permId) {
-            DB::table('presence_role_has_permissions')->insert([
-                'role_id' => $userRoleId,
-                'permission_id' => $permId,
-            ]);
-        }
+        $user->assignRole($userRole);
     }
 }
