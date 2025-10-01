@@ -1,7 +1,7 @@
 "use client";
 
 import Navbar from "@/app/components/header";
-import Footer from "@/components/footer";
+import Footer from "@/components/Footer";
 
 import Home from "./sections/home";
 import Sekilas from "./sections/sekilas";
@@ -22,7 +22,6 @@ export default function Main() {
 			<Prestasi />
 			<Tur />
 			<Mitra />
-			
 			<Footer />
 		</div>
 	);

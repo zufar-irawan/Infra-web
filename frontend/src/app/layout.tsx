@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 
 import { LangProvider } from "./components/LangContext";
+import ChatWidget from "./components/Chatbot/Chatwidget";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -23,7 +24,10 @@ export default function RootLayout({
     <html lang="id" className="scroll-smooth">
       <body className={`${poppins.className} antialiased`}>
         <LangProvider>
-          <main className="overflow-y-auto">{children}</main>
+          <main className="overflow-y-auto">
+            {children}
+            <ChatWidget />
+          </main>
         </LangProvider>
       </body>
     </html>

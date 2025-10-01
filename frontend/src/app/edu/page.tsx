@@ -1,19 +1,3 @@
-<<<<<<< HEAD
-"use client";
-
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-
-export default function EduPage() {
-  const router = useRouter();
-
-  useEffect(() => {
-    router.replace("/edu/login");
-  }, [router]);
-
-  return null;
-}
-=======
 "use client"
 
 import React, { useState } from 'react';
@@ -216,4 +200,3 @@ export default function LoginRegisterPage() {
         </div>
     );
 }
->>>>>>> abac329ca410e0f818e2dcd7fb6a56b0f9ec12df
