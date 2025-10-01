@@ -36,7 +36,7 @@ export default function Pesan() {
     delay: string;
   }) => (
     <div
-      className={`flex flex-col md:flex-row items-center md:items-center gap-6 md:gap-10 transition-all duration-1000 ${
+      className={`flex flex-col md:flex-row items-center gap-6 transition-all duration-1000 ${
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
       }`}
       style={{ transitionDelay: delay }}
@@ -54,7 +54,7 @@ export default function Pesan() {
 
       {/* Bubble Text */}
       <div className="relative bg-[#243771] text-white rounded-[10px] p-6 md:p-8 shadow-md flex flex-col justify-center transform transition duration-500 hover:-translate-y-2 hover:shadow-2xl w-full md:w-[370px] h-auto md:h-[352px]">
-        {/* Panah hanya tampil di desktop */}
+        {/* Panah hanya di desktop */}
         <div className="hidden md:block absolute left-[-14px] top-1/2 -translate-y-1/2 w-0 h-0 border-t-[14px] border-b-[14px] border-r-[14px] border-transparent border-r-[#243771]" />
         <h3 className="font-bold uppercase mb-3 text-sm md:text-base">{title}</h3>
         <p className="text-sm leading-relaxed flex-1">{text}</p>
@@ -80,8 +80,8 @@ export default function Pesan() {
           </span>
         </h2>
 
-        {/* Cards */}
-        <div className="flex flex-col gap-16">
+        {/* 2 Kolom di Desktop */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
           <Card
             img="/pp2.png"
             title="PEMBINA YAYASAN"
