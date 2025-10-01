@@ -290,14 +290,14 @@ function FAQSection() {
                   <span className="text-left">
                     {lang === "id" ? item.q_id : item.q_en}
                   </span>
-                  <span className="text-lg ml-4">{isOpen ? "−" : "+"}</span>
+                  <span className="text-lg ml-4">{isOpen ? "-" : "+"}</span>
                 </button>
 
                 <div
                   id={`faq-content-${i}`}
                   role="region"
                   aria-labelledby={`faq-btn-${i}`}
-                  ref={(el) => (contentRefs.current[i] = el)}
+                  // ref={(el) => (contentRefs.current[i] = el)}
                   className="overflow-hidden"
                   style={{
                     maxHeight: "0px",
