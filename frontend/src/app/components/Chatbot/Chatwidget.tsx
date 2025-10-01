@@ -42,14 +42,14 @@ export default function ChatWidget() {
             {/* Floating Button */}
             <button
                 onClick={() => setOpen(!open)}
-                className="fixed bottom-6 right-6 bg-blue-600 p-4 rounded-full shadow-2xl text-white hover:bg-blue-700 transition-transform active:scale-95"
+                className="z-50 fixed bottom-6 right-6 bg-blue-600 p-4 rounded-full shadow-2xl text-white hover:bg-blue-700 transition-transform active:scale-95"
             >
                 <MessageCircle className="w-6 h-6" />
             </button>
 
             {/* Chat Window */}
             {open && (
-                <div className="fixed bottom-20 right-6 w-96 max-h-[600px] bg-white rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-gray-200">
+                <div className="z-50 fixed bottom-20 right-6 w-96 max-h-[600px] bg-white rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-gray-200">
                     {/* Header */}
                     <div className="bg-gradient-to-r from-blue-500 to-blue-700 text-white p-4 text-lg font-semibold rounded-t-3xl">
                         Chatbot
