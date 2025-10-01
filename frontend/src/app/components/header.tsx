@@ -167,28 +167,16 @@ export default function Header() {
                   <div className="absolute left-0 mt-3 text-sm bg-white/90 shadow-lg rounded text-orange-600 w-36">
                     <a
                       className="block px-4 py-2 hover:bg-gray-200 rounded-t transition"
-                      href="#ekstrakurikuler"
+                      href="/kegiatansiswa/ekstrakurikuler"
                     >
                       Ekstrakurikuler
                     </a>
                     <a
                       className="block px-4 py-2 hover:bg-gray-200 rounded-t transition"
-                      href="#osis-mpk"
+                      href="/kegiatansiswa/prestasi"
                     >
                       Prestasi
                     </a>
-                    <a
-                      className="block px-4 py-2 hover:bg-gray-200 transition"
-                      href="#acara"
-                    >
-                      Mitra
-                    </a>
-                    {/* <a
-                      className="block px-4 py-2 hover:bg-gray-200 rounded-b transition"
-                      href="#study-tour"
-                    >
-                      Study Tour
-                    </a> */}
                   </div>
                 )}
               </div>
