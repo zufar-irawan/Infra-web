@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Navbar from '@/components/header'
-import Footer from '@/app/components/Footer';
+import Footer from '@/components/Footer';
 
 export default function PrestasiPage() {
     const [akademikPage, setAkademikPage] = useState(0);

@@ -1,10 +1,15 @@
 "use client";
 
 import Navbar from "@/app/components/header";
-import Footer from "./components/Footer";
+import Footer from "@/components/footer";
 
 import Home from "./sections/home";
-import About from "./sections/about";
+import Sekilas from "./sections/sekilas";
+import Prestasi from "./sections/prestasi";
+import Pesan from "./sections/pesan";
+import Tur from "./sections/tur";
+import Mitra from "./sections/mitra";
+
 
 export default function Main() {
 	return (
@@ -12,8 +17,12 @@ export default function Main() {
 			<Navbar />
 
 			<Home />
-			<About />
-
+			<Sekilas />
+			<Pesan />
+			<Prestasi />
+			<Tur />
+			<Mitra />
+			
 			<Footer />
 		</div>
 	);
