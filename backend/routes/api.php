@@ -99,3 +99,38 @@ Route::prefix('lms')->group(function () {
         Route::apiResource('finance', LmsFinanceController::class)->only(['index','store','show']);
     });
 });
+
+Route::prefix('presence')->group(function () {
+    // Device Management
+    Route::apiResource('devices', App\Http\Controllers\PresenceDeviceController::class);
+
+    // RFID Management
+    Route::get('rfids/datatable', [App\Http\Controllers\PresenceRfidController::class, 'datatable'])->name('rfids.datatable');
+    Route::apiResource('rfids', App\Http\Controllers\PresenceRfidController::class);
+
+    // Teacher Management
+    Route::get('guru/datatable', [App\Http\Controllers\GuruController::class, 'datatable'])->name('guru.datatable');
+    Route::apiResource('guru', App\Http\Controllers\GuruController::class);
+
+    // Class Management
+    Route::get('kelas/datatable', [App\Http\Controllers\KelasController::class, 'datatable'])->name('kelas.datatable');
+    Route::apiResource('kelas', App\Http\Controllers\KelasController::class);
+
+    // Student Management
+    Route::get('siswa/datatable', [App\Http\Controllers\SiswaController::class, 'datatable'])->name('siswa.datatable');
+    Route::apiResource('siswa', App\Http\Controllers\SiswaController::class);
+
+    // Attendance Management
+    Route::get('absensi/datatable', [App\Http\Controllers\AbsensiSiswaController::class, 'datatable'])->name('absensi.datatable');
+    Route::apiResource('absensi', App\Http\Controllers\AbsensiSiswaController::class)->only(['index','show','store']);
+
+    // Dashboard
+    Route::get('dashboard', [App\Http\Controllers\PresenceDashboardController::class, 'index'])->name('dashboard.index');
+
+    // Reports
+    Route::get('reports/school', [App\Http\Controllers\PresenceReportController::class, 'reportSchool'])->name('reports.school');
+    Route::get('reports/teacher', [App\Http\Controllers\PresenceReportController::class, 'reportTeacher'])->name('reports.teacher');
+    Route::get('reports/student', [App\Http\Controllers\PresenceReportController::class, 'reportStudent'])->name('reports.student');
+    Route::post('reports/school/datatable', [App\Http\Controllers\PresenceReportController::class, 'schoolDatatable'])->name('reports.school.datatable');
+    Route::post('reports/teacher/datatable', [App\Http\Controllers\PresenceReportController::class, 'teacherDatatable'])->name('reports.teacher.datatable');
+});
