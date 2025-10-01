@@ -41,6 +41,7 @@ export default function PrestasiPage() {
         (nonAkademikPage + 1) * itemsPerPage
     );
 
+    // @ts-ignore
     const PrestasiCard = ({ item }) => (
         <div className="bg-gradient-to-br from-orange-400 to-orange-500 rounded-lg overflow-hidden shadow-lg transform hover:scale-105 transition-transform">
             <div className="p-6 text-center relative">
