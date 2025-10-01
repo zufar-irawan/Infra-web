@@ -230,7 +230,6 @@ export default function Header() {
                   )}
                 </div>
 
-<<<<<<< HEAD
                 {/* News */}
                 {/* <a
                   href="#berita"
@@ -247,8 +246,6 @@ export default function Header() {
                   {lang === "id" ? "Penerimaan Siswa" : "Students Registration"}
                 </a>
 
-=======
->>>>>>> 05b22656bb24daf6db51521dc513007601ac96ab
                 {/* Edukasi */}
                 <a
                   href="/edu/login" target="_blank"
