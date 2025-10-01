@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import { GraduationCap, Users, Award, School, Star } from 'lucide-react';
-import Footer from '../components/footer';
-import Navbar from '../components/header'
+import Footer from '@/components/Footer';
+import Navbar from '@/components/header'
 
 export default function PenerimaanSiswaPage() {
     const [expandedStep, setExpandedStep] = useState(null);

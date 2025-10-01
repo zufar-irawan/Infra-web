@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useLang } from "./LangContext";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { ExternalLink } from "lucide-react";
 
 export default function Header() {
   const pathname = usePathname();
@@ -231,6 +232,14 @@ export default function Header() {
                   className="hover:text-yellow-400 transition cursor-pointer"
                 >
                   {lang === "id" ? "Penerimaan Siswa" : "Students Registration"}
+                </a>
+
+                {/* Edukasi */}
+                <a
+                  href="/edu"
+                  className="hover:text-yellow-400 transition cursor-pointer"
+                >
+                  {lang === "id" ? "Presma Edu" : "Presma Edu"} <ExternalLink size={20} />
                 </a>
 
                 {/* Registration */}
