@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Navbar from "@/app/components/header";
-import Footer from "@/app/components/footer";
+import Footer from "@/app/components/Footer";
 import { useLang } from "../../components/LangContext";
 import { useEffect, useState, useRef } from "react";
 
@@ -165,7 +165,7 @@ function FAQSection() {
     },
   ];
 
-  
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent | TouchEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
@@ -177,7 +177,7 @@ function FAQSection() {
     };
 
     document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("touchstart", handleClickOutside); 
+    document.addEventListener("touchstart", handleClickOutside);
     document.addEventListener("keydown", handleEsc);
 
     return () => {

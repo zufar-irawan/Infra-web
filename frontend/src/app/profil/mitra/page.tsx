@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Navbar from "@/app/components/header";
-import Footer from "@/app/components/footer";
+import Footer from "@/app/components/Footer";
 import { useLang } from "../../components/LangContext";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
@@ -176,11 +176,10 @@ function FadeInCard({
   return (
     <div
       ref={ref}
-      className={`transition-all duration-1000 ease-out transform ${
-        visible
+      className={`transition-all duration-1000 ease-out transform ${visible
           ? "opacity-100 translate-y-0"
           : "opacity-0 translate-y-10"
-      }`}
+        }`}
       style={{
         transitionDelay: visible ? `${delay}ms` : "0ms",
       }}

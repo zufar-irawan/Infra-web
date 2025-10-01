@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Navbar from "@/app/components/header";
-import Footer from "@/app/components/footer";
+import Footer from "@/app/components/Footer";
 import { useLang } from "../../components/LangContext";
 import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
@@ -98,20 +98,17 @@ export default function Tentang() {
           alt={lang === "id" ? person.name_id : person.name_en}
           width={section === "manajemen" ? 288 : 176}
           height={section === "manajemen" ? 320 : 192}
-          className={`object-cover w-full ${
-            section === "manajemen" ? "h-80" : "h-48"
-          } transition-all duration-300 ${
-            isSelected ? "brightness-50" : "brightness-100"
-          }`}
+          className={`object-cover w-full ${section === "manajemen" ? "h-80" : "h-48"
+            } transition-all duration-300 ${isSelected ? "brightness-50" : "brightness-100"
+            }`}
         />
 
         {/* Default footer */}
         {!isSelected && (
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#243771]/95 via-[#243771]/70 to-transparent p-3">
             <p
-              className={`text-white text-center ${
-                section === "manajemen" ? "text-base" : "text-xs sm:text-sm"
-              } font-medium`}
+              className={`text-white text-center ${section === "manajemen" ? "text-base" : "text-xs sm:text-sm"
+                } font-medium`}
             >
               {lang === "id" ? person.name_id : person.name_en}
             </p>
