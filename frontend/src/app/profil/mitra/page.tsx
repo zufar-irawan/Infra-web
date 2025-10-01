@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Navbar from "@/app/components/header";
-import Footer from "@/app/components/Footer";
+import Footer from "@/app/components/footer";
 import { useLang } from "../../components/LangContext";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
