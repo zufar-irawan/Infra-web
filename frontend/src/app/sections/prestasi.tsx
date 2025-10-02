@@ -3,14 +3,39 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useLang } from "../components/LangContext";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function Prestasi() {
   const { lang } = useLang();
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement | null>(null);
 
-  // animasi masuk saat scroll
+  // slider state
+  const [current, setCurrent] = useState(0);
+
+  // dummy data prestasi
+  const achievements = [
+    {
+      img: "/pp2.png",
+      title: "Juara Dua",
+      desc_id: "Prestasi lomba basket tingkat provinsi.",
+      desc_en: "Second place in provincial basketball tournament.",
+    },
+    {
+      img: "/pp2.png",
+      title: "Juara Tiga",
+      desc_id: "Kompetisi desain poster digital tingkat nasional.",
+      desc_en: "Third place in national digital poster competition.",
+    },
+    {
+      img: "/pp2.png",
+      title: "Juara Satu",
+      desc_id: "Kompetisi robotik antar sekolah.",
+      desc_en: "First place in inter-school robotics competition.",
+    },
+  ];
+
+  // animasi muncul saat scroll
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -24,63 +49,99 @@ export default function Prestasi() {
     return () => observer.disconnect();
   }, []);
 
-  // dummy data prestasi
-  const achievements = ["/pp2.png", "/pp2.png", "/pp2.png", "/pp2.png"];
+  // next & prev slide
+  const nextSlide = () => {
+    setCurrent((prev) => (prev + 1) % achievements.length);
+  };
+  const prevSlide = () => {
+    setCurrent((prev) => (prev - 1 + achievements.length) % achievements.length);
+  };
 
   return (
-    <section id="prestasi" className="py-20 bg-white" ref={sectionRef}>
-      <div className="container mx-auto px-6 md:px-12 lg:px-20">
-        {/* Title */}
-        <h2
-          className={`text-3xl md:text-4xl font-bold text-center mb-12 transition-all duration-1000 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-          }`}
-        >
-          <span className="text-[#243771]">
-            {lang === "id" ? "" : ""}
-          </span>
-          <span className="text-[#FE4D01]">
-            {lang === "id" ? "Prestasi" : "Achievements"}
-          </span>
-        </h2>
+    <section id="prestasi" ref={sectionRef} className="relative overflow-hidden">
+      {/* Background miring oranye */}
+      <div className="absolute inset-0 bg-[#FE4D01] transform -skew-y-6 origin-top-left z-0"></div>
 
-        {/* Grid Prestasi */}
+      {/* Content */}
+      <div className="relative z-10 container mx-auto px-6 md:px-12 lg:px-20 py-20">
+        {/* Title */}
         <div
-          className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 justify-items-center transition-all duration-1000 delay-300 ${
+          className={`max-w-2xl transition-all duration-1000 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
           }`}
         >
-          {achievements.map((img, i) => (
-            <div
-              key={i}
-              className="bg-white rounded-[9px] shadow-md overflow-hidden transform transition duration-500 hover:-translate-y-2 hover:shadow-2xl"
-              style={{ width: "258px", height: "322px" }}
-            >
-              <Image
-                src={img}
-                alt={`Prestasi ${i + 1}`}
-                width={258}
-                height={322}
-                className="w-full h-full object-cover"
-              />
-            </div>
-          ))}
+          <h2 className="text-2xl md:text-3xl font-bold text-[#FE4D01] mb-4">
+            {lang === "id" ? "Prestasi" : "Achievements"}
+          </h2>
+          <p className="text-gray-700 text-sm md:text-base leading-relaxed">
+            {lang === "id"
+              ? "Dari berbagai macam program keahlian yang ada, lahirlah berbagai prestasi yang membanggakan nama sekolah. Namun, tidak hanya dari bidang akademik. Bidang non akademik juga sama membanggakannya."
+              : "From the various expertise programs available, many achievements have brought pride to the school. Not only in academics, but also in non-academic fields."}
+          </p>
         </div>
 
-        {/* Button */}
-        <div
-          className={`flex justify-center mt-10 transition-all duration-1000 delay-500 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-          }`}
-        >
+        {/* Slider */}
+        <div className="mt-10 flex flex-col md:flex-row items-center md:items-start gap-6">
+          {/* Card prestasi */}
+          <div className="relative flex-1 w-full max-w-md mx-auto">
+            <div className="overflow-hidden rounded-lg shadow-lg bg-white transition-all duration-700">
+              <Image
+                src={achievements[current].img}
+                alt={achievements[current].title}
+                width={600}
+                height={400}
+                className="object-cover w-full h-[250px] md:h-[300px]"
+              />
+              <div className="p-4">
+                <h3 className="text-[#243771] font-bold text-lg">
+                  {achievements[current].title}
+                </h3>
+                <p className="text-sm text-gray-600 mt-2">
+                  {lang === "id"
+                    ? achievements[current].desc_id
+                    : achievements[current].desc_en}
+                </p>
+              </div>
+            </div>
+
+            {/* Slider buttons */}
+            <div className="flex justify-center gap-4 mt-4">
+              <button
+                onClick={prevSlide}
+                className="w-10 h-10 flex items-center justify-center rounded-full bg-[#243771] text-white hover:bg-[#1a2a5c] transition"
+              >
+                ‹
+              </button>
+              <button
+                onClick={nextSlide}
+                className="w-10 h-10 flex items-center justify-center rounded-full bg-[#243771] text-white hover:bg-[#1a2a5c] transition"
+              >
+                ›
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* CTA Button */}
+        <div className="mt-8 flex justify-center">
           <Link
             href="/profil/prestasi"
-            className="px-6 py-3 rounded-lg bg-[#FE4D01] text-white font-semibold shadow hover:bg-[#e44400] transition"
+            className="px-6 py-3 rounded-md bg-[#243771] text-white font-semibold hover:bg-[#1a2a5c] transition"
           >
-            {lang === "id" ? "Pelajari Lebih Lanjut" : "Learn More"}
+            {lang === "id" ? "Selengkapnya" : "Learn More"}
           </Link>
         </div>
       </div>
+
+      {/* Dekorasi kotak kotak bawah */}
+      <div className="absolute bottom-0 left-0 w-full h-6 bg-[length:40px_40px] bg-repeat-x"
+        style={{
+          backgroundImage:
+            "linear-gradient(45deg, #FE4D01 25%, transparent 25%), linear-gradient(-45deg, #FE4D01 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #FE4D01 75%), linear-gradient(-45deg, transparent 75%, #FE4D01 75%)",
+          backgroundSize: "40px 40px",
+          backgroundPosition: "0 0, 0 20px, 20px -20px, -20px 0px",
+        }}
+      ></div>
     </section>
   );
 }

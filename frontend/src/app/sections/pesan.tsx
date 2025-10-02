@@ -93,7 +93,7 @@ export default function Pesan() {
       <div className="absolute top-0 left-40 w-[50px] h-[50px] bg-[#FE4D01]" />
       <div className="absolute bottom-12.5 left-12.5 w-[50px] h-[50px] bg-[#FE4D01]" />
       <div className="absolute bottom-0 left-0 w-[50px] h-[50px] bg-[#FE4D01]" />
-      <div className="absolute top-0 right-12 w-[50px] h-[50px] bg-[#FE4D01]" />
+      <div className="absolute top-0 right-12.5 w-[50px] h-[50px] bg-[#FE4D01]" />
       <div className="absolute bottom-0 right-40 w-[50px] h-[50px] bg-[#FE4D01]" />
     </section>
   );
