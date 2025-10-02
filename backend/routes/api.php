@@ -58,6 +58,7 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::prefix('lms')->group(function () {
     Route::post('auth/register', [LmsUserController::class, 'register']);
     Route::post('auth/login', [LmsUserController::class, 'login']);
+    Route::get('auth/me', [LmsUserController::class, 'me'])->middleware('auth:lms_api');
 
     Route::middleware('auth:lms_api')->group(function () {
         // Auth
