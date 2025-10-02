@@ -12,8 +12,8 @@ export default function Tentang() {
   const { lang } = useLang();
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
-      <Navbar />
+    <>
+
       <div className="h-[100px] bg-white" />
 
       {/* Breadcrumbs */}
@@ -39,9 +39,7 @@ export default function Tentang() {
       </section>
 
       <MitraSection />
-
-      <Footer />
-    </div>
+    </>
   );
 }
 
