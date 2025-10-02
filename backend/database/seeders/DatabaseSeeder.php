@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\LmsUser;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -18,6 +19,36 @@ class DatabaseSeeder extends Seeder
         User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
+        ]);
+
+        LmsUser::create([
+            'name' => 'Admin',
+            'email' => 'admin@mail.com',
+            'password' => bcrypt('12345678'),
+            'role' => 'admin',
+            'phone' => '081234567890',
+            'status' => true,
+            'created_at' => now()
+        ]);
+
+        LmsUser::create([
+            'name' => 'Teacher',
+            'email' => 'guru@mail.com',
+            'password' => bcrypt('12345678'),
+            'role' => 'teacher',
+            'phone' => '081234567890',
+            'status' => true,
+            'created_at' => now()
+        ]);
+
+        LmsUser::create([
+            'name' => 'Student',
+            'email' => 'guru@mail.com',
+            'password' => bcrypt('12345678'),
+            'role' => 'student',
+            'phone' => '081234567890',
+            'status' => true,
+            'created_at' => now()
         ]);
 
         $this->call([
