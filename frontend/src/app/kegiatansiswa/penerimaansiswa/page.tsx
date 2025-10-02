@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { GraduationCap, Users, Award, School, Star } from 'lucide-react';
+
 import Footer from '@/app/components/footer';
 import Navbar from '@/components/header'
 
@@ -41,8 +42,7 @@ export default function PenerimaanSiswaPage() {
     };
 
     return (
-        <div className="min-h-screen bg-white">
-            <Navbar />
+        <>
             {/* Breadcrumb */}
             <div className="bg-white mt-16 px-6 py-4 border-b">
                 <div className="max-w-7xl mx-auto">
@@ -189,8 +189,6 @@ export default function PenerimaanSiswaPage() {
                     </div>
                 </div>
             </div>
-
-            <Footer />
-        </div>
+        </>
     );
 }

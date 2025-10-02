@@ -214,17 +214,29 @@ export default function Header() {
                       >
                         Prestasi
                       </a>
+                        <a
+                            className="block px-4 py-2 hover:bg-gray-200 rounded-t transition"
+                            href="/kegiatansiswa/penerimaansiswa"
+                        >
+                            Penerimaan Siswa
+                        </a>
+                        <a
+                            className="block px-4 py-2 hover:bg-gray-200 rounded-t transition"
+                            href="#berita"
+                        >
+                            Berita Terkini
+                        </a>
                     </div>
                   )}
                 </div>
 
                 {/* News */}
-                <a
+                {/* <a
                   href="#berita"
                   className="hover:text-yellow-400 transition cursor-pointer"
                 >
                   {lang === "id" ? "Berita Terkini" : "Latest News"}
-                </a>
+                </a> */}
 
                 {/* Penerimaan Siswa */}
                 <a
@@ -236,10 +248,10 @@ export default function Header() {
 
                 {/* Edukasi */}
                 <a
-                  href="/edu"
-                  className="hover:text-yellow-400 transition cursor-pointer"
+                  href="/edu/login" target="_blank"
+                  className="hover:text-yellow-400 transition cursor-pointer flex items-center gap-1"
                 >
-                  {lang === "id" ? "Presma Edu" : "Presma Edu"} <ExternalLink size={20} />
+                  {lang === "id" ? "Presma Edu" : "Presma Edu"} <ExternalLink size={16} />
                 </a>
 
                 {/* Registration */}

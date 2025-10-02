@@ -41,6 +41,7 @@ export default function PrestasiPage() {
         (nonAkademikPage + 1) * itemsPerPage
     );
 
+    // @ts-ignore
     const PrestasiCard = ({ item }) => (
         <div className="bg-gradient-to-br from-orange-400 to-orange-500 rounded-lg overflow-hidden shadow-lg transform hover:scale-105 transition-transform">
             <div className="p-6 text-center relative">
@@ -122,9 +123,7 @@ export default function PrestasiPage() {
     );
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <Navbar />
-            {/* Breadcrumb */}
+        <>
             <div className="bg-white px-6 py-4 border-b mt-16">
                 <div className="max-w-7xl mx-auto">
                     <p className="text-sm text-gray-600">
@@ -185,6 +184,7 @@ export default function PrestasiPage() {
                     >
                         <ChevronLeft className="w-6 h-6" />
                     </button>
+
                     <button
                         onClick={() => setNonAkademikPage((prev) => (prev + 1) % totalNonAkademikPages)}
                         className="p-2 border-2 border-blue-900 rounded hover:bg-blue-900 hover:text-white transition-colors"
@@ -194,8 +194,7 @@ export default function PrestasiPage() {
                     </button>
                 </div>
             </div>
+        </>
 
-            <Footer />
-        </div>
     );
 }

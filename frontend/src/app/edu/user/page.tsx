@@ -2,5 +2,5 @@
 import { redirect } from "next/navigation";
 
 export default function Page() {
-  redirect("/edu/login");
+  redirect("/edu/user/dashboard");
 }

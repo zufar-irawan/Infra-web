@@ -17,9 +17,7 @@ export default function Ekstrakurikuler() {
     ];
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <Navbar />
-            {/* Breadcrumb */}
+        <>
             <div className="bg-white px-6 py-4 border-b mt-16">
                 <div className="max-w-7xl mx-auto">
                     <p className="text-sm text-gray-600">
@@ -61,8 +59,6 @@ export default function Ekstrakurikuler() {
                     ))}
                 </div>
             </div>
-
-            <Footer />
-        </div>
+        </>
     );
 }
