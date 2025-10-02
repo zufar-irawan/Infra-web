@@ -1,6 +1,12 @@
 "use client";
 
-import { createContext, useState, ReactNode, useContext } from "react";
+import {
+  createContext,
+  useState,
+  ReactNode,
+  useContext,
+  useEffect,
+} from "react";
 
 type Lang = "id" | "en";
 
@@ -15,7 +21,24 @@ const LangContext = createContext<LangContextType>({
 });
 
 export const LangProvider = ({ children }: { children: ReactNode }) => {
-  const [lang, setLang] = useState<Lang>("id");
+  const [lang, setLangState] = useState<Lang>("id");
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    const savedLang = localStorage.getItem("lang") as Lang | null;
+    if (savedLang) {
+      setLangState(savedLang);
+    }
+    setIsMounted(true);
+  }, []);
+
+  const setLang = (newLang: Lang) => {
+    setLangState(newLang);
+    localStorage.setItem("lang", newLang);
+  };
+
+  // Hindari hydration error: jangan render sebelum client siap
+  if (!isMounted) return null;
 
   return (
     <LangContext.Provider value={{ lang, setLang }}>

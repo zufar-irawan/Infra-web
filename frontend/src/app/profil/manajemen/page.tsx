@@ -133,9 +133,8 @@ export default function Tentang() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
-      {/* Navbar */}
-      <Navbar />
+    <>
+
       <div className="h-[100px] bg-white" />
 
       {/* Breadcrumbs */}
@@ -180,10 +179,7 @@ export default function Tentang() {
 
       {/* FAQ Section */}
       <FAQSection />
-
-      {/* Footer */}
-      <Footer />
-    </div>
+    </>
   );
 }
 
