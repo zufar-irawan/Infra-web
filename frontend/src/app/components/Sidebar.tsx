@@ -1,5 +1,25 @@
 "use client";
 
+import React from "react";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import { Button } from "./ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Badge } from "./ui/badge";
+import {
+  BookOpen,
+  Users,
+  FileText,
+  Calendar,
+  Award,
+  Settings,
+  BarChart3,
+  GraduationCap,
+  Home,
+  LogOut,
+  Bell,
+} from "lucide-react";
+
 interface User {
   name: string;
   email: string;
@@ -8,85 +28,169 @@ interface User {
 
 interface SidebarProps {
   user: User;
+  activeSection: string;
+  onSectionChange: (section: string) => void;
 }
 
-const menus = {
-  user: [
-    { label: "Dashboard", href: "/dashboard" },
-    { label: "Kelas Saya", href: "/dashboard/kelas" },
-    { label: "Tugas", href: "/dashboard/tugas" },
-    { label: "Ujian", href: "/dashboard/ujian" },
-    { label: "Nilai", href: "/dashboard/nilai" },
-    { label: "Jadwal", href: "/dashboard/jadwal" },
-    { label: "Profil", href: "/dashboard/profil" },
-  ],
-  guru: [
-    { label: "Dashboard", href: "/dashboard" },
-    { label: "Kelas", href: "/dashboard/kelas" },
-    { label: "Mata Pelajaran", href: "/dashboard/mapel" },
-    { label: "Tugas", href: "/dashboard/tugas" },
-    { label: "Ujian", href: "/dashboard/ujian" },
-    { label: "Penilaian", href: "/dashboard/penilaian" },
-    { label: "Jadwal", href: "/dashboard/jadwal" },
-    { label: "Profil", href: "/dashboard/profil" },
-  ],
-  admin: [
-    { label: "Dashboard", href: "/dashboard" },
-    { label: "Manajemen User", href: "/dashboard/users" },
-    { label: "Manajemen Kelas", href: "/dashboard/kelas" },
-    { label: "Mata Pelajaran", href: "/dashboard/mapel" },
-    { label: "Laporan", href: "/dashboard/laporan" },
-    { label: "Sistem", href: "/dashboard/system" },
-  ],
-};
+export default function Sidebar({ user, activeSection, onSectionChange }: SidebarProps) {
+  const router = useRouter();
 
-export default function Sidebar({ user }: SidebarProps) {
-  const roleMenus = menus[user.role];
+  // 🔹 Fungsi logout langsung pakai axios
+  const handleLogout = async () => {
+    try {
+      await axios.post("http://localhost:8000/api/lms/auth/logout", null, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Accept: "application/json",
+        },
+      });
+
+      // Hapus token & user dari localStorage
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+
+      // Redirect ke halaman login
+      router.push("/edu/login");
+    } catch (error) {
+      console.error("Logout gagal:", error);
+    }
+  };
+
+  const getMenuItems = () => {
+    const commonItems = [
+      { id: "dashboard", label: "Dashboard", icon: Home },
+      { id: "profil", label: "Profil", icon: Settings },
+    ];
+
+    switch (user.role) {
+      case "user":
+        return [
+          ...commonItems.slice(0, 1),
+          { id: "kelas", label: "Kelas Saya", icon: BookOpen },
+          { id: "tugas", label: "Tugas", icon: FileText },
+          { id: "ujian", label: "Ujian", icon: Award },
+          { id: "nilai", label: "Nilai", icon: BarChart3 },
+          { id: "jadwal", label: "Jadwal", icon: Calendar },
+          ...commonItems.slice(1),
+        ];
+      case "guru":
+        return [
+          ...commonItems.slice(0, 1),
+          { id: "kelas", label: "Kelas", icon: Users },
+          { id: "mapel", label: "Mata Pelajaran", icon: BookOpen },
+          { id: "tugas", label: "Tugas", icon: FileText },
+          { id: "ujian", label: "Ujian", icon: Award },
+          { id: "penilaian", label: "Penilaian", icon: BarChart3 },
+          { id: "jadwal", label: "Jadwal", icon: Calendar },
+          ...commonItems.slice(1),
+        ];
+      case "admin":
+        return [
+          ...commonItems.slice(0, 1),
+          { id: "users", label: "Manajemen User", icon: Users },
+          { id: "kelas", label: "Manajemen Kelas", icon: GraduationCap },
+          { id: "mapel", label: "Mata Pelajaran", icon: BookOpen },
+          { id: "laporan", label: "Laporan", icon: BarChart3 },
+          { id: "system", label: "Sistem", icon: Settings },
+        ];
+      default:
+        return commonItems;
+    }
+  };
+
+  const menuItems = getMenuItems();
 
   return (
-    <aside className="w-64 min-h-screen bg-white text-gray-700 border-r border-gray-200">
+    <div className="w-64 bg-white border-r border-gray-200 flex flex-col h-full">
       {/* Header */}
-      <section className="flex items-center gap-2 p-5">
-        <img src="/smk.png" width={40} height={40} alt="logo" />
-        <h1 className="text-2xl font-bold">EduLearn</h1>
-      </section>
-
-      {/* User Info */}
-      <section className="flex flex-col p-5 border-b">
-        <h2 className="font-bold">{user.name}</h2>
-        <p className="text-sm text-gray-500">{user.email}</p>
-        <span className="mt-1 inline-block text-xs px-2 py-1 rounded-full bg-green-100 text-green-700 capitalize">
-          {user.role}
-        </span>
-      </section>
-
-      {/* Menu */}
-      <section className="flex flex-col gap-1 p-5">
-        {roleMenus.map((item, idx) => (
-          <a
-            key={idx}
-            href={item.href}
-            className={`rounded-lg px-4 py-3 transition ${
-              idx === 0
-                ? "bg-orange-600 text-white"
-                : "hover:bg-gray-100 text-gray-700"
-            }`}
-          >
-            {item.label}
-          </a>
-        ))}
-      </section>
-
-      {/* Notifikasi */}
-      <div className="flex items-center justify-between p-5 hover:bg-gray-100 cursor-pointer">
-        <span>Notifikasi</span>
-        <span className="bg-red-600 text-white flex items-center justify-center w-6 h-6 rounded-full text-xs">
-          3
-        </span>
+      <div className="p-6 border-b border-gray-200">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
+            <BookOpen className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h1 className="font-bold text-lg text-gray-900">EduLearn</h1>
+            <p className="text-sm text-gray-600">LMS Platform</p>
+          </div>
+        </div>
       </div>
 
-      {/* Keluar */}
-      <div className="p-5 hover:bg-gray-100 cursor-pointer">Keluar</div>
-    </aside>
+      {/* User Profile */}
+      <div className="p-4 border-b border-gray-200">
+        <div className="flex items-center gap-3">
+          <Avatar>
+            <AvatarImage src="" />
+            <AvatarFallback className="bg-primary text-white">
+              {user.name.charAt(0).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex-1 min-w-0">
+            <p className="font-medium text-sm text-gray-900 truncate">{user.name}</p>
+            <p className="text-xs text-gray-600 truncate">{user.email}</p>
+          </div>
+          <Badge
+            variant="secondary"
+            className={`text-xs ${
+              user.role === "admin"
+                ? "bg-red-100 text-red-800"
+                : user.role === "guru"
+                ? "bg-blue-100 text-blue-800"
+                : "bg-green-100 text-green-800"
+            }`}
+          >
+            {user.role === "admin" ? "Admin" : user.role === "guru" ? "Guru" : "Siswa"}
+          </Badge>
+        </div>
+      </div>
+
+      {/* Navigation Menu */}
+      <div className="flex-1 py-4">
+        <nav className="space-y-1 px-3">
+          {menuItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeSection === item.id;
+
+            return (
+              <Button
+                key={item.id}
+                variant={isActive ? "default" : "ghost"}
+                className={`w-full justify-start gap-3 ${
+                  isActive
+                    ? "bg-primary text-white hover:bg-primary/90"
+                    : "text-gray-700 hover:bg-gray-100"
+                }`}
+                onClick={() => onSectionChange(item.id)}
+              >
+                <Icon className="w-4 h-4" />
+                {item.label}
+              </Button>
+            );
+          })}
+        </nav>
+      </div>
+
+      {/* Notifications */}
+      <div className="px-3 py-4 border-t border-gray-200">
+        <Button variant="ghost" className="w-full justify-start gap-3 text-gray-700">
+          <Bell className="w-4 h-4" />
+          Notifikasi
+          <Badge variant="destructive" className="ml-auto text-xs">
+            3
+          </Badge>
+        </Button>
+      </div>
+
+      {/* Logout */}
+      <div className="p-3 border-t border-gray-200">
+        <Button
+          variant="ghost"
+          className="w-full justify-start gap-3 text-gray-700 hover:bg-red-50 hover:text-red-700"
+          onClick={handleLogout}
+        >
+          <LogOut className="w-4 h-4" />
+          Keluar
+        </Button>
+      </div>
+    </div>
   );
 }
