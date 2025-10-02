@@ -27,7 +27,7 @@ export default function DashboardPage() {
       })
       .catch(() => {
         localStorage.removeItem("token");
-        router.push("/login");
+        router.push("./login");
       })
       .finally(() => setLoading(false));
   }, [router]);
