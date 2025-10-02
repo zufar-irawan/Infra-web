@@ -77,6 +77,14 @@ class LmsUserController extends Controller
         ]);
     }
 
+    public function me(Request $request)
+    {
+        return response()->json([
+            'success' => true,
+            'user' => $request->user(), // otomatis dari sanctum token
+        ]);
+    }
+
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()?->delete();
