@@ -9,12 +9,14 @@ import Prestasi from "./sections/prestasi";
 import Pesan from "./sections/pesan";
 import Tur from "./sections/tur";
 import Mitra from "./sections/mitra";
+import SocialBar from "./components/social";
 
 
 export default function Main() {
 	return (
 		<div className="flex-1 w-full min-h-screen">
 			<Navbar />
+			<SocialBar />
 
 			<Home />
 			<Sekilas />
