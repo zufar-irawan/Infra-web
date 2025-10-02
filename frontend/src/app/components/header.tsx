@@ -8,7 +8,7 @@ import { ExternalLink } from "lucide-react";
 
 export default function Header() {
   const pathname = usePathname();
-  const { lang, setLang } = useLang();
+  const { lang } = useLang();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -36,24 +36,7 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // close mobile menu when click outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        mobileMenuRef.current &&
-        !mobileMenuRef.current.contains(event.target as Node) &&
-        !(event.target as HTMLElement).closest("button.hamburger-btn")
-      ) {
-        setIsMobileMenuOpen(false);
-      }
-    };
-    if (isMobileMenuOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isMobileMenuOpen]);
-
-  // handle hover dropdown with delay close
+  // handle hover dropdown with delay close (desktop)
   const handleMouseEnter = (menu: string) => {
     if (hoverTimeout.current) clearTimeout(hoverTimeout.current);
     setHoveredDropdown(menu);
@@ -61,7 +44,15 @@ export default function Header() {
   const handleMouseLeave = () => {
     hoverTimeout.current = setTimeout(() => {
       setHoveredDropdown(null);
-    }, 200); // 200ms delay
+    }, 200);
+  };
+
+  // handle sidebar click (close dropdown if click outside dropdown-btn/submenu)
+  const handleSidebarClick = (event: React.MouseEvent) => {
+    const target = event.target as HTMLElement;
+    if (!target.closest("button.dropdown-btn") && !target.closest(".submenu")) {
+      setOpenMobileDropdown(null);
+    }
   };
 
   return (
@@ -99,16 +90,12 @@ export default function Header() {
                   onMouseEnter={() => handleMouseEnter("profil")}
                   onMouseLeave={handleMouseLeave}
                 >
-                  <button className="relative flex items-center gap-1 font-medium transition cursor-pointer group-hover:text-white">
+                  <button className="relative flex items-center gap-1 font-medium transition cursor-pointer group">
                     {lang === "id" ? "Profil Sekolah" : "School Profile"}
                     <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                      viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"
-                      className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round"
-                        d="m19.5 8.25-7.5 7.5-7.5-7.5"/></svg>
                   </button>
                   {hoveredDropdown === "profil" && (
-                    <div className="absolute left-0 mt-3 text-sm bg-white/95 shadow-lg rounded text-orange-600 w-40 transition duration-300 opacity-100">
+                    <div className="absolute left-0 mt-3 text-sm bg-white/95 shadow-lg rounded text-orange-600 w-40 transition duration-300">
                       <a href="/profil/tentang-kami" className="block px-4 py-2 hover:bg-gray-200">Tentang Kami</a>
                       <a href="/profil/visi-misi" className="block px-4 py-2 hover:bg-gray-200">Visi & Misi</a>
                       <a href="/profil/prestasi" className="block px-4 py-2 hover:bg-gray-200">Prestasi</a>
@@ -127,16 +114,12 @@ export default function Header() {
                   onMouseEnter={() => handleMouseEnter("kegiatan")}
                   onMouseLeave={handleMouseLeave}
                 >
-                  <button className="relative flex items-center gap-1 font-medium transition cursor-pointer group-hover:text-white">
+                  <button className="relative flex items-center gap-1 font-medium transition cursor-pointer group">
                     {lang === "id" ? "Kegiatan Siswa" : "Students Activity"}
                     <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                      viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"
-                      className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round"
-                        d="m19.5 8.25-7.5 7.5-7.5-7.5"/></svg>
                   </button>
                   {hoveredDropdown === "kegiatan" && (
-                    <div className="absolute left-0 mt-3 text-sm bg-white/95 shadow-lg rounded text-orange-600 w-44 transition duration-300 opacity-100">
+                    <div className="absolute left-0 mt-3 text-sm bg-white/95 shadow-lg rounded text-orange-600 w-44 transition duration-300">
                       <a href="/kegiatansiswa/ekstrakurikuler" className="block px-4 py-2 hover:bg-gray-200">Ekstrakurikuler</a>
                       <a href="/kegiatansiswa/prestasi" className="block px-4 py-2 hover:bg-gray-200">Prestasi</a>
                       <a href="#berita" className="block px-4 py-2 hover:bg-gray-200">Berita Terkini</a>
@@ -144,7 +127,6 @@ export default function Header() {
                   )}
                 </div>
 
-                {/* lainnya */}
                 <a href="/penerimaansiswa" className="relative font-medium transition cursor-pointer group">
                   {lang === "id" ? "Penerimaan Siswa" : "Students Registration"}
                   <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
@@ -161,7 +143,6 @@ export default function Header() {
               </nav>
             </div>
           ) : (
-            // Mobile Menu button
             <button className="text-white hamburger-btn" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
               <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
@@ -170,54 +151,119 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Mobile Dropdown Menu */}
+      {/* Overlay when sidebar open */}
+      {isMobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-black/30 z-40 transition-opacity duration-300"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Mobile Sidebar */}
       <div
         ref={mobileMenuRef}
-        className={`fixed top-0 right-0 h-full w-64 bg-white text-orange-600 shadow-lg transform transition-transform duration-300 ease-in-out ${
+        onClick={handleSidebarClick}
+        className={`fixed top-0 right-0 h-full w-64 bg-[#243771] text-white shadow-lg transform transition-transform duration-300 ease-in-out z-50 ${
           isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
+        <div className="flex items-center justify-between px-6 py-4">
+          {/* Back Button Icon */}
+          <button onClick={() => setIsMobileMenuOpen(false)} className="text-white hover:text-gray-300">
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7"/></svg>
+          </button>
+        </div>
+
         <div className="flex flex-col px-6 py-4 space-y-2">
-          <a href="/" className="py-2 hover:bg-gray-200">{lang === "id" ? "Beranda" : "Home"}</a>
+          <a href="/" className="relative py-2 group">
+            {lang === "id" ? "Beranda" : "Home"}
+            <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+          </a>
 
           {/* Profil Sekolah mobile */}
-          <button onClick={() => setOpenMobileDropdown(openMobileDropdown === "profil" ? null : "profil")}
-            className="flex justify-between items-center py-2 hover:bg-gray-200">
+          <button
+            onClick={() => setOpenMobileDropdown(openMobileDropdown === "profil" ? null : "profil")}
+            className="flex justify-between items-center py-2 dropdown-btn relative group"
+          >
             {lang === "id" ? "Profil Sekolah" : "School Profile"}
             <span>{openMobileDropdown === "profil" ? "-" : "+"}</span>
+            <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
           </button>
-          <div className={`pl-4 flex flex-col overflow-hidden transition-all duration-300 ease-in-out ${
+          <div className={`submenu pl-4 flex flex-col overflow-hidden transition-all duration-300 ease-in-out ${
               openMobileDropdown === "profil" ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
             }`}>
-            <a href="/profil/tentang-kami" className="py-1 hover:bg-gray-200">Tentang Kami</a>
-            <a href="/profil/visi-misi" className="py-1 hover:bg-gray-200">Visi & Misi</a>
-            <a href="/profil/prestasi" className="py-1 hover:bg-gray-200">Prestasi</a>
-            <a href="/profil/manajemen" className="py-1 hover:bg-gray-200">Manajemen</a>
-            <a href="/profil/fasilitas" className="py-1 hover:bg-gray-200">Fasilitas</a>
-            <a href="/profil/mitra" className="py-1 hover:bg-gray-200">Mitra</a>
-            <a href="/profil/testimoni" className="py-1 hover:bg-gray-200">Testimoni</a>
-            <a href="/profil/faq" className="py-1 hover:bg-gray-200">FAQ</a>
+            <a href="/profil/tentang-kami" className="relative py-1 group">
+              Tentang Kami
+              <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            <a href="/profil/visi-misi" className="relative py-1 group">
+              Visi & Misi
+              <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            <a href="/profil/prestasi" className="relative py-1 group">
+              Prestasi
+              <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            <a href="/profil/manajemen" className="relative py-1 group">
+              Manajemen
+              <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            <a href="/profil/fasilitas" className="relative py-1 group">
+              Fasilitas
+              <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            <a href="/profil/mitra" className="relative py-1 group">
+              Mitra
+              <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            <a href="/profil/testimoni" className="relative py-1 group">
+              Testimoni
+              <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            <a href="/profil/faq" className="relative py-1 group">
+              FAQ
+              <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+            </a>
           </div>
 
           {/* Kegiatan Siswa mobile */}
-          <button onClick={() => setOpenMobileDropdown(openMobileDropdown === "kegiatan" ? null : "kegiatan")}
-            className="flex justify-between items-center py-2 hover:bg-gray-200">
+          <button
+            onClick={() => setOpenMobileDropdown(openMobileDropdown === "kegiatan" ? null : "kegiatan")}
+            className="flex justify-between items-center py-2 dropdown-btn relative group"
+          >
             {lang === "id" ? "Kegiatan Siswa" : "Students Activity"}
             <span>{openMobileDropdown === "kegiatan" ? "-" : "+"}</span>
+            <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
           </button>
-          <div className={`pl-4 flex flex-col overflow-hidden transition-all duration-300 ease-in-out ${
+          <div className={`submenu pl-4 flex flex-col overflow-hidden transition-all duration-300 ease-in-out ${
               openMobileDropdown === "kegiatan" ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
             }`}>
-            <a href="/kegiatansiswa/ekstrakurikuler" className="py-1 hover:bg-gray-200">Ekstrakurikuler</a>
-            <a href="/kegiatansiswa/prestasi" className="py-1 hover:bg-gray-200">Prestasi</a>
-            <a href="#berita" className="py-1 hover:bg-gray-200">Berita Terkini</a>
+            <a href="/kegiatansiswa/ekstrakurikuler" className="relative py-1 group">
+              Ekstrakurikuler
+              <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            <a href="/kegiatansiswa/prestasi" className="relative py-1 group">
+              Prestasi
+              <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            <a href="#berita" className="relative py-1 group">
+              Berita Terkini
+              <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+            </a>
           </div>
 
-          <a href="/penerimaansiswa" className="py-2 hover:bg-gray-200">{lang === "id" ? "Penerimaan Siswa" : "Students Registration"}</a>
-          <a href="/edu/login" target="_blank" className="flex items-center gap-1 py-2 hover:bg-gray-200">
-            {lang === "id" ? "Presma Edu" : "Presma Edu"} <ExternalLink size={16}/>
+          <a href="/penerimaansiswa" className="relative py-2 group">
+            {lang === "id" ? "Penerimaan Siswa" : "Students Registration"}
+            <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
           </a>
-          <button className="px-4 py-2 text-white rounded bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 transition font-semibold">
+
+          <a href="/edu/login" target="_blank" className="relative flex items-center gap-1 py-2 group">
+            {lang === "id" ? "Presma Edu" : "Presma Edu"} <ExternalLink size={16}/>
+            <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+          </a>
+
+          <button className="px-4 py-2 mt-2 text-white rounded bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 transition font-semibold">
             {lang === "id" ? "Pendaftaran" : "Registration"}
           </button>
         </div>
