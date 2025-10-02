@@ -12,9 +12,7 @@ export default function Tentang() {
   const { lang } = useLang();
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
-      {/* Navbar */}
-      <Navbar />
+    <>
 
       {/* Spacer biar ga ketiban header */}
       <div className="h-[100px] bg-white" />
@@ -46,10 +44,7 @@ export default function Tentang() {
 
       {/* FAQ Section */}
       <FAQSection />
-
-      {/* Footer */}
-      <Footer />
-    </div>
+    </>
   );
 }
 
