@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Progress } from './ui/progress';
-import { Chart, ChartContainer, ChartTooltip } from './ui/chart';
+import { ChartContainer, ChartTooltip } from './ui/chart';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { Users, BookOpen, GraduationCap, Settings, TrendingUp, AlertCircle, UserPlus, FileText } from 'lucide-react';
 
