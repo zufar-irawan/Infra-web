@@ -1,6 +1,10 @@
 "use client";
 
+import { useState } from 'react';
+
 export default function Sidebar() {
+    const [user] = useState('student');
+
     return (
         <aside className="w-xs min-h-screen bg-white text-gray-700 divide-y-1 divide-gray-200 border-r border-gray-200">
             <section className="w-full flex items-center justify-center gap-2 p-5">
@@ -9,7 +13,11 @@ export default function Sidebar() {
             </section>
             <section className="w-full flex flex-col justify-center p-5">
                 <h2 className="font-bold">John Doe</h2>
-                <p className="text-sm">XII PPLG 1</p>
+                <p className="text-sm">
+                    {user === 'student' && 'Siswa SMK Presma'}
+                    {user === 'teacher' && 'Guru SMK Presma'}
+                    {user === 'admin' && 'Admin SMK Prestasi Prima'}
+                </p>
             </section>
             <section className="w-full h-160 flex p-5">
                 <div className="w-full flex flex-col gap-1">
