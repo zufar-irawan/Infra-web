@@ -12,7 +12,10 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   title: "SMK Prestasi Prima",
-  description: "official Website of SMK Prestasi Prima",
+  description: "Official Website of SMK Prestasi Prima",
+  icons: {
+    icon: "/webp/smk.webp"
+  },
 };
 
 export default function RootLayout({

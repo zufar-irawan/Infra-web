@@ -1,6 +1,13 @@
-// app/edu/page.tsx
-import { redirect } from "next/navigation";
+"use client";
 
-export default function Page() {
-  redirect("/edu/admin/dashboard");
+import Dashboard from "../pages/dashboard/page";
+import Sidebar from "../pages/sidebar";
+
+export default function Admin() {
+    return (
+        <div className="w-full min-h-screen flex bg-gray-100">
+            <Sidebar />
+            <Dashboard />
+        </div>
+    )
 }

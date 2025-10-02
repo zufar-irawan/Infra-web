@@ -15,8 +15,8 @@ export async function POST(req: Request) {
     });
 
     const data = await res.json();
-    return NextResponse.json({ reply: data.reply || "Bot tidak merespon." });
+    return NextResponse.json({ reply: data.reply || "Bot tidak merespon.", isBot:data.isBot || true });
   } catch (err) {
-    return NextResponse.json({ reply: `⚠️ Error: tidak bisa terhubung ke n8n. ${err}` }, { status: 500 });
+    return NextResponse.json({ reply: `⚠️ Error: tidak bisa terhubung ke n8n. ${err}`, isBot: true }, { status: 500 });
   }
 }

@@ -60,11 +60,11 @@ export default function LoginRegisterPage() {
         // Redirect sesuai role
         if (role === "admin") {
           router.push("/edu/admin");
-        } else if (role === "guru") {
-          router.push("/edu/guru");
+        } else if (role === "teacher") {
+          router.push("/edu/teacher");
         } else {
           // default user
-          router.push("/edu/user");
+          router.push("/edu/student");
         }
       }
     } catch (err: any) {
@@ -84,37 +84,53 @@ export default function LoginRegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 text-sm">
       <div className="w-full max-w-md">
         {/* Logo & Title */}
         <div className="text-center mb-8">
-          <div className="w-24 h-24 bg-gradient-to-br from-blue-800 to-blue-900 rounded-full mx-auto mb-4 flex items-center justify-center shadow-lg">
-            <div className="rounded-lg flex items-center justify-center">
-              <img src="../smk.png" alt="Logo" />
-            </div>
+          <div className="w-20 h-20 bg-blue-900 rounded-full mx-auto mb-4 flex items-center justify-center shadow-md">
+            <img src="../smk.png" alt="Logo" />
           </div>
-          <h1 className="text-2xl font-bold text-orange-500 mb-2">Presma EDU</h1>
+          <h1 className="text-2xl font-black text-orange-500 mb-2">Presma EDU</h1>
         </div>
 
         {/* Card */}
         <div className="bg-white rounded-2xl shadow-xl p-8">
+          <div className="flex mb-6 bg-gray-100 rounded-full p-1">
+            <button
+                onClick={() => setActiveTab('masuk')}
+                className={`flex-1 py-2.5 px-4 rounded-full font-semibold transition-all cursor-pointer ${activeTab === 'masuk'
+                    ? 'bg-blue-900 text-white shadow-md'
+                    : 'bg-transparent text-gray-600 hover:text-gray-900'
+                    }`}
+            >
+              Masuk
+            </button>
+            <button
+                onClick={() => setActiveTab('daftar')}
+                className={`flex-1 py-2.5 px-4 rounded-full font-semibold transition-all cursor-pointer ${activeTab === 'daftar'
+                    ? 'bg-orange-500 text-white shadow-md'
+                    : 'bg-transparent text-gray-600 hover:text-gray-900'
+                    }`}
+            >
+              Daftar
+            </button>
+            </div>
           <div className="mb-6">
             <h2 className="text-xl font-bold text-gray-900 mb-1">
-              {activeTab === "masuk"
-                ? "Selamat Datang Kembali"
-                : "Selamat Datang"}
+              Selamat Datang!
             </h2>
-            <p className="text-sm text-gray-500">
+            <p className="text-gray-500">
               {activeTab === "masuk"
-                ? "Masuk ke akun anda untuk melanjutkan pembelajaran"
-                : "Daftar untuk melanjutkan pembelajaran"}
+                ? "Silahkan login menggunakan akun anda."
+                : "Silahkan daftar untuk membuat akun anda."}
             </p>
           </div>
 
           {/* Form */}
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block font-semibold text-gray-700 mb-2">
                 Email
               </label>
               <input
@@ -128,7 +144,7 @@ export default function LoginRegisterPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block font-semibold text-gray-700 mb-2">
                 Password
               </label>
               <input
@@ -141,10 +157,23 @@ export default function LoginRegisterPage() {
               />
             </div>
 
+            {/* Pesan error / success */}
+          {/* {errorMsg && (
+            <p className="mt-4 text-red-500 font-semibold">{errorMsg}</p>
+          )}
+          {successMsg && (
+            <p className="mt-4 text-green-600 font-semibold">
+              {successMsg}
+            </p>
+          )} */}
+
+          <div>
+            
+          </div>
             <button
               type="submit"
               disabled={loading}
-              className={`w-full py-3 px-4 rounded-lg font-bold text-white transition-all shadow-md hover:shadow-xl transform hover:-translate-y-0.5 ${
+              className={`w-full py-3 px-4 rounded-lg font-bold text-white transition-all cursor-pointer transform hover:-translate-y-0.5 ${
                 activeTab === "masuk"
                   ? "bg-blue-900 hover:bg-blue-800"
                   : "bg-orange-500 hover:bg-orange-600"
@@ -158,15 +187,7 @@ export default function LoginRegisterPage() {
             </button>
           </form>
 
-          {/* Pesan error / success */}
-          {errorMsg && (
-            <p className="mt-4 text-red-500 text-sm font-semibold">{errorMsg}</p>
-          )}
-          {successMsg && (
-            <p className="mt-4 text-green-600 text-sm font-semibold">
-              {successMsg}
-            </p>
-          )}
+          
 
           {/* Divider */}
           <div className="relative my-6">
@@ -182,7 +203,7 @@ export default function LoginRegisterPage() {
           <button
             onClick={handleGoogleLogin}
             type="button"
-            className="w-full py-3 px-4 bg-white border-2 border-gray-200 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition-all flex items-center justify-center gap-3 shadow-sm hover:shadow-md"
+            className="w-full py-3 px-4 bg-white border-2 border-gray-200 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition-all flex items-center justify-center gap-2 cursor-pointer"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path
