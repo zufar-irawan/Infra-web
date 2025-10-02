@@ -1,20 +1,49 @@
 "use client";
 
-import Image from "next/image";
 import { useLang } from "../components/LangContext";
 
 export default function Mitra() {
   const { lang } = useLang();
 
-  const logos = [
-    { src: "/panasonic.png", alt: "Panasonic" },
-    { src: "/jatelindo.png", alt: "Jatelindo" },
-    { src: "/antam.png", alt: "Antam" },
+  const companyLogos = [
+    "slack",
+    "framer",
+    "netflix",
+    "google",
+    "linkedin",
+    "instagram",
+    "facebook",
   ];
 
+  // buat 30 kotak dengan spacing 6.5rem antar kotak
+  const boxes = Array.from({ length: 30 }, (_, i) => i * 6.5);
+
   return (
-    <section id="mitra" className="py-20 bg-white">
-      <div className="container mx-auto px-6 md:px-12 lg:px-20">
+    <section id="mitra" className="relative bg-white overflow-hidden">
+      {/* Dekorasi kotak baris atas */}
+      <div className="absolute top-0 left-0 w-full flex">
+        {boxes.map((pos, idx) => (
+          <div
+            key={`top-${idx}`}
+            className="absolute top-0 w-[50px] h-[50px] bg-[#FE4D01]"
+            style={{ left: `${pos}rem` }}
+          />
+        ))}
+      </div>
+
+      {/* Dekorasi kotak baris bawah */}
+      <div className="absolute bottom-0 left-0 w-full flex">
+        {boxes.map((pos, idx) => (
+          <div
+            key={`bottom-${idx}`}
+            className="absolute bottom-0 w-[50px] h-[50px] bg-[#FE4D01]"
+            style={{ left: `${pos}rem` }}
+          />
+        ))}
+      </div>
+
+      {/* Konten dengan jarak lebih jauh dari kotak */}
+      <div className="container relative z-10 mx-auto px-6 md:px-12 lg:px-20 pt-32 pb-32">
         {/* Title */}
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
           <span className="text-[#FE4D01]">
@@ -22,41 +51,47 @@ export default function Mitra() {
           </span>
         </h2>
 
-        {/* Marquee Container */}
-        <div className="overflow-hidden relative w-full">
-          <div className="flex animate-marquee whitespace-nowrap">
-            {[...logos, ...logos].map((logo, i) => (
-              <div
-                key={i}
-                className="flex items-center justify-center mx-8 min-w-[150px]"
-              >
-                <Image
-                  src={logo.src}
-                  alt={logo.alt}
-                  width={180}
-                  height={80}
-                  className="object-contain"
+        {/* Marquee */}
+        <div className="overflow-hidden w-full relative max-w-6xl mx-auto select-none">
+          {/* Fade gradient kiri */}
+          <div className="absolute left-0 top-0 h-full w-20 z-10 pointer-events-none bg-gradient-to-r from-white to-transparent" />
+
+          {/* Isi marquee */}
+          <div
+            className="marquee-inner flex will-change-transform min-w-[200%]"
+            style={{ animationDuration: "18s" }}
+          >
+            <div className="flex">
+              {[...companyLogos, ...companyLogos].map((company, index) => (
+                <img
+                  key={index}
+                  src={`https://raw.githubusercontent.com/prebuiltui/prebuiltui/main/assets/companyLogo/${company}.svg`}
+                  alt={company}
+                  className="h-14 w-auto mx-8 object-contain"
+                  draggable={false}
                 />
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
+
+          {/* Fade gradient kanan */}
+          <div className="absolute right-0 top-0 h-full w-20 md:w-40 z-10 pointer-events-none bg-gradient-to-l from-white to-transparent" />
         </div>
       </div>
 
-      {/* Marquee Animation */}
+      {/* Animasi marquee */}
       <style jsx>{`
-        @keyframes marquee {
+        .marquee-inner {
+          animation: marqueeScroll linear infinite;
+        }
+
+        @keyframes marqueeScroll {
           0% {
             transform: translateX(0%);
           }
           100% {
             transform: translateX(-50%);
           }
-        }
-        .animate-marquee {
-          display: flex;
-          width: max-content;
-          animation: marquee 20s linear infinite;
         }
       `}</style>
     </section>

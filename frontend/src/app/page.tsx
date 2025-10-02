@@ -10,6 +10,7 @@ import Pesan from "./sections/pesan";
 import Tur from "./sections/tur";
 import Mitra from "./sections/mitra";
 import SocialBar from "./components/social";
+import Jurusan from "./sections/jurusan";
 
 
 export default function Main() {
@@ -21,8 +22,9 @@ export default function Main() {
 			<Home />
 			<Sekilas />
 			<Pesan />
+			<Jurusan />
 			<Prestasi />
-			<Tur />
+			{/* <Tur /> */}
 			<Mitra />
 			<Footer />
 		</div>

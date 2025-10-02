@@ -1,20 +1,26 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useLang } from "../components/LangContext";
 import { useEffect, useState, useRef } from "react";
 
 export default function Prestasi() {
   const { lang } = useLang();
+  const [current, setCurrent] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement | null>(null);
 
-  // animasi masuk saat scroll
+  const achievements = [
+    { img: "/pp2.png", title: "Juara Dua" },
+    { img: "/pp2.png", title: "Juara Tiga" },
+    { img: "/pp2.png", title: "Juara Satu" },
+  ];
+
+  // observer animasi masuk
   useEffect(() => {
     const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
+      entries => {
+        entries.forEach(entry => {
           if (entry.isIntersecting) setIsVisible(true);
         });
       },
@@ -24,63 +30,113 @@ export default function Prestasi() {
     return () => observer.disconnect();
   }, []);
 
-  // dummy data prestasi
-  const achievements = ["/pp2.png", "/pp2.png", "/pp2.png", "/pp2.png"];
+  // next & prev slide
+  const nextSlide = () => {
+    setCurrent((prev) => (prev + 1) % achievements.length);
+  };
+  const prevSlide = () => {
+    setCurrent((prev) => (prev - 1 + achievements.length) % achievements.length);
+  };
 
   return (
-    <section id="prestasi" className="py-20 bg-white" ref={sectionRef}>
-      <div className="container mx-auto px-6 md:px-12 lg:px-20">
-        {/* Title */}
-        <h2
-          className={`text-3xl md:text-4xl font-bold text-center mb-12 transition-all duration-1000 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-          }`}
-        >
-          <span className="text-[#243771]">
-            {lang === "id" ? "" : ""}
-          </span>
-          <span className="text-[#FE4D01]">
-            {lang === "id" ? "Prestasi" : "Achievements"}
-          </span>
-        </h2>
+    <>
+      {/* === SECTION PRESTASI === */}
+      <section
+        id="prestasi"
+        ref={sectionRef}
+        className="relative overflow-hidden py-24 md:py-28 bg-white"
+      >
+        {/* Background oranye miring */}
+        <div className="absolute top-120 left-0 right-0 h-100 bg-[#FE4D01] transform -skew-y-6 origin-top-left z-0"></div>
 
-        {/* Grid Prestasi */}
-        <div
-          className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 justify-items-center transition-all duration-1000 delay-300 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-          }`}
-        >
-          {achievements.map((img, i) => (
-            <div
-              key={i}
-              className="bg-white rounded-[9px] shadow-md overflow-hidden transform transition duration-500 hover:-translate-y-2 hover:shadow-2xl"
-              style={{ width: "258px", height: "322px" }}
-            >
-              <Image
-                src={img}
-                alt={`Prestasi ${i + 1}`}
-                width={258}
-                height={322}
-                className="w-full h-full object-cover"
-              />
-            </div>
-          ))}
-        </div>
-
-        {/* Button */}
-        <div
-          className={`flex justify-center mt-10 transition-all duration-1000 delay-500 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-          }`}
-        >
-          <Link
-            href="/profil/prestasi"
-            className="px-6 py-3 rounded-lg bg-[#FE4D01] text-white font-semibold shadow hover:bg-[#e44400] transition"
+        <div className="relative z-10 container mx-auto px-6 md:px-12 lg:px-20">
+          <div
+            className={`flex flex-col md:flex-row items-start gap-10 transition-all duration-1000 ease-out ${
+              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+            }`}
           >
-            {lang === "id" ? "Pelajari Lebih Lanjut" : "Learn More"}
-          </Link>
+            {/* Kiri: Text */}
+            <div className="md:w-1/2">
+              <h2 className="text-2xl md:text-3xl font-bold text-[#FE4D01] mb-4">
+                {lang === "id" ? "Prestasi" : "Achievements"}
+              </h2>
+              <p className="text-[#243771] text-sm md:text-base leading-relaxed">
+                {lang === "id"
+                  ? "Dari berbagai macam program keahlian yang ada, lahirlah berbagai prestasi yang membanggakan nama sekolah. Namun, tidak hanya dari bidang akademik. Bidang non akademik juga sama membanggakannya."
+                  : "From various expertise programs, achievements were born that make the school proud. Not only in academics but also in non-academic fields."}
+              </p>
+            </div>
+
+            {/* Kanan: Slider */}
+            <div className="md:w-1/2 flex flex-col">
+              {/* Cards */}
+              <div className="flex gap-4 overflow-hidden transition-all duration-500 ease-in-out">
+                {achievements
+                  .slice(current, current + 2)
+                  .concat(
+                    current + 2 > achievements.length
+                      ? achievements.slice(0, (current + 2) % achievements.length)
+                      : []
+                  )
+                  .map((item, i) => (
+                    <div
+                      key={i}
+                      className="bg-white rounded-xl shadow-md overflow-hidden flex-shrink-0 transform transition hover:scale-105 hover:shadow-xl"
+                      style={{ width: "295px", height: "369px" }}
+                    >
+                      <Image
+                        src={item.img}
+                        alt={item.title}
+                        width={295}
+                        height={369}
+                        className="object-cover w-full h-full"
+                      />
+                    </div>
+                  ))}
+              </div>
+
+              {/* Tombol Navigasi + Selengkapnya */}
+              <div className="flex items-center justify-between mt-6">
+                <a
+                  href="/profil/prestasi"
+                  className="px-6 py-2 rounded-md bg-[#243771] text-white text-sm md:text-base font-semibold shadow hover:shadow-lg hover:bg-[#1a2a5c] transition"
+                >
+                  {lang === "id" ? "Selengkapnya" : "More"}
+                </a>
+                <div className="flex gap-3">
+                  <button
+                    onClick={prevSlide}
+                    aria-label="Previous slide"
+                    className="w-10 h-10 flex items-center justify-center rounded-full bg-[#243771] text-white shadow hover:shadow-lg hover:bg-[#1a2a5c] transition"
+                  >
+                    ‹
+                  </button>
+                  <button
+                    onClick={nextSlide}
+                    aria-label="Next slide"
+                    className="w-10 h-10 flex items-center justify-center rounded-full bg-[#243771] text-white shadow hover:shadow-lg hover:bg-[#1a2a5c] transition"
+                  >
+                    ›
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+
+      {/* === SECTION GEDUNG FULLSCREEN === */}
+      <section className="relative w-full bg-[#FE4D01]">
+        <div className="w-full h-screen relative">
+          <Image
+            src="svg/gedung.svg"
+            alt="Gedung SMK Prestasi Prima"
+            fill
+            priority
+            className="object-cover object-center"
+          />
+        </div>
+      </section>
+    </>
   );
 }
