@@ -1,5 +1,8 @@
 "use client"
 
+import Footer from '@/app/components/footer';
+import Navbar from '@/app/components/header';
+
 export default function Ekstrakurikuler() {
 
     const ekstrakurikuler = [
