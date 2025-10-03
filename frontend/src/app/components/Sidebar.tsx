@@ -1,24 +1,13 @@
 "use client";
-
-import {getAuthenticatedUser, UserData} from "@/app/lib/Auth";
-import {GetServerSideProps} from "next";
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 
 interface SidebarProps {
-    user: UserData | null
+    user: any | null
 }
 
-export const getServerSideProps: GetServerSideProps<SidebarProps> = async ({ req }) => {
-    try {
-        const user = getAuthenticatedUser();
-        return { props: { user } };
-    } catch (err) {
-        console.error(err);
-        return { props: { user: null } };
-    }
-};
+// App Router tidak menggunakan getServerSideProps; data user diambil di server route atau context lain
 
 export default function Sidebar({ user }:SidebarProps) {
     console.log(user);
