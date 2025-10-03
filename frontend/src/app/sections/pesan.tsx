@@ -62,15 +62,15 @@ export default function Pesan() {
     <section
       id="pesan"
       ref={sectionRef}
-      className="relative bg-[#243771] py-20 overflow-hidden"
+      className="relative w-full bg-[#243771] py-20 overflow-hidden"
     >
-      <div className="container mx-auto px-6 md:px-12 lg:px-20 relative z-10">
+      <div className="w-full max-w-4/5 mx-auto px-6 md:px-12 lg:px-20 relative z-10">
         {/* Grid angka */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-10 text-center justify-items-center">
+        <div className="grid grid:cols-1 sm:grid-cols-2 lg:flex items-center gap-10 text-center justify-items-center justify-center">
           {data.map((item, index) => (
             <div
               key={item.label}
-              className={`bg-white shadow-md w-[95px] h-[120px] flex flex-col items-center justify-center transform transition duration-500 hover:-translate-y-2 hover:shadow-xl ${
+              className={`bg-white shadow-md w-[200px] h-[120px] flex flex-col items-center justify-center transform transition duration-500 hover:-translate-y-2 hover:shadow-xl ${
                 isVisible ? "scale-105 opacity-100" : "scale-90 opacity-0"
               }`}
               style={{

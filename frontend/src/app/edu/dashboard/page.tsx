@@ -10,6 +10,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [activeSection, setActiveSection] = useState("dashboard");
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -34,7 +35,7 @@ export default function DashboardPage() {
 
   return (
     <div className="flex">
-      {user && <Sidebar user={user} />}
+      {user && <Sidebar user={user} activeSection={activeSection} onSectionChange={setActiveSection} />}
       {user && <DashboardContent user={user} />}
     </div>
   );
