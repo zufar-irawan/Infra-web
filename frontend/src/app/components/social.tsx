@@ -12,29 +12,28 @@ export default function SocialBar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
+70
   return (
-    <div className="fixed top-1/2 right-0 transform -translate-y-1/2 z-50">
-      <div className="relative w-[68px] h-[231px] flex items-center justify-center">
+      <div className={`fixed top-1/2 right-0 transform -translate-y-1/2 z-50 w-[68px] h-[231px] flex items-center justify-center rounded-tl-sm rounded-bl-sm ${ !scrolled ? 'bg-white/70' : 'bg-orange-600/70'}`}>
         {/* Background Putih */}
-        <Image
+        {/* <Image
           src="/social-bar-white.png"
           alt="Social Bar White"
           fill
           className={`absolute transition-opacity duration-300 ${
             scrolled ? "opacity-0" : "opacity-100"
           }`}
-        />
+        /> */}
 
         {/* Background Orange */}
-        <Image
+        {/* <Image
           src="/social-bar-orange.png"
           alt="Social Bar Orange"
           fill
           className={`absolute transition-opacity duration-300 filter-fe4d01 ${
             scrolled ? "opacity-100" : "opacity-0"
           }`}
-        />
+        /> */}
 
         {/* Ikon Sosial Media */}
         <div className="flex flex-col items-center gap-5 relative z-10">
@@ -110,26 +109,25 @@ export default function SocialBar() {
             />
           </a>
         </div>
+        {/* CSS khusus filter warna */}
+        <style jsx global>{`
+          .filter-fe4d01 {
+            filter: brightness(0) saturate(100%) invert(43%) sepia(82%)
+              saturate(3800%) hue-rotate(1deg) brightness(101%) contrast(101%);
+          }
+          .social-icon {
+            transition: transform 0.2s ease, filter 0.2s ease;
+            cursor: pointer;
+          }
+          .social-icon:hover {
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 6px rgba(0, 0, 0, 0.25));
+          }
+          .social-icon:active {
+            transform: scale(0.9);
+          }
+        `}</style>
       </div>
 
-      {/* CSS khusus filter warna */}
-      <style jsx global>{`
-        .filter-fe4d01 {
-          filter: brightness(0) saturate(100%) invert(43%) sepia(82%)
-            saturate(3800%) hue-rotate(1deg) brightness(101%) contrast(101%);
-        }
-        .social-icon {
-          transition: transform 0.2s ease, filter 0.2s ease;
-          cursor: pointer;
-        }
-        .social-icon:hover {
-          transform: scale(1.1);
-          filter: drop-shadow(0 0 6px rgba(0, 0, 0, 0.25));
-        }
-        .social-icon:active {
-          transform: scale(0.9);
-        }
-      `}</style>
-    </div>
   );
 }

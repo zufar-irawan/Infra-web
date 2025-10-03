@@ -79,7 +79,7 @@ export default function Header() {
           {/* Logo */}
           <a href="/" className="flex items-center gap-2">
             <Image src="/webp/smk.webp" alt="Logo" width={46} height={46} className="rounded-full bg-[#243771]" />
-            <span className="font-bold text-xl">SMK Prestasi Prima</span>
+            <span className="hidden sm:inline font-bold text-xl">SMK Prestasi Prima</span>
           </a>
 
           {/* Desktop Menu */}

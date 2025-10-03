@@ -17,22 +17,22 @@ export default function Home() {
         {/* content */}
         <div className="relative z-20 w-full min-h-screen flex items-center justify-center px-4">
           <div className="w-full max-w-4/5 flex flex-col items-center sm:items-start text-center sm:text-left">
-            <p className="uppercase text-xl sm:text-2xl md:text-3xl font-semibold">
+            <p className="uppercase text-xl sm:text-2xl lg:text-3xl font-semibold">
               {lang === "id" ? "SELAMAT DATANG DI SITUS RESMI" : "WELCOME TO OFFICIAL WEBSITE"}
             </p>
-            <h1 className="uppercase text-4xl sm:text-5xl md:text-6xl bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent selection:text-white font-bold leading-tight">
+            <h1 className="uppercase text-4xl sm:text-5xl lg:text-6xl bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent selection:text-white font-bold leading-tight">
               SMK PRESTASI PRIMA
             </h1>
-            <q className="uppercase italic text-base sm:text-lg md:text-xl opacity-90">
+            <q className="uppercase italic text-base sm:text-lg lg:text-xl opacity-90">
               IF BETTER IS POSSIBLE, GOOD IS NOT ENOUGH
             </q>
 
             {/* buttons */}
-<div className="flex flex-col sm:flex-row gap-4 mt-6 w-full sm:w-auto">
+<div className="flex flex-col sm:flex-row gap-4 mt-6 w-full max-w-2xs sm:w-auto">
   {/* Daftar Sekarang */}
   <a
     href="/penerimaansiswa"
-    className="w-full sm:w-auto text-center px-5 py-3 text-white rounded bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 transition font-semibold flex items-center justify-center gap-2"
+    className="w-full sm:w-auto text-center px-5 py-2 text-white rounded bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 transition font-semibold flex items-center justify-center gap-2"
   >
     {lang === "id" ? "DAFTAR SEKARANG" : "REGISTER NOW"}
     <svg
@@ -58,7 +58,7 @@ export default function Home() {
         {/* curved bottom (smooth + responsive) */}
         <div className="absolute bottom-0 w-full overflow-hidden leading-none">
           <svg
-            className="relative block w-full h-20 sm:h-28 md:h-40"
+            className="relative block w-full h-20 sm:h-28 lg:h-40"
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 1440 320"
             preserveAspectRatio="none"
