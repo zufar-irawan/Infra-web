@@ -1,6 +1,5 @@
 import {serialize} from "cookie";
 import {NextApiResponse, NextApiRequest} from "next";
-import {IncomingMessage} from "node:http";
 
 const TOKEN_NAME = "token";
 
@@ -31,11 +30,9 @@ export function removeToken(res: NextApiResponse) {
 }
 
 //Ambil token
-export function getToken(req: NextApiRequest): string | null;
-export function getToken(req: IncomingMessage): string | null;
-export function getToken(req: any): string | null {
-    const cookieHeader = req.headers?.cookie;
-    if (!cookieHeader) return null;
-    const match = cookieHeader.match(/token=([^;]+)/);
+export function getToken(req: NextApiRequest) {
+    const cookie = req.headers.cookie;
+    if (!cookie) return null;
+    const match = cookie.match(new RegExp(`${TOKEN_NAME}=([^;]+)`));
     return match ? match[1] : null;
 }
