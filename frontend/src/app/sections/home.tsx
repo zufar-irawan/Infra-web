@@ -16,19 +16,19 @@ export default function Home() {
 
         {/* content */}
         <div className="relative z-20 w-full min-h-screen flex items-center justify-center px-4">
-          <div className="w-full max-w-4/5 flex flex-col items-center sm:items-start text-center sm:text-left">
-            <p className="uppercase text-xl sm:text-2xl lg:text-3xl font-semibold">
+          <div className="w-full max-w-7xl sm:max-w-4/5 flex flex-col items-center sm:items-start text-center sm:text-left">
+            <p className="uppercase text-xl sm:text-2xl xl:text-3xl font-semibold">
               {lang === "id" ? "SELAMAT DATANG DI SITUS RESMI" : "WELCOME TO OFFICIAL WEBSITE"}
             </p>
-            <h1 className="uppercase text-4xl sm:text-5xl lg:text-6xl bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent selection:text-white font-bold leading-tight">
+            <h1 className="uppercase text-4xl sm:text-5xl xl:text-6xl bg-gradient-to-r from-orange-500 to-orange-600 bg-clip-text text-transparent selection:text-white font-bold leading-tight">
               SMK PRESTASI PRIMA
             </h1>
-            <q className="uppercase italic text-base sm:text-lg lg:text-xl opacity-90">
+            <q className="uppercase italic text-base sm:text-lg xl:text-xl opacity-90">
               IF BETTER IS POSSIBLE, GOOD IS NOT ENOUGH
             </q>
 
             {/* buttons */}
-<div className="flex flex-col sm:flex-row gap-4 mt-6 w-full max-w-2xs sm:w-auto">
+<div className="flex flex-col sm:flex-row gap-4 mt-6 w-fit sm:w-auto">
   {/* Daftar Sekarang */}
   <a
     href="/penerimaansiswa"

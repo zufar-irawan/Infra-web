@@ -6,7 +6,7 @@ export default function Berita() {
         <main>
             <H />
             <section className="w-full min-h-screen">
-
+                berita
             </section>
             <F />
         </main>

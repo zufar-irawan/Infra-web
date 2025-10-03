@@ -67,7 +67,7 @@ export default function Header() {
     <header className="fixed top-0 w-full z-50 select-none">
       {/* Navbar */}
       <div
-        className={`transition duration-300 p-3 text-white ${
+        className={`transition duration-300 p-4 text-white ${
           pathname === "/"
             ? isScrolled
               ? "bg-[#243771] shadow-md"
@@ -75,7 +75,7 @@ export default function Header() {
             : "bg-[#243771] shadow-md"
         }`}
       >
-        <div className="w-full max-w-4/5 mx-auto flex items-center justify-between">
+        <div className="w-full max-w-7xl sm:max-w-4/5 mx-auto flex items-center justify-between">
           {/* Logo */}
           <a href="/" className="flex items-center gap-2">
             <Image src="/webp/smk.webp" alt="Logo" width={46} height={46} className="rounded-full bg-[#243771]" />
@@ -84,7 +84,7 @@ export default function Header() {
 
           {/* Desktop Menu */}
           {!isMobile ? (
-            <div className="text-[15px] hidden md:flex items-center">
+            <div className="text-[15px] hidden xl:flex items-center">
               <nav className="flex items-center gap-6 text-white relative">
                 {/* Home */}
                 <a href={`${pathname === "/" ? "#" : "/"}`} className="relative font-medium transition cursor-pointer group">
