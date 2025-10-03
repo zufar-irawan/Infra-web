@@ -54,19 +54,19 @@ export default function LoginRegisterPage() {
 
                 {/* Card */}
                 <div className="bg-white rounded-2xl shadow-xl p-8">
-                    <div className="flex mb-6 bg-gray-100 rounded-full p-1">
+                    <div className="flex mb-6 bg-[#243771] rounded-full p-1">
                         <button onClick={() => setActiveTab('masuk')}
                                 className={`flex-1 py-2.5 px-4 rounded-full font-semibold transition-all cursor-pointer ${activeTab === 'masuk' 
-                                    ? 'bg-blue-900 text-white shadow-md' 
-                                    : 'bg-transparent text-gray-600 hover:text-gray-900'}`}
+                                    ? 'bg-orange-500 text-white' 
+                                    : 'bg-transparent text-gray-200 hover:text-gray-900'}`}
                         >
                             Masuk
                         </button>
 
                         <button onClick={() => setActiveTab('daftar')}
                                 className={`flex-1 py-2.5 px-4 rounded-full font-semibold transition-all cursor-pointer ${activeTab === 'daftar' 
-                                    ? 'bg-orange-500 text-white shadow-md' 
-                                    : 'bg-transparent text-gray-600 hover:text-gray-900'}`}
+                                    ? 'bg-orange-500 text-white'
+                                    : 'bg-transparent text-gray-200 hover:text-gray-900'}`}
                         >
                             Daftar
                         </button>
