@@ -152,6 +152,15 @@ export default function Header() {
                       <a href="/kegiatansiswa/prestasi" className="block px-4 py-2 hover:bg-gray-200">
                         {lang === "id" ? "Prestasi" : "Achievements"}
                       </a>
+                      <a href="/kegiatansiswa/prestasi" className="block px-4 py-2 hover:bg-gray-200">
+                        OSIS & MPK
+                      </a>
+                      <a href="/kegiatansiswa/prestasi" className="block px-4 py-2 hover:bg-gray-200">
+                        {lang === "id" ? "Acara" : "Event"}
+                      </a>
+                      <a href="/kegiatansiswa/prestasi" className="block px-4 py-2 hover:bg-gray-200">
+                        Study Tour
+                      </a>
                     </div>
                   )}
                 </div>
@@ -287,6 +296,18 @@ export default function Header() {
             </a>
             <a href="/kegiatansiswa/prestasi" className="relative py-1 group">
               {lang === "id" ? "Prestasi" : "Achievements"}
+              <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            <a href="/kegiatansiswa/osis-mpk" className="relative py-1 group">
+              OSIS & MPK
+              <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            <a href="/kegiatansiswa/acara" className="relative py-1 group">
+              {lang === "id" ? "Acara" : "Event"}
+              <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            <a href="/kegiatansiswa/study-tour" className="relative py-1 group">
+              Study Tour
               <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
             </a>
           </div>
