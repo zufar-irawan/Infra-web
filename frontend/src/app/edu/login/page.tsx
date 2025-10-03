@@ -2,10 +2,11 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import axios from "axios";
-import Swal from "sweetalert2";
+import {useRouter} from "next/navigation";
 
 export default function LoginRegisterPage() {
+    const router = useRouter();
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
@@ -14,34 +15,7 @@ export default function LoginRegisterPage() {
     const [activeTab, setActiveTab] = useState("masuk");
 
     const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setError("");
-        setLoading(true);
 
-        try {
-            if(activeTab === "masuk") {
-                //login
-                const res = await axios.post("/api/login", { email, password });
-
-                // Route Handler Anda mengembalikan { success: true }
-                if(res.status === 200 && res.data.success) {
-                    Swal.fire({
-                        icon: "success",
-                        text: "You have been successfully login to dashboard!",
-                        title: "Login successfully",
-                    })
-
-                    window.location.href = "/edu/dashboard"
-                }
-            } else {
-                //register
-
-            }
-        } catch (err: any){
-            setError(err || "login gagal");
-        } finally {
-            setLoading(false);
-        }
     }
 
     const handleGoogleLogin = () => {
