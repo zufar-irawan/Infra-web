@@ -29,8 +29,8 @@ export default function Jurusan() {
   ];
 
   return (
-    <section id="jurusan" className="relative py-20 bg-white overflow-hidden">
-      <div className="container mx-auto px-6 md:px-12 lg:px-20">
+    <section id="jurusan" className="relative py-30 bg-white overflow-hidden">
+      <div className="w-full max-w-7xl sm:max-w-4/5 mx-auto px-6 md:px-12 lg:px-20">
         {/* Title */}
         <h2 className="text-3xl md:text-4xl font-bold text-center">
           <span className="text-[#FE4D01]">

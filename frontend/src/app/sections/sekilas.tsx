@@ -26,10 +26,10 @@ export default function Sekilas() {
   return (
     <section
       id="sekilas"
-      className="relative py-20 bg-white overflow-hidden"
+      className="relative py-30 bg-white overflow-hidden"
       ref={sectionRef}
     >
-      <div className="container mx-auto px-6 md:px-12 lg:px-20 relative z-10">
+      <div className="w-full max-w-7xl sm:max-w-4/5 mx-auto px-6 md:px-12 lg:px-20 relative z-10">
         <div className="flex flex-col md:flex-row items-center gap-10">
           {/* Kiri: Foto Kepala Sekolah */}
           <div
