@@ -5,6 +5,7 @@ import { useLang } from "./LangContext";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { ExternalLink, ChevronDown } from "lucide-react";
+import Link from "next/link";
 
 export default function Header() {
   const pathname = usePathname();
@@ -75,20 +76,20 @@ export default function Header() {
       >
         <div className="container mx-auto flex items-center justify-between">
           {/* Logo */}
-          <a href="/" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2">
             <Image src="/webp/smk.webp" alt="Logo" width={46} height={46} className="rounded-full bg-[#243771]" />
             <span className="font-bold text-xl">SMK Prestasi Prima</span>
-          </a>
+          </Link>
 
           {/* Desktop Menu */}
           {!isMobile ? (
             <div className="text-[15px] hidden md:flex items-center gap-6">
               <nav className="flex items-center gap-6 text-white relative">
                 {/* Home */}
-                <a href={`${pathname === "/" ? "#" : "/"}`} className="relative font-medium transition cursor-pointer group">
+                <Link href={`${pathname === "/" ? "#" : "/"}`} className="relative font-medium transition cursor-pointer group">
                   {lang === "id" ? "Beranda" : "Home"}
                   <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
-                </a>
+                </Link>
 
                 {/* Profil Sekolah */}
                 <div
@@ -103,30 +104,30 @@ export default function Header() {
                   </button>
                   {hoveredDropdown === "profil" && (
                     <div className="absolute left-0 mt-3 text-sm bg-white/95 shadow-lg rounded text-orange-600 w-44 transition duration-300">
-                      <a href="/profil/tentang-kami" className="block px-4 py-2 hover:bg-gray-200">
+                      <Link href="/profil/tentang-kami" className="block px-4 py-2 hover:bg-gray-200">
                         {lang === "id" ? "Tentang Kami" : "About Us"}
-                      </a>
-                      <a href="/profil/visi-misi" className="block px-4 py-2 hover:bg-gray-200">
+                      </Link>
+                      <Link href="/profil/visi-misi" className="block px-4 py-2 hover:bg-gray-200">
                         {lang === "id" ? "Visi & Misi" : "Vision & Mission"}
-                      </a>
-                      <a href="/profil/prestasi" className="block px-4 py-2 hover:bg-gray-200">
+                      </Link>
+                      <Link href="/profil/prestasi" className="block px-4 py-2 hover:bg-gray-200">
                         {lang === "id" ? "Prestasi" : "Achievements"}
-                      </a>
-                      <a href="/profil/manajemen" className="block px-4 py-2 hover:bg-gray-200">
+                      </Link>
+                      <Link href="/profil/manajemen" className="block px-4 py-2 hover:bg-gray-200">
                         {lang === "id" ? "Manajemen" : "Management"}
-                      </a>
-                      <a href="/profil/fasilitas" className="block px-4 py-2 hover:bg-gray-200">
+                      </Link>
+                      <Link href="/profil/fasilitas" className="block px-4 py-2 hover:bg-gray-200">
                         {lang === "id" ? "Fasilitas" : "Facilities"}
-                      </a>
-                      <a href="/profil/mitra" className="block px-4 py-2 hover:bg-gray-200">
+                      </Link>
+                      <Link href="/profil/mitra" className="block px-4 py-2 hover:bg-gray-200">
                         {lang === "id" ? "Mitra" : "Partners"}
-                      </a>
-                      <a href="/profil/testimoni" className="block px-4 py-2 hover:bg-gray-200">
+                      </Link>
+                      <Link href="/profil/testimoni" className="block px-4 py-2 hover:bg-gray-200">
                         {lang === "id" ? "Testimoni" : "Testimonials"}
-                      </a>
-                      <a href="/profil/faq" className="block px-4 py-2 hover:bg-gray-200">
+                      </Link>
+                      <Link href="/profil/faq" className="block px-4 py-2 hover:bg-gray-200">
                         {lang === "id" ? "FAQ" : "FAQ"}
-                      </a>
+                      </Link>
                     </div>
                   )}
                 </div>
@@ -144,29 +145,29 @@ export default function Header() {
                   </button>
                   {hoveredDropdown === "kegiatan" && (
                     <div className="absolute left-0 mt-3 text-sm bg-white/95 shadow-lg rounded text-orange-600 w-48 transition duration-300">
-                      <a href="/kegiatansiswa/ekstrakurikuler" className="block px-4 py-2 hover:bg-gray-200">
+                      <Link href="/kegiatansiswa/ekstrakurikuler" className="block px-4 py-2 hover:bg-gray-200">
                         {lang === "id" ? "Ekstrakurikuler" : "Extracurricular"}
-                      </a>
-                      <a href="/kegiatansiswa/prestasi" className="block px-4 py-2 hover:bg-gray-200">
+                      </Link>
+                      <Link href="/kegiatansiswa/prestasi" className="block px-4 py-2 hover:bg-gray-200">
                         {lang === "id" ? "Prestasi" : "Achievements"}
-                      </a>
-                      <a href="#berita" className="block px-4 py-2 hover:bg-gray-200">
+                      </Link>
+                      <Link href="#berita" className="block px-4 py-2 hover:bg-gray-200">
                         {lang === "id" ? "Berita Terkini" : "Latest News"}
-                      </a>
+                      </Link>
                     </div>
                   )}
                 </div>
 
                 {/* Other Links */}
-                <a href="/penerimaansiswa" className="relative font-medium transition cursor-pointer group">
+                <Link href="/penerimaansiswa" className="relative font-medium transition cursor-pointer group">
                   {lang === "id" ? "Penerimaan Siswa" : "Students Registration"}
                   <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
-                </a>
+                </Link>
 
-                <a href="/edu/login" target="_blank" className="relative font-medium transition cursor-pointer flex items-center gap-1 group">
+                <Link href="/edu/login" target="_blank" className="relative font-medium transition cursor-pointer flex items-center gap-1 group">
                   {lang === "id" ? "Presma Edu" : "Presma Edu"} <ExternalLink size={16}/>
                   <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
-                </a>
+                </Link>
 
                 {/* Tombol bilingual desktop */}
                 <button
@@ -223,10 +224,10 @@ export default function Header() {
 
         {/* Sidebar MENU bilingual */}
         <div className="flex flex-col px-6 py-4 space-y-2">
-          <a href="/" className="relative py-2 group">
+          <Link href="/" className="relative py-2 group">
             {lang === "id" ? "Beranda" : "Home"}
             <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
-          </a>
+          </Link>
 
           {/* Profil Sekolah mobile */}
           <button
@@ -240,38 +241,38 @@ export default function Header() {
           <div className={`submenu pl-4 flex flex-col overflow-hidden transition-all duration-300 ease-in-out ${
               openMobileDropdown === "profil" ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
             }`}>
-            <a href="/profil/tentang-kami" className="relative py-1 group">
+            <Link href="/profil/tentang-kami" className="relative py-1 group">
               {lang === "id" ? "Tentang Kami" : "About Us"}
               <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
-            </a>
-            <a href="/profil/visi-misi" className="relative py-1 group">
+            </Link>
+            <Link href="/profil/visi-misi" className="relative py-1 group">
               {lang === "id" ? "Visi & Misi" : "Vision & Mission"}
               <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
-            </a>
-            <a href="/profil/prestasi" className="relative py-1 group">
+            </Link>
+            <Link href="/profil/prestasi" className="relative py-1 group">
               {lang === "id" ? "Prestasi" : "Achievements"}
               <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
-            </a>
-            <a href="/profil/manajemen" className="relative py-1 group">
+            </Link>
+            <Link href="/profil/manajemen" className="relative py-1 group">
               {lang === "id" ? "Manajemen" : "Management"}
               <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
-            </a>
-            <a href="/profil/fasilitas" className="relative py-1 group">
+            </Link>
+            <Link href="/profil/fasilitas" className="relative py-1 group">
               {lang === "id" ? "Fasilitas" : "Facilities"}
               <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
-            </a>
-            <a href="/profil/mitra" className="relative py-1 group">
+            </Link>
+            <Link href="/profil/mitra" className="relative py-1 group">
               {lang === "id" ? "Mitra" : "Partners"}
               <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
-            </a>
-            <a href="/profil/testimoni" className="relative py-1 group">
+            </Link>
+            <Link href="/profil/testimoni" className="relative py-1 group">
               {lang === "id" ? "Testimoni" : "Testimonials"}
               <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
-            </a>
-            <a href="/profil/faq" className="relative py-1 group">
+            </Link>
+            <Link href="/profil/faq" className="relative py-1 group">
               {lang === "id" ? "FAQ" : "FAQ"}
               <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
-            </a>
+            </Link>
           </div>
 
           {/* Kegiatan Siswa mobile */}
@@ -286,29 +287,29 @@ export default function Header() {
           <div className={`submenu pl-4 flex flex-col overflow-hidden transition-all duration-300 ease-in-out ${
               openMobileDropdown === "kegiatan" ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
             }`}>
-            <a href="/kegiatansiswa/ekstrakurikuler" className="relative py-1 group">
+            <Link href="/kegiatansiswa/ekstrakurikuler" className="relative py-1 group">
               {lang === "id" ? "Ekstrakurikuler" : "Extracurricular"}
               <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
-            </a>
-            <a href="/kegiatansiswa/prestasi" className="relative py-1 group">
+            </Link>
+            <Link href="/kegiatansiswa/prestasi" className="relative py-1 group">
               {lang === "id" ? "Prestasi" : "Achievements"}
               <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
-            </a>
-            <a href="#berita" className="relative py-1 group">
+            </Link>
+            <Link href="#berita" className="relative py-1 group">
               {lang === "id" ? "Berita Terkini" : "Latest News"}
               <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
-            </a>
+            </Link>
           </div>
 
-          <a href="/penerimaansiswa" className="relative py-2 group">
+          <Link href="/penerimaansiswa" className="relative py-2 group">
             {lang === "id" ? "Penerimaan Siswa" : "Students Registration"}
             <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
-          </a>
+          </Link>
 
-          <a href="/edu/login" target="_blank" className="relative flex items-center gap-1 py-2 group">
+          <Link href="/edu/login" target="_blank" className="relative flex items-center gap-1 py-2 group">
             Presma Edu <ExternalLink size={16}/>
             <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
-          </a>
+          </Link>
 
           <button className="px-4 py-2 mt-2 text-white rounded bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 transition font-semibold">
             {lang === "id" ? "Pendaftaran" : "Registration"}

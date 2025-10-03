@@ -1,7 +1,7 @@
 "use client";
 
-import Navbar from "@/app/components/header";
-import Footer from "@/app/components/footer";
+import Navbar from "@/components/Header";
+import Footer from "@/components/Footer";
 
 import Home from "./sections/home";
 import Sekilas from "./sections/sekilas";
@@ -9,7 +9,7 @@ import Prestasi from "./sections/prestasi";
 import Pesan from "./sections/pesan";
 import Tur from "./sections/tur";
 import Mitra from "./sections/mitra";
-import SocialBar from "./components/social";
+import SocialBar from "@/components/Social";
 import Jurusan from "./sections/jurusan";
 
 

@@ -1,6 +1,6 @@
 import React from "react";
-import Navbar from "@/components/header"
-import Footer from "@/app/components/footer";
+import Navbar from "@/components/Header"
+import Footer from "@/components/Footer";
 
 export default function ProfilLayout(
     {children}: {children: React.ReactNode}

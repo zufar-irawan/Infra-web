@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import Navbar from "@/app/components/header";
-import Footer from "@/app/components/footer";
+import Navbar from "@/components/Header";
+import Footer from "@/components/Footer";
 import { useLang } from "../../components/LangContext";
 import { useState, useRef, useEffect } from "react";
 
