@@ -64,7 +64,7 @@ export default function Pesan() {
       ref={sectionRef}
       className="relative w-full bg-[#243771] py-20 overflow-hidden"
     >
-      <div className="w-full max-w-4/5 mx-auto px-6 md:px-12 lg:px-20 relative z-10">
+      <div className="w-full max-w-7xl sm:max-w-4/5 mx-auto px-6 md:px-12 lg:px-20 relative z-10">
         {/* Grid angka */}
         <div className="grid grid:cols-1 sm:grid-cols-2 lg:flex items-center gap-10 text-center justify-items-center justify-center">
           {data.map((item, index) => (
