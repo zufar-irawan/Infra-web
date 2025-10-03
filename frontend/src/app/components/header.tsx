@@ -111,9 +111,6 @@ export default function Header() {
                       <a href="/profil/visi-misi" className="block px-4 py-2 hover:bg-gray-200">
                         {lang === "id" ? "Visi & Misi" : "Vision & Mission"}
                       </a>
-                      <a href="/profil/prestasi" className="block px-4 py-2 hover:bg-gray-200">
-                        {lang === "id" ? "Prestasi" : "Achievements"}
-                      </a>
                       <a href="/profil/manajemen" className="block px-4 py-2 hover:bg-gray-200">
                         {lang === "id" ? "Manajemen" : "Management"}
                       </a>
@@ -125,6 +122,9 @@ export default function Header() {
                       </a>
                       <a href="/profil/testimoni" className="block px-4 py-2 hover:bg-gray-200">
                         {lang === "id" ? "Testimoni" : "Testimonials"}
+                      </a>
+                      <a href="/berita" className="block px-4 py-2 hover:bg-gray-200">
+                        {lang === "id" ? "Berita" : "News"}
                       </a>
                       <a href="/profil/faq" className="block px-4 py-2 hover:bg-gray-200">
                         {lang === "id" ? "FAQ" : "FAQ"}
@@ -151,9 +151,6 @@ export default function Header() {
                       </a>
                       <a href="/kegiatansiswa/prestasi" className="block px-4 py-2 hover:bg-gray-200">
                         {lang === "id" ? "Prestasi" : "Achievements"}
-                      </a>
-                      <a href="#berita" className="block px-4 py-2 hover:bg-gray-200">
-                        {lang === "id" ? "Berita Terkini" : "Latest News"}
                       </a>
                     </div>
                   )}
@@ -246,10 +243,6 @@ export default function Header() {
               {lang === "id" ? "Visi & Misi" : "Vision & Mission"}
               <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
             </a>
-            <a href="/profil/prestasi" className="relative py-1 group">
-              {lang === "id" ? "Prestasi" : "Achievements"}
-              <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
-            </a>
             <a href="/profil/manajemen" className="relative py-1 group">
               {lang === "id" ? "Manajemen" : "Management"}
               <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
@@ -264,6 +257,10 @@ export default function Header() {
             </a>
             <a href="/profil/testimoni" className="relative py-1 group">
               {lang === "id" ? "Testimoni" : "Testimonials"}
+              <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            <a href="/berita" className="relative py-1 group">
+              {lang === "id" ? "Berita" : "News"}
               <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
             </a>
             <a href="/profil/faq" className="relative py-1 group">
@@ -290,10 +287,6 @@ export default function Header() {
             </a>
             <a href="/kegiatansiswa/prestasi" className="relative py-1 group">
               {lang === "id" ? "Prestasi" : "Achievements"}
-              <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
-            </a>
-            <a href="#berita" className="relative py-1 group">
-              {lang === "id" ? "Berita Terkini" : "Latest News"}
               <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
             </a>
           </div>
