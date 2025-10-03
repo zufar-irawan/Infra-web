@@ -38,7 +38,7 @@ export async function POST(request: Request) {
     const { email, password } = await request.json();
 
     try {
-        // 2. Panggil API Backend (lms/auth/login)
+        // 2. Panggil API Backend (lms/user/login)
         const response = await api.post<any, { data: { data: LoginResponse } }>(
             "/lms/auth/login",
             {email, password},

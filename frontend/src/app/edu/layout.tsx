@@ -15,7 +15,7 @@ export default function EduLayout(
 
     return (
         <div className="flex flex-row">
-            { !isLogin && <Sidebar />}
+            {/*{ !isLogin && <Sidebar />}*/}
 
             <div className={`flex-col ${isLogin && "w-full justify-center"}`}>
                 {children}

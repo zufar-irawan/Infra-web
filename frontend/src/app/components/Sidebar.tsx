@@ -1,25 +1,18 @@
 "use client";
 
-import Link from "next/link";
-import {getCurrenUser, User} from "@/app/lib/user";
-import {getToken} from "@/app/lib/Auth";
+import {getAuthenticatedUser, UserData} from "@/app/lib/Auth";
 import {GetServerSideProps} from "next";
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
+
 interface SidebarProps {
-    user: User | null
+    user: UserData | null
 }
 
 export const getServerSideProps: GetServerSideProps<SidebarProps> = async ({ req }) => {
-    const token = getToken(req);
-
-    if (!token) {
-        return { props: { user: null } }; // user belum login
-    }
-
     try {
-        const user = await getCurrenUser(token);
+        const user = getAuthenticatedUser();
         return { props: { user } };
     } catch (err) {
         console.error(err);

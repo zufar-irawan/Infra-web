@@ -1,38 +1,41 @@
-import {serialize} from "cookie";
-import {NextApiResponse, NextApiRequest} from "next";
+import { cookies } from "next/headers";
 
-const TOKEN_NAME = "token";
-
-//Simpan token
-export function setToken(res: NextApiResponse, token: string) {
-    const cookie = serialize(TOKEN_NAME, token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        path: "/",
-        maxAge: 60 * 60 * 24 * 7,
-    });
-
-    res.setHeader("Set-Cookie", cookie);
+// Definisikan ulang interface UserData
+export interface UserData {
+    id: number;
+    name: string;
+    email: string;
+    role: "siswa" | "guru" | "admin";
 }
 
-//Hapus token
-export function removeToken(res: NextApiResponse) {
-    const cookie = serialize(TOKEN_NAME, "", {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        path: "/",
-        maxAge: -1,
-    })
+const USER_DATA_NAME = "user_data"; // Harus sama dengan nama cookie di route.ts
 
-    res.setHeader("Set-Cookie", cookie);
-}
+/**
+ * Mengambil data user yang tersimpan di cookie.
+ * Fungsi ini harus dipanggil di lingkungan Server (Server Component atau Route Handler).
+ * @returns UserData | null
+ */
+export function getAuthenticatedUser(): UserData | null {
+    try {
+        // @ts-ignore
+        const userCookie = cookies().get(USER_DATA_NAME);
 
-//Ambil token
-export function getToken(req: NextApiRequest) {
-    const cookie = req.headers.cookie;
-    if (!cookie) return null;
-    const match = cookie.match(new RegExp(`${TOKEN_NAME}=([^;]+)`));
-    return match ? match[1] : null;
+        if (!userCookie || !userCookie.value) {
+            return null;
+        }
+
+        // Cookie disimpan sebagai JSON string, harus di-parse kembali
+        const userData = JSON.parse(userCookie.value);
+
+        // Validasi tipe data dasar (opsional, tapi disarankan)
+        if (typeof userData === 'object' && userData !== null && 'id' in userData && 'name' in userData) {
+            return userData as UserData;
+        }
+
+        return null;
+
+    } catch (error) {
+        console.error("Gagal mengambil atau mem-parse data user dari cookie:", error);
+        return null;
+    }
 }
