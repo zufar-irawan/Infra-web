@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 export default function LoginRegisterPage() {
     const [email, setEmail] = useState("");
@@ -24,6 +25,12 @@ export default function LoginRegisterPage() {
 
                 // Route Handler Anda mengembalikan { success: true }
                 if(res.status === 200 && res.data.success) {
+                    Swal.fire({
+                        icon: "success",
+                        text: "You have been successfully login to dashboard!",
+                        title: "Login successfully",
+                    })
+
                     window.location.href = "/edu/dashboard"
                 }
             } else {
@@ -31,7 +38,7 @@ export default function LoginRegisterPage() {
 
             }
         } catch (err: any){
-            setError(err.response?.data?.message || "login gagal");
+            setError(err || "login gagal");
         } finally {
             setLoading(false);
         }
@@ -43,6 +50,7 @@ export default function LoginRegisterPage() {
 
     return (
         <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 text-sm">
+            <h1>{error}</h1>
             <div className="w-full max-w-md">
                 {/* Logo & Title */}
                 <div className="text-center mb-8">
