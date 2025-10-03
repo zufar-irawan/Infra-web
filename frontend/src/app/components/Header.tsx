@@ -5,7 +5,6 @@ import { useLang } from "./LangContext";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { ExternalLink, ChevronDown } from "lucide-react";
-import Link from "next/link";
 
 export default function Header() {
   const pathname = usePathname();
@@ -13,7 +12,6 @@ export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [openMobileDropdown, setOpenMobileDropdown] = useState<string | null>(null);
   const [openMobileDropdown1, setOpenMobileDropdown1] = useState<string | null>(null);
   const [openMobileDropdown2, setOpenMobileDropdown2] = useState<string | null>(null);
 
@@ -54,7 +52,8 @@ export default function Header() {
   const handleSidebarClick = (event: React.MouseEvent) => {
     const target = event.target as HTMLElement;
     if (!target.closest("button.dropdown-btn") && !target.closest(".submenu")) {
-      setOpenMobileDropdown(null);
+      setOpenMobileDropdown1(null);
+      setOpenMobileDropdown2(null);
     }
   };
 
@@ -62,7 +61,7 @@ export default function Header() {
   const flagUrl =
     lang === "id"
       ? "https://flagcdn.com/w20/id.png"
-      : "https://flagcdn.com/w20/gb.png";
+      : "https://flagcdn.com/w20/us.png";
 
   return (
     <header className="fixed top-0 w-full z-50 select-none">
@@ -76,16 +75,16 @@ export default function Header() {
             : "bg-[#243771] shadow-md"
         }`}
       >
-        <div className="container mx-auto flex items-center justify-between">
+        <div className="w-full max-w-4/5 mx-auto flex items-center justify-between">
           {/* Logo */}
           <a href="/" className="flex items-center gap-2">
             <Image src="/webp/smk.webp" alt="Logo" width={46} height={46} className="rounded-full bg-[#243771]" />
-            <span className="font-bold text-xl">SMK Prestasi Prima</span>
+            <span className="hidden sm:inline font-bold text-xl">SMK Prestasi Prima</span>
           </a>
 
           {/* Desktop Menu */}
           {!isMobile ? (
-            <div className="text-[15px] hidden md:flex items-center gap-6">
+            <div className="text-[15px] hidden md:flex items-center">
               <nav className="flex items-center gap-6 text-white relative">
                 {/* Home */}
                 <a href={`${pathname === "/" ? "#" : "/"}`} className="relative font-medium transition cursor-pointer group">
@@ -112,9 +111,6 @@ export default function Header() {
                       <a href="/profil/visi-misi" className="block px-4 py-2 hover:bg-gray-200">
                         {lang === "id" ? "Visi & Misi" : "Vision & Mission"}
                       </a>
-                      <a href="/profil/prestasi" className="block px-4 py-2 hover:bg-gray-200">
-                        {lang === "id" ? "Prestasi" : "Achievements"}
-                      </a>
                       <a href="/profil/manajemen" className="block px-4 py-2 hover:bg-gray-200">
                         {lang === "id" ? "Manajemen" : "Management"}
                       </a>
@@ -126,6 +122,9 @@ export default function Header() {
                       </a>
                       <a href="/profil/testimoni" className="block px-4 py-2 hover:bg-gray-200">
                         {lang === "id" ? "Testimoni" : "Testimonials"}
+                      </a>
+                      <a href="/berita" className="block px-4 py-2 hover:bg-gray-200">
+                        {lang === "id" ? "Berita" : "News"}
                       </a>
                       <a href="/profil/faq" className="block px-4 py-2 hover:bg-gray-200">
                         {lang === "id" ? "FAQ" : "FAQ"}
@@ -153,40 +152,43 @@ export default function Header() {
                       <a href="/kegiatansiswa/prestasi" className="block px-4 py-2 hover:bg-gray-200">
                         {lang === "id" ? "Prestasi" : "Achievements"}
                       </a>
-                      <a href="#berita" className="block px-4 py-2 hover:bg-gray-200">
-                        {lang === "id" ? "Berita Terkini" : "Latest News"}
+                      <a href="/kegiatansiswa/osis-mpk" className="block px-4 py-2 hover:bg-gray-200">
+                        OSIS & MPK
+                      </a>
+                      <a href="/kegiatansiswa/acara" className="block px-4 py-2 hover:bg-gray-200">
+                        {lang === "id" ? "Acara" : "Event"}
+                      </a>
+                      <a href="/kegiatansiswa/study-tour" className="block px-4 py-2 hover:bg-gray-200">
+                        Study Tour
                       </a>
                     </div>
                   )}
                 </div>
-
-                {/* Other Links */}
-                <a href="/penerimaansiswa" className="relative font-medium transition cursor-pointer group">
-                  {lang === "id" ? "Penerimaan Siswa" : "Students Registration"}
-                  <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
-                </a>
 
                 <a href="/edu/login" target="_blank" className="relative font-medium transition cursor-pointer flex items-center gap-1 group">
                   {lang === "id" ? "Presma Edu" : "Presma Edu"} <ExternalLink size={16}/>
                   <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
                 </a>
 
-                {/* Tombol bilingual desktop */}
-                <button
-                  onClick={() => setLang(lang === "id" ? "en" : "id")}
-                  className="px-3 py-2 rounded bg-white/10 hover:bg-white/20 flex items-center gap-2 transition"
-                >
-                  <Image src={flagUrl} alt={lang === "id" ? "ID Flag" : "EN Flag"} width={20} height={15} className="rounded-sm"/>
-                  <span>{lang === "id" ? "ID" : "EN"}</span>
-                </button>
+                  <div className="flex items-center gap-2">
+                    <button className="px-4 py-2 rounded bg-orange-600 hover:bg-orange-700 transition font-semibold cursor-pointer">
+                      {lang === "id" ? "Pendaftaran" : "Registration"}
+                    </button>
 
-                <button className="px-4 py-2 rounded bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 transition font-semibold">
-                  {lang === "id" ? "Pendaftaran" : "Registration"}
-                </button>
+                    {/* Tombol bilingual desktop */}
+                    <button
+                      onClick={() => setLang(lang === "id" ? "en" : "id")}
+                      className="px-3 py-2 rounded bg-white/30 hover:bg-white/20 flex items-center gap-2 transition cursor-pointer"
+                    >
+                      <Image src={flagUrl} alt={lang === "id" ? "ID Flag" : "EN Flag"} width={20} height={15} className="rounded-sm"/>
+                      <span>{lang === "id" ? "ID" : "EN"}</span>
+                    </button>
+                  </div>
+                
               </nav>
             </div>
           ) : (
-            <button className="text-white hamburger-btn" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+            <button className="text-white hamburger-btn cursor-pointer hover:opacity-70" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
               <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
             </button>
@@ -210,8 +212,7 @@ export default function Header() {
         <div className="flex items-center justify-between px-6 py-4">
           {/* Back Button Icon */}
           <button onClick={() => setIsMobileMenuOpen(false)} className="text-white hover:text-gray-300">
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24"
-              stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7"/></svg>
+            <span className="text-xl cursor-pointer">&#10005;</span>
           </button>
 
           {/* Tombol bilingual mobile */}
@@ -233,15 +234,15 @@ export default function Header() {
 
           {/* Profil Sekolah mobile */}
           <button
-            onClick={() => setOpenMobileDropdown(openMobileDropdown === "profil" ? null : "profil")}
-            className="flex justify-between items-center py-2 dropdown-btn relative group"
+            onClick={() => setOpenMobileDropdown1(openMobileDropdown1 === "profil" ? null : "profil")}
+            className="flex justify-between items-center py-2 dropdown-btn relative group cursor-pointer"
           >
             {lang === "id" ? "Profil Sekolah" : "School Profile"}
-            <span>{openMobileDropdown === "profil" ? "-" : "+"}</span>
+            <span>{openMobileDropdown1 === "profil" ? "-" : "+"}</span>
             <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
           </button>
           <div className={`submenu pl-4 flex flex-col overflow-hidden transition-all duration-300 ease-in-out ${
-              openMobileDropdown === "profil" ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+              openMobileDropdown1 === "profil" ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
             }`}>
             <a href="/profil/tentang-kami" className="relative py-1 group">
               {lang === "id" ? "Tentang Kami" : "About Us"}
@@ -249,10 +250,6 @@ export default function Header() {
             </a>
             <a href="/profil/visi-misi" className="relative py-1 group">
               {lang === "id" ? "Visi & Misi" : "Vision & Mission"}
-              <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
-            </a>
-            <a href="/profil/prestasi" className="relative py-1 group">
-              {lang === "id" ? "Prestasi" : "Achievements"}
               <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
             </a>
             <a href="/profil/manajemen" className="relative py-1 group">
@@ -271,6 +268,10 @@ export default function Header() {
               {lang === "id" ? "Testimoni" : "Testimonials"}
               <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
             </a>
+            <a href="/berita" className="relative py-1 group">
+              {lang === "id" ? "Berita" : "News"}
+              <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+            </a>
             <a href="/profil/faq" className="relative py-1 group">
               {lang === "id" ? "FAQ" : "FAQ"}
               <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
@@ -279,15 +280,15 @@ export default function Header() {
 
           {/* Kegiatan Siswa mobile */}
           <button
-            onClick={() => setOpenMobileDropdown(openMobileDropdown === "kegiatan" ? null : "kegiatan")}
-            className="flex justify-between items-center py-2 dropdown-btn relative group"
+            onClick={() => setOpenMobileDropdown2(openMobileDropdown2 === "kegiatan" ? null : "kegiatan")}
+            className="flex justify-between items-center py-2 dropdown-btn relative group cursor-pointer"
           >
             {lang === "id" ? "Kegiatan Siswa" : "Students Activity"}
-            <span>{openMobileDropdown === "kegiatan" ? "-" : "+"}</span>
+            <span>{openMobileDropdown2 === "kegiatan" ? "-" : "+"}</span>
             <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
           </button>
           <div className={`submenu pl-4 flex flex-col overflow-hidden transition-all duration-300 ease-in-out ${
-              openMobileDropdown === "kegiatan" ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+              openMobileDropdown2 === "kegiatan" ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
             }`}>
             <a href="/kegiatansiswa/ekstrakurikuler" className="relative py-1 group">
               {lang === "id" ? "Ekstrakurikuler" : "Extracurricular"}
@@ -297,23 +298,26 @@ export default function Header() {
               {lang === "id" ? "Prestasi" : "Achievements"}
               <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
             </a>
-            <a href="#berita" className="relative py-1 group">
-              {lang === "id" ? "Berita Terkini" : "Latest News"}
+            <a href="/kegiatansiswa/osis-mpk" className="relative py-1 group">
+              OSIS & MPK
+              <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            <a href="/kegiatansiswa/acara" className="relative py-1 group">
+              {lang === "id" ? "Acara" : "Event"}
+              <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+            </a>
+            <a href="/kegiatansiswa/study-tour" className="relative py-1 group">
+              Study Tour
               <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
             </a>
           </div>
 
-          <a href="/penerimaansiswa" className="relative py-2 group">
-            {lang === "id" ? "Penerimaan Siswa" : "Students Registration"}
-            <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
-          </a>
-
-          <a href="/edu/login" target="_blank" className="relative flex items-center gap-1 py-2 group">
+          <a href="/edu/login" target="_blank" className="px-4 py-2 mt-2 text-white rounded border border-white hover:opacity-70 transition font-semibold flex items-center gap-2 justify-center">
             Presma Edu <ExternalLink size={16}/>
             <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
           </a>
 
-          <button className="px-4 py-2 mt-2 text-white rounded bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 transition font-semibold">
+          <button className="px-4 py-2 mt-2 text-white rounded bg-orange-600 hover:bg-orange-700 transition font-semibold cursor-pointer">
             {lang === "id" ? "Pendaftaran" : "Registration"}
           </button>
         </div>
