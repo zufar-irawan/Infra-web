@@ -13,6 +13,7 @@ export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [openMobileDropdown, setOpenMobileDropdown] = useState<string | null>(null);
   const [openMobileDropdown1, setOpenMobileDropdown1] = useState<string | null>(null);
   const [openMobileDropdown2, setOpenMobileDropdown2] = useState<string | null>(null);
 
