@@ -1,19 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useLang } from "../components/LangContext";
+import { useLang } from "../../components/LangContext";
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
 
-export default function Berita() {
+export default function OsisMpk() {
     const { lang } = useLang();
 
     return (
-      <div>
-        <Header/>
-
         <main className="py-25">
             {/* Breadcrumbs */}
             <section className="w-full py-4 bg-white">
@@ -31,7 +26,7 @@ export default function Berita() {
                   </Link>
                   <span className="text-[#243771]">{">"}</span>
                   <span className="text-[#243771]">
-                    {lang === "id" ? "Berita" : "News"}
+                    Study Tour
                   </span>
                 </nav>
               </div>
@@ -42,8 +37,5 @@ export default function Berita() {
                 </div>
             </section>
         </main>
-
-        <Footer/>
-      </div>
     )
 }
