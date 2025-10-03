@@ -14,7 +14,7 @@ export default function EduLayout(
     const isLogin = pathname.includes("/login")
 
     return (
-        <div className="flex flex-row">
+        <div className="flex flex-row bg-gray-100">
             {!isLogin && <Sidebar />}
 
             <div className={`flex-col ${isLogin && "w-full justify-center"}`}>
