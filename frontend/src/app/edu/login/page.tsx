@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import api from "@/app/lib/api";
+import axios from "axios";
 
 export default function LoginRegisterPage() {
     const [email, setEmail] = useState("");
@@ -20,15 +20,18 @@ export default function LoginRegisterPage() {
         try {
             if(activeTab === "masuk") {
                 //login
-                const res = await api.post("/lms/auth/login", { email, password })
+                const res = await axios.post("/api/login", { email, password });
 
-                if(res.status === 200) window.location.href = "/edu/dashboard"
+                // Route Handler Anda mengembalikan { success: true }
+                if(res.status === 200 && res.data.success) {
+                    window.location.href = "/edu/dashboard"
+                }
             } else {
                 //register
 
             }
         } catch (err: any){
-            setError(err.response?.data?.message || "Login gagal");
+            setError(err.response?.data?.message || "login gagal");
         } finally {
             setLoading(false);
         }
