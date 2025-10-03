@@ -1,5 +1,5 @@
-import H from "../components/header";
-import F from "../components/footer";
+import H from "../components/Header";
+import F from "../components/Footer";
 
 export default function Berita() {
     return (
