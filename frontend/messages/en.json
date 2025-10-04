@@ -1,5 +1,5 @@
 {
-  "Header":{
+  "Header": {
     "home": "Home",
     "profil": "School Profile",
     "tentang": "About us",
@@ -9,12 +9,14 @@
     "mitra": "Partners",
     "testimoni": "Testimony",
     "berita": "News",
-
     "kegiatan": "Student Activity",
     "ekstrakurikuler": "Extracurricular",
     "prestasi": "Achievements",
     "acara": "Events",
-
     "daftar": "Registration"
+  },
+  "home": {
+    "welcomeMessage": "WELCOME TO OFFICIAL WEBSITE",
+    "registerButton": "REGISTER NOW"
   }
 }

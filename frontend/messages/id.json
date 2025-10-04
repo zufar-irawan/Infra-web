@@ -16,5 +16,9 @@
     "acara": "Acara",
 
     "daftar": "Pendaftaran"
+  },
+  "home": {
+    "welcomeMessage": "SELAMAT DATANG DI SITUS RESMI",
+    "registerButton": "DAFTAR SEKARANG"
   }
 }
