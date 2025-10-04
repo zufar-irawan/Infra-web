@@ -1,9 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useLang } from "../../components/LangContext";
-import { useState, useEffect, useRef } from "react";
-import Image from "next/image";
+import { useLang } from "@/components/LangContext";
 
 export default function StudyTour() {
     const { lang } = useLang();

@@ -1,32 +1,36 @@
 "use client";
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from "next/image";
 import {BellRing, Bolt, BookMarked, ChartNoAxesCombined, LayoutDashboard, LogOut, Shapes, Users} from "lucide-react";
+import axios from "axios";
+import {User} from "@/app/api/me/route";
 
 
-interface SidebarProps {
-    user: any | null
-}
-
-export default function Sidebar({ user }:SidebarProps) {
-    console.log(user);
-    const [role, setRole] = useState<string | null>(null);
+export default function Sidebar() {
     const router = useRouter();
 
+    const [user, setUser] = useState<User | null>(null)
+
     useEffect(() => {
-        if (typeof window !== 'undefined') {
-            const userStr = localStorage.getItem('user');
-            if (userStr) {
-                try {
-                    const user = JSON.parse(userStr);
-                    setRole(user.role || user.peran || null);
-                } catch (e) {
-                    setRole(null);
-                }
+        const fetchUser = async () => {
+            try {
+                const res = await axios.get("/api/me");
+
+                setUser(res.data.user);
+            } catch (e: any){
+                console.error(e);
             }
         }
-    }, []);
+
+        fetchUser();
+    }, [])
+
+    useEffect(() => {
+        if(user) {
+            console.log(user)
+        }
+    }, [user]);
     
     const handleLogout = () => {
         if (typeof window !== 'undefined') {
@@ -48,18 +52,16 @@ export default function Sidebar({ user }:SidebarProps) {
 
                 <section className="w-full flex p-5 gap-2 items-center">
                     <div className="w-15 h-15 text-center rounded-4xl bg-orange-600
-                text-white font-bold text-4xl items-center justify-center flex">
-                        J
+                    text-white font-bold text-2xl items-center justify-center flex">
+                        {user?.name?.split(" ").map(n => n[0]?.toUpperCase()).join("") || "T"}
                     </div>
 
                     <div className={"flex flex-col"}>
                         <h2 className="font-bold">
-                            John Doe
+                            {user?.name || "Tamu"}
                         </h2>
                         <p className="text-sm">
-                            {role === 'siswa' ? 'Siswa SMK Presma' :
-                                (role === 'guru' ? 'Guru SMK Presma' :
-                                    role === 'admin' ? 'Admin SMK Prestasi Prima' : "Tamu")}
+                            {user?.role || "Tamu"}
                         </p>
                     </div>
                 </section>

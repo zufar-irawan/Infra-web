@@ -4,8 +4,8 @@ import React, { useState } from "react";
 import Image from "next/image";
 import {useRouter} from "next/navigation";
 import api from "@/app/lib/api";
-import Swal from "sweetalert2";
 import {showLoginSuccessAlert} from "@/components/LoginSuccess";
+import axios from "axios";
 
 export default function LoginRegisterPage() {
     const router = useRouter();
@@ -24,26 +24,48 @@ export default function LoginRegisterPage() {
         try {
             setLoading(true);
 
-            const res = await api.post("/lms/auth/login", {email, password});
+            const res = await axios.post("/api/login", {email, password})
 
-            if(res.status === 200) {
-                localStorage.setItem("token", res.data.data.token);
-
+            if(res.data.login) {
                 showLoginSuccessAlert()
 
-                router.push("/edu/dashboard");
+                router.push("/edu/dashboard")
+            } else {
+                setError(res.data.message)
             }
-
         } catch (error: any) {
             if(error.response.status === 401 || error.response.status === 400) {
-                setError("Email atau password salah, silahkan coba lagi!")
+                setError(error.response.data.message)
             } else {
-                console.error("Login gagal:", error.response?.data || error.message);
-                alert(error.response?.data?.message || "Login gagal, coba lagi.");
+                console.error(error.response.data.message)
+                alert(error.response?.data?.message || "Login gagal, coba lagi.")
             }
         } finally {
             setLoading(false);
         }
+
+        // try {
+        //     setLoading(true);
+        //
+        //     const res = await api.post("/lms/auth/login", {email, password});
+        //
+        //     if(res.status === 200) {
+        //
+        //         showLoginSuccessAlert()
+        //
+        //         router.push("/edu/dashboard");
+        //     }
+        //
+        // } catch (error: any) {
+        //     if(error.response.status === 401 || error.response.status === 400) {
+        //         setError("Email atau password salah, silahkan coba lagi!")
+        //     } else {
+        //         console.error("Login gagal:", error.response?.data || error.message);
+        //         alert(error.response?.data?.message || "Login gagal, coba lagi.");
+        //     }
+        // } finally {
+        //     setLoading(false);
+        // }
     }
 
     const handleGoogleLogin = () => {
