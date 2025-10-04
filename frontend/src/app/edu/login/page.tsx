@@ -3,6 +3,9 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import {useRouter} from "next/navigation";
+import api from "@/app/lib/api";
+import Swal from "sweetalert2";
+import {showLoginSuccessAlert} from "@/components/LoginSuccess";
 
 export default function LoginRegisterPage() {
     const router = useRouter();
@@ -10,12 +13,37 @@ export default function LoginRegisterPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const [success, setSuccess] = useState(false);
     const [loading, setLoading] = useState(false);
 
     const [activeTab, setActiveTab] = useState("masuk");
 
     const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault()
 
+        try {
+            setLoading(true);
+
+            const res = await api.post("/lms/auth/login", {email, password});
+
+            if(res.status === 200) {
+                localStorage.setItem("token", res.data.data.token);
+
+                showLoginSuccessAlert()
+
+                router.push("/edu/dashboard");
+            }
+
+        } catch (error: any) {
+            if(error.response.status === 401 || error.response.status === 400) {
+                setError("Email atau password salah, silahkan coba lagi!")
+            } else {
+                console.error("Login gagal:", error.response?.data || error.message);
+                alert(error.response?.data?.message || "Login gagal, coba lagi.");
+            }
+        } finally {
+            setLoading(false);
+        }
     }
 
     const handleGoogleLogin = () => {
@@ -24,7 +52,6 @@ export default function LoginRegisterPage() {
 
     return (
         <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 text-sm">
-            <h1>{error}</h1>
             <div className="w-full max-w-md">
                 {/* Logo & Title */}
                 <div className="text-center mb-8">
@@ -82,7 +109,9 @@ export default function LoginRegisterPage() {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 placeholder="nama@example.com"
-                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                                className={`w-full px-4 py-3 bg-gray-50 border rounded-lg text-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all
+                                ${error ? "border-red-600 border-1" : "border-gray-200"}
+                                `}
                             />
                         </div>
 
@@ -97,8 +126,16 @@ export default function LoginRegisterPage() {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 placeholder="Masukkan password"
-                                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                                className={`w-full px-4 py-3 bg-gray-50 border rounded-lg text-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all
+                                ${error ? "border-red-600" : "border-gray-200"}
+                                `}
                             />
+                        </div>
+
+                        <div className={`px-4 w-full py-3 rounded-lg 
+                        ${!error && "hidden"} border bg-red-300 border-red-600
+                        `}>
+                            <p>{error}</p>
                         </div>
 
                         <button
