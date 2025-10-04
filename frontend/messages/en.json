@@ -1,5 +1,20 @@
 {
   "Header":{
-    "home": "Home"
+    "home": "Home",
+    "profil": "School Profile",
+    "tentang": "About us",
+    "visimisi": "Vision & Mission",
+    "manajemen": "Management",
+    "fasilitas": "Fasility",
+    "mitra": "Partners",
+    "testimoni": "Testimony",
+    "berita": "News",
+
+    "kegiatan": "Student Activity",
+    "ekstrakurikuler": "Extracurricular",
+    "prestasi": "Achievements",
+    "acara": "Events",
+
+    "daftar": "Registration"
   }
 }

@@ -1,5 +1,20 @@
 {
   "Header": {
-    "home": "Beranda"
+    "home": "Beranda",
+    "profil": "Profil Sekolah",
+    "tentang": "Tentang Kami",
+    "visimisi": "Visi & Misi",
+    "manajemen": "Manajemen",
+    "fasilitas": "Fasilitas",
+    "mitra": "Mitra",
+    "testimoni": "Testimoni",
+    "berita": "Berita",
+
+    "kegiatan": "Kegiatan Siswa",
+    "ekstrakurikuler": "Ekstrakurikuler",
+    "prestasi": "Prestasi",
+    "acara": "Acara",
+
+    "daftar": "Pendaftaran"
   }
 }
