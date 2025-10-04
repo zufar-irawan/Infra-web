@@ -1,12 +1,20 @@
 import type { NextConfig } from "next";
+import createNextIntlPlugin from "next-intl/plugin";
 
 const nextConfig: NextConfig = {
-  reactStrictMode : false
-};
-module.exports = {
-  images: {
-    domains: ["flagcdn.com"],
-  },
+    images: {
+        remotePatterns: [
+            {
+                protocol: 'https',
+                hostname: 'flagcdn.com'
+            },
+            {
+                protocol: 'https',
+                hostname: 'cdn-icons-png.flaticon.com'
+            },
+        ]
+    }
 };
 
-export default nextConfig;
+const withNextIntl = createNextIntlPlugin()
+export default withNextIntl(nextConfig);

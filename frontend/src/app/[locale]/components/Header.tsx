@@ -5,8 +5,11 @@ import { useLang } from "./LangContext";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { ExternalLink, ChevronDown } from "lucide-react";
+import {useTranslations} from "next-intl";
 
 export default function Header() {
+    const t = useTranslations('Header')
+
   const pathname = usePathname();
   const { lang, setLang } = useLang();
   const [isScrolled, setIsScrolled] = useState(false);
@@ -88,7 +91,7 @@ export default function Header() {
               <nav className="flex items-center gap-6 text-white relative">
                 {/* Home */}
                 <a href={`${pathname === "/" ? "#" : "/"}`} className="relative font-medium transition cursor-pointer group">
-                  {lang === "id" ? "Beranda" : "Home"}
+                  {t('home')}
                   <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
                 </a>
 

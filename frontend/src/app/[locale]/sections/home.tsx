@@ -1,6 +1,5 @@
 // oxlint-disable no-unused-vars
 import { useLang } from "../components/LangContext";
-import SocialBar from "@/components/Social";
 
 export default function Home() {
   const { lang } = useLang();

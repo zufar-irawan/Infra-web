@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import {useRouter} from "next/navigation";
-import api from "@/app/lib/api";
 import {showLoginSuccessAlert} from "@/components/LoginSuccess";
 import axios from "axios";
 
