@@ -3,46 +3,35 @@
 import Link from "next/link";
 import { useLang } from "../components/LangContext";
 import { useState } from "react";
+import {useTranslations} from "next-intl";
 
 export default function Berita() {
-  const { lang } = useLang();
+    const t = useTranslations('beritaHome')
   const [current, setCurrent] = useState(0);
 
   const news = [
     {
       id: 1,
-      date_id: "22 September 2025",
-      date_en: "September 22, 2025",
-      title_id: "Bandtols Wakili Sekolah Prestasi Prima di Ajang Awesome Skool Fest",
-      title_en: "Bandtols Represent SMK Prestasi Prima at Awesome Skool Fest",
-      desc_id:
+      date: "22 September 2025",
+      title: "Bandtols Wakili Sekolah Prestasi Prima di Ajang Awesome Skool Fest",
+      desc:
         "Bandtols, grup musik kebanggaan Sekolah Prestasi Prima, berhasil meraih pencapaian luar biasa dengan resmi lolos dan mengamankan posisi untuk tampil di ajang bergengsi Awesome Skool Fest...",
-      desc_en:
-        "Bandtols, the pride of SMK Prestasi Prima, achieved an extraordinary milestone by officially qualifying to perform at the prestigious Awesome Skool Fest...",
       img: "https://source.unsplash.com/600x400/?concert,music",
     },
     {
       id: 2,
-      date_id: "17 Agustus 2025",
-      date_en: "August 17, 2025",
-      title_id: "Upacara HUT RI 80 di Lapangan Utama SMK Prestasi Prima",
-      title_en: "80th Independence Day Ceremony at SMK Prestasi Prima",
-      desc_id:
+      date: "17 Agustus 2025",
+      title: "Upacara HUT RI 80 di Lapangan Utama SMK Prestasi Prima",
+      desc:
         "SMK Prestasi Prima menggelar upacara bendera memperingati Hari Ulang Tahun ke-80 Republik Indonesia. Acara berjalan dengan khidmat dan penuh semangat...",
-      desc_en:
-        "SMK Prestasi Prima held a flag ceremony to commemorate the 80th Anniversary of the Republic of Indonesia. The event was solemn and full of spirit...",
       img: "https://source.unsplash.com/600x400/?ceremony,indonesia",
     },
     {
       id: 3,
-      date_id: "10 Juli 2025",
-      date_en: "July 10, 2025",
-      title_id: "Siswa SMK Prestasi Prima Raih Juara 1 Lomba Coding Nasional",
-      title_en: "SMK Prestasi Prima Student Wins 1st Place in National Coding Competition",
-      desc_id:
+      date: "10 Juli 2025",
+      title: "Siswa SMK Prestasi Prima Raih Juara 1 Lomba Coding Nasional",
+      desc:
         "Prestasi membanggakan kembali diraih oleh siswa SMK Prestasi Prima dalam ajang lomba coding tingkat nasional dengan meraih juara pertama...",
-      desc_en:
-        "A proud achievement was made by an SMK Prestasi Prima student by winning 1st place in the national coding competition...",
       img: "https://source.unsplash.com/600x400/?coding,computer",
     },
   ];
@@ -55,12 +44,10 @@ export default function Berita() {
       <div className="container mx-auto px-6 md:px-12 lg:px-20 text-center">
         {/* Title */}
         <h2 className="text-3xl md:text-4xl font-bold mb-4 text-[#FE4D01]">
-          {lang === "id" ? "Berita Terkini" : "Latest News"}
+          {t('title')}
         </h2>
         <p className="text-[#243771] mb-10">
-          {lang === "id"
-            ? "Ikuti perkembangan berita terbaru dari SMK Prestasi Prima"
-            : "Stay updated with the latest news from SMK Prestasi Prima"}
+          {t('description')}
         </p>
 
         {/* Carousel */}
@@ -74,25 +61,25 @@ export default function Berita() {
                 <div className="h-[200px] w-full overflow-hidden">
                   <img
                     src={item.img}
-                    alt={lang === "id" ? item.title_id : item.title_en}
+                    alt={item.title}
                     className="w-full h-full object-cover"
                   />
                 </div>
                 <div className="p-4 text-left flex flex-col justify-between flex-1">
                   <p className="text-sm text-[#FE4D01] font-medium">
-                    {lang === "id" ? item.date_id : item.date_en}
+                    {item.date}
                   </p>
                   <h3 className="font-bold text-md mb-2 line-clamp-2">
-                    {lang === "id" ? item.title_id : item.title_en}
+                    {item.title}
                   </h3>
                   <p className="text-sm text-gray-600 mb-3 line-clamp-3">
-                    {lang === "id" ? item.desc_id : item.desc_en}
+                    {item.desc}
                   </p>
                   <Link
                     href="#"
                     className="text-sm font-semibold text-[#FE4D01] hover:underline mt-auto"
                   >
-                    {lang === "id" ? "Baca Selengkapnya..." : "Read More..."}
+                    {t('button')}
                   </Link>
                 </div>
               </div>

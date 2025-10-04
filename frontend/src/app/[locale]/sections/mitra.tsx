@@ -1,9 +1,9 @@
 "use client";
 
-import { useLang } from "../components/LangContext";
+import {useTranslations} from "next-intl";
 
 export default function Mitra() {
-  const { lang } = useLang();
+    const t = useTranslations('mitraHome')
 
   const companyLogos = [
     "slack",
@@ -69,7 +69,7 @@ export default function Mitra() {
         {/* Title */}
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
           <span className="text-[#FE4D01]">
-            {lang === "id" ? "Mitra" : "Partners"}
+            {t('title')}
           </span>
         </h2>
 

@@ -137,7 +137,7 @@ export default function Header() {
                                             </Link>
 
                                             <Link href="/profil/fasilitas" className="block px-4 py-2 hover:bg-gray-200">
-                                                {t('vasilitas')}
+                                                {t('fasilitas')}
                                             </Link>
 
                                             <Link href="/profil/mitra" className="block px-4 py-2 hover:bg-gray-200">
@@ -177,7 +177,7 @@ export default function Header() {
                                             className="absolute left-0 mt-3 text-sm bg-white/95 shadow-lg rounded text-orange-600 w-48 transition duration-300">
                                             <Link href="/kegiatansiswa/ekstrakurikuler"
                                                className="block px-4 py-2 hover:bg-gray-200">
-                                                {t('esktrakurikuler')}
+                                                {t('ekstrakurikuler')}
                                             </Link>
 
                                             <Link href="/kegiatansiswa/prestasi"

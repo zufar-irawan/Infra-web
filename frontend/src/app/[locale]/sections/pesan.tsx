@@ -1,10 +1,8 @@
 "use client";
 
-import { useLang } from "../components/LangContext";
 import { useEffect, useRef, useState } from "react";
 
 export default function Pesan() {
-  const { lang } = useLang();
   const sectionRef = useRef<HTMLDivElement | null>(null);
   const [isVisible, setIsVisible] = useState(false);
 

@@ -9,16 +9,66 @@
     "mitra": "Mitra",
     "testimoni": "Testimoni",
     "berita": "Berita",
-
     "kegiatan": "Kegiatan Siswa",
     "ekstrakurikuler": "Ekstrakurikuler",
     "prestasi": "Prestasi",
     "acara": "Acara",
-
     "daftar": "Pendaftaran"
   },
   "home": {
     "welcomeMessage": "SELAMAT DATANG DI SITUS RESMI",
     "registerButton": "DAFTAR SEKARANG"
+  },
+  "glimpse": {
+    "principalImageAlt": "Kepala Sekolah",
+    "title": "Kenapa SMK Prestasi Prima?",
+    "description": "Di SMK Prestasi Prima, kami percaya bahwa masa depan ada di tangan para digital creator, oleh karena itu sebagai Sekolah IT, berkomitmen membentuk talenta unggul melalui empat Program Keahlian yang relevan (DKV, BCF, PPLG, dan TJKT) dan kurikulum berbasis praktik industri; sebuah komitmen yang memastikan setiap lulusan siap bersaing, memimpin di era teknologi, dan menjadi bukti nyata dari visi kami untuk menghasilkan SDM IT profesional.",
+    "readMoreButton": "Selengkapnya"
+  },
+  "expertisePrograms": {
+    "title": "Program Keahlian",
+    "description": "Program keahlian ini dirancang untuk membekali siswa dengan keterampilan spesifik dan pengetahuan praktis yang relevan dengan kebutuhan dunia kerja saat ini, menggabungkan teori dengan praktik intensif.",
+    "programs": {
+      "visualDesign": "Desain Komunikasi Visual",
+      "broadcasting": "Broadcasting dan Film",
+      "softwareDev": "Pengembangan Perangkat Lunak & Gim",
+      "networkEng": "Teknik Jaringan Komputer & Telekomunikasi"
+    }
+  },
+  "achievements": {
+    "title": "Prestasi",
+    "description": "Dari berbagai macam program keahlian yang ada, lahirlah berbagai prestasi yang membanggakan nama sekolah. Namun, tidak hanya dari bidang akademik. Bidang non akademik juga sama membanggakannya.",
+    "moreButton": "Selengkapnya"
+  },
+  "mitraHome": {
+    "title": "Mitra"
+  },
+  "beritaHome": {
+    "title": "Berita",
+    "description": "Ikuti perkembangan berita terbaru dari SMK Prestasi Prima",
+    "button": "Baca Selengkapnya..."
+  },
+  "footer": {
+    "schoolProfile": {
+      "title": "Profil Sekolah",
+      "aboutUs": "Tentang kami",
+      "visionMission": "Visi & Misi",
+      "management": "Manajemen",
+      "facilities": "Fasilitas",
+      "partners": "Mitra",
+      "testimonials": "Testimoni",
+      "news": "Berita"
+    },
+    "studentActivities": {
+      "title": "Kegiatan Siswa",
+      "extracurriculars": "Ekstrakurikuler",
+      "achievements": "Prestasi",
+      "events": "Acara"
+    },
+    "other": {
+      "title": "Lainnya",
+      "home": "Beranda",
+      "registration": "Pendaftaran"
+    }
   }
 }

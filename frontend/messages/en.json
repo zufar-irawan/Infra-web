@@ -18,5 +18,57 @@
   "home": {
     "welcomeMessage": "WELCOME TO OFFICIAL WEBSITE",
     "registerButton": "REGISTER NOW"
+  },
+  "glimpse": {
+    "principalImageAlt": "Principal",
+    "title": "Why SMK Prestasi Prima?",
+    "description": "At SMK Prestasi Prima, we believe the future is in the hands of digital creators. As an IT school, we are committed to shaping outstanding talents through four relevant expertise programs (DKV, BCF, PPLG, and TJKT) and an industry-based curriculum. This ensures graduates are ready to compete, lead in the era of technology, and become the true evidence of our vision to produce professional IT human resources.",
+    "readMoreButton": "Read More"
+  },
+  "expertisePrograms": {
+    "title": "Expertise Programs",
+    "description": "These programs are designed to equip students with specific skills and practical knowledge relevant to today's job market, combining theory with intensive practice.",
+    "programs": {
+      "visualDesign": "Visual Communication Design",
+      "broadcasting": "Broadcasting and Film",
+      "softwareDev": "Software & Game Development",
+      "networkEng": "Computer & Telecommunication Network"
+    }
+  },
+  "achievements": {
+    "title": "Achievements",
+    "description": "From various expertise programs, achievements were born that make the school proud. Not only in academics but also in non-academic fields.",
+    "moreButton": "More"
+  },
+  "mitraHome": {
+    "title": "Partners"
+  },
+  "beritaHome": {
+    "title": "News",
+    "description": "Stay updated with the latest news from SMK Prestasi Prima",
+    "button": "Read More..."
+  },
+  "footer": {
+    "schoolProfile": {
+      "title": "School Profile",
+      "aboutUs": "About Us",
+      "visionMission": "Vision & Mission",
+      "management": "Management",
+      "facilities": "Facilities",
+      "partners": "Partners",
+      "testimonials": "Testimonials",
+      "news": "News"
+    },
+    "studentActivities": {
+      "title": "Student Activities",
+      "extracurriculars": "Extracurriculars",
+      "achievements": "Achievements",
+      "events": "Events"
+    },
+    "other": {
+      "title": "Others",
+      "home": "Home",
+      "registration": "Registration"
+    }
   }
 }
