@@ -1,7 +1,6 @@
 "use client";
 
 import {useEffect, useState, useRef} from "react";
-import {useLang} from "./LangContext";
 import Image from "next/image";
 import {usePathname, useRouter} from "next/navigation";
 import {ExternalLink, ChevronDown} from "lucide-react";
@@ -25,7 +24,6 @@ export default function Header() {
         router.push(`/${langCode}${curentPath}`);
     }
 
-    const {lang, setLang} = useLang();
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
@@ -262,12 +260,12 @@ export default function Header() {
 
                     {/* Tombol bilingual mobile */}
                     <button
-                        onClick={() => handleLanguageChange(lang === "id" ? "en" : "id")}
+                        onClick={() => handleLanguageChange(locale === "id" ? "en" : "id")}
                         className="px-3 py-2 rounded bg-white/10 hover:bg-white/20 flex items-center gap-2 transition"
                     >
                         <Image src={flagUrl} alt={locale === "id" ? "ID Flag" : "EN Flag"} width={20} height={15}
                                className="rounded-sm"/>
-                        <span>{lang === "id" ? "ID" : "EN"}</span>
+                        <span>{locale === "id" ? "ID" : "EN"}</span>
                     </button>
                 </div>
 
