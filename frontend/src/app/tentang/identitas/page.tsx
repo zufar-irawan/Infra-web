@@ -5,7 +5,7 @@ import { useLang } from "../../components/LangContext";
 import { useState } from "react";
 import Pesan from "@/app/sections/pesan";
 
-export default function Tentang() {
+export default function Identitas() {
   const { lang } = useLang();
   const [showModal, setShowModal] = useState(false);
 
@@ -71,8 +71,8 @@ export default function Tentang() {
                 </h3>
                 <p className="text-gray-700 leading-relaxed text-justify text-base sm:text-lg">
                   {lang === "id"
-                    ? "Di sekolah Prestasi Prima yang unggul dan terpercaya siswa & siswi disiapkan untuk menjadi tenaga yang terampil dan mandiri. Tidak hanya itu ketakwaan dan kecerdasan pun harus dimiliki, dan percaya diri selalu terjaga dengan berkarakter Pancasila. Jika ada yang lebih baik, baik saja tidak cukup."
-                    : "At the superior and trusted Prestasi Prima school, students are prepared to become skilled and independent workforce. Not only that, piety and intelligence must be possessed, and self-confidence is always maintained with Pancasila character. If there is something better, good is not enough."}
+                    ? "Di sekolah Prestasi Prima yang unggul dan terpercaya, siswa dan siswi disiapkan untuk menjadi tenaga yang terampil dan mandiri. Tidak hanya itu, ketakwaan dan kecerdasan pun harus dimiliki, dan percaya diri selalu terjaga dengan berkarakter Pancasila. Jika ada yang lebih baik, baik saja tidak cukup."
+                    : "At the superior and trusted Prestasi Prima school, students are prepared to become skilled and independent workforce. Moreover, piety and intelligence must be possessed, and self-confidence is always maintained with Pancasila character. If better is possible, good is not enough."}
                 </p>
               </div>
             </div>
@@ -107,7 +107,7 @@ export default function Tentang() {
           >
             <img
               src="/svg/sejarah.svg"
-              alt="Sejarah SMK Prestasi Prima"
+              alt={lang === "id" ? "Sejarah SMK Prestasi Prima" : "History of SMK Prestasi Prima"}
               className="
                 w-full object-contain rounded-lg
                 hover:scale-[1.02] transition-transform duration-500
@@ -123,7 +123,7 @@ export default function Tentang() {
               "
             >
               <span className="text-white text-lg font-medium bg-black/40 px-4 py-2 rounded-md">
-                Klik untuk melihat gambar
+                {lang === "id" ? "Klik untuk melihat gambar" : "Click to view image"}
               </span>
             </div>
           </div>
@@ -156,7 +156,7 @@ export default function Tentang() {
 
               <img
                 src="/svg/sejarah.svg"
-                alt="Sejarah SMK Prestasi Prima"
+                alt={lang === "id" ? "Sejarah SMK Prestasi Prima" : "History of SMK Prestasi Prima"}
                 className="w-full object-contain rounded-lg"
               />
             </div>
@@ -167,7 +167,7 @@ export default function Tentang() {
         <section className="relative w-full bg-white overflow-hidden">
           <img
             src="/svg/gedung.svg"
-            alt="Gedung SMK Prestasi Prima"
+            alt={lang === "id" ? "Gedung SMK Prestasi Prima" : "Prestasi Prima Building"}
             className="
               w-full h-[40vh] sm:h-[50vh] lg:h-screen
               object-cover object-center
