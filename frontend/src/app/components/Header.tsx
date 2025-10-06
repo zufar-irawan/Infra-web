@@ -85,7 +85,7 @@ export default function Header() {
                   name_id: "Tentang Kami",
                   name_en: "About Us",
                   submenu: [
-                    { href: "/profil/identitas", id: "Identitas Sekolah", en: "School Identity" },
+                    { href: "/tentang/identitas", id: "Identitas Sekolah", en: "School Identity" },
                     { href: "/profil/visi-misi", id: "Visi & Misi", en: "Vision & Mission" },
                     { href: "/profil/manajemen", id: "Manajemen Staff", en: "Management Staff" },
                     { href: "/profil/fasilitas", id: "Fasilitas", en: "Facilities" },

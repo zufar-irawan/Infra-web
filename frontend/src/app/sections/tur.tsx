@@ -21,7 +21,7 @@ export default function Berita() {
         "Bandtols, grup musik kebanggaan Sekolah Prestasi Prima, berhasil meraih pencapaian luar biasa dengan resmi lolos dan mengamankan posisi untuk tampil di ajang bergengsi Awesome Skool Fest...",
       desc_en:
         "Bandtols, the pride of SMK Prestasi Prima, achieved an extraordinary milestone by officially qualifying to perform at the prestigious Awesome Skool Fest...",
-      img: "https://source.unsplash.com/600x400/?concert,music",
+      img: "/svg/bandtols.svg",
     },
     {
       id: 2,
@@ -33,7 +33,7 @@ export default function Berita() {
         "SMK Prestasi Prima menggelar upacara bendera memperingati Hari Ulang Tahun ke-80 Republik Indonesia. Acara berjalan dengan khidmat dan penuh semangat...",
       desc_en:
         "SMK Prestasi Prima held a flag ceremony to commemorate the 80th Anniversary of the Republic of Indonesia. The event was solemn and full of spirit...",
-      img: "https://source.unsplash.com/600x400/?ceremony,indonesia",
+      img: "/svg/paskib.svg",
     },
     {
       id: 3,
@@ -46,7 +46,7 @@ export default function Berita() {
         "Prestasi membanggakan kembali diraih oleh siswa SMK Prestasi Prima dalam ajang lomba coding tingkat nasional dengan meraih juara pertama...",
       desc_en:
         "A proud achievement was made by an SMK Prestasi Prima student by winning 1st place in the national coding competition...",
-      img: "https://source.unsplash.com/600x400/?coding,computer",
+      img: "/svg/bandtols.svg",
     },
   ];
 
