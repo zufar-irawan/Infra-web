@@ -24,8 +24,8 @@ export default function Main() {
 			<Pesan />
 			<Jurusan />
 			<Prestasi />
-			{/* <Tur /> */}
 			<Mitra />
+			<Tur />
 			<Footer />
 		</div>
 	);

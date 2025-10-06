@@ -152,13 +152,13 @@ export default function Header() {
                       <a href="/kegiatansiswa/prestasi" className="block px-4 py-2 hover:bg-gray-200">
                         {lang === "id" ? "Prestasi" : "Achievements"}
                       </a>
-                      <a href="/kegiatansiswa/prestasi" className="block px-4 py-2 hover:bg-gray-200">
+                      <a href="/kegiatansiswa/osis-mpk" className="block px-4 py-2 hover:bg-gray-200">
                         OSIS & MPK
                       </a>
-                      <a href="/kegiatansiswa/prestasi" className="block px-4 py-2 hover:bg-gray-200">
+                      <a href="/kegiatansiswa/acara" className="block px-4 py-2 hover:bg-gray-200">
                         {lang === "id" ? "Acara" : "Event"}
                       </a>
-                      <a href="/kegiatansiswa/prestasi" className="block px-4 py-2 hover:bg-gray-200">
+                      <a href="/kegiatansiswa/study-tour" className="block px-4 py-2 hover:bg-gray-200">
                         Study Tour
                       </a>
                     </div>
