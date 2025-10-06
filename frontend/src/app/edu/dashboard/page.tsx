@@ -5,7 +5,6 @@ import { Menu } from "lucide-react"
 
 export default function Dashboard() {
     const [isUser] = useState('student')
-    const [username] = useState('Hafiz')
 
     return (
         <>
@@ -24,7 +23,7 @@ export default function Dashboard() {
                     
                     <div>
                         <h1 className="text-lg sm:text-xl font-bold">Dashboard {isUser === 'admin' ? "Admin" : isUser === 'teacher' ? "Guru" : "Siswa"}</h1>
-                        <p className="text-black/60 text-sm sm:text-base">Selamat datang kembali, {username}!</p>
+                        <p className="text-black/60 text-sm sm:text-base">Selamat datang kembali, Hafiz!</p>
                     </div>
                 </div>
                 <p className="bg-emerald-200 text-emerald-800 px-3 py-2 text-xs sm:text-sm rounded-sm">XII DKV 1</p>
@@ -157,7 +156,7 @@ export default function Dashboard() {
                 <div className="bg-white rounded-2xl p-4 shadow-md border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 flex flex-col gap-4">
                     <div>
                         <h2 className="text-lg font-semibold">Ujian Terbaru</h2>
-                        <p className="text-black/60 text-sm">Dimohon untuk selesaikan tugas anda dengan tepat waktu</p>
+                        <p className="text-black/60 text-sm">Dimohon untuk selesaikan ujian anda dengan tepat waktu</p>
                     </div>
                     
                     <div className="divide-y divide-black/10">

@@ -2,9 +2,10 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from "next/image";
-import {BellRing, Bolt, BookMarked, BarChart3, LayoutDashboard, LogOut, Shapes, Users, X} from "lucide-react";
+import {BellRing, Bolt, BookMarked, BarChart3, LayoutDashboard, Users, LogOut, Shapes, X, Calendar} from "lucide-react";
 import axios from "axios";
 import {User} from "@/app/api/me/route";
+import { PathParamsContext } from 'next/dist/shared/lib/hooks-client-context.shared-runtime';
 
 
 interface SidebarProps {
@@ -13,6 +14,8 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
+    const [isUser] = useState('student')
+    
     const router = useRouter();
 
     const [user, setUser] = useState<User | null>(null)
@@ -61,7 +64,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             <div>
                 {/* Header with gradient */}
                 <section className="w-full bg-gradient-to-br from-orange-600 via-orange-500 to-orange-600 
-                                  flex justify-between items-center gap-3 p-6 shadow-lg relative overflow-hidden">
+                                  flex justify-between items-center gap-3 p-6 relative overflow-hidden">
                     <div className="absolute inset-0 bg-white/5 backdrop-blur-3xl"></div>
                     <div className="relative z-10 flex items-center gap-3">
                         <div className="bg-white/20 p-2 rounded-2xl backdrop-blur-sm shadow-lg">
@@ -108,79 +111,231 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 </section>
 
                 {/* Navigation Menu */}
-                <section className="w-full px-5 pb-5">
-                    <nav className="flex flex-col gap-1.5">
-                        <a href="#" className="group bg-gradient-to-r from-orange-600 to-orange-500 text-white 
-                                           rounded-xl px-4 py-3.5 flex items-center gap-3 
-                                           shadow-md hover:shadow-lg transition-all duration-300
-                                           hover:scale-[1.02] active:scale-[0.98]">
-                            <div className="p-1.5 bg-white/20 rounded-lg">
-                                <LayoutDashboard className="w-5 h-5" />
-                            </div>
-                            <span className="font-semibold">Dashboard</span>
-                        </a>
-                        
-                        <a href="#" className="group rounded-xl px-4 py-3.5 hover:bg-gradient-to-r hover:from-orange-50 hover:to-orange-50/50
-                                           transition-all duration-300 cursor-pointer flex items-center gap-3
-                                           hover:shadow-sm hover:scale-[1.02] active:scale-[0.98]
-                                           border border-transparent hover:border-orange-100">
-                            <div className="p-1.5 rounded-lg group-hover:bg-orange-100 transition-colors">
-                                <Shapes className="w-5 h-5 text-gray-600 group-hover:text-orange-600 transition-colors" />
-                            </div>
-                            <span className="font-medium text-gray-700 group-hover:text-orange-700 transition-colors">
-                                Manajemen Kelas
-                            </span>
-                        </a>
-                        
-                        <a href="#" className="group rounded-xl px-4 py-3.5 hover:bg-gradient-to-r hover:from-orange-50 hover:to-orange-50/50
-                                           transition-all duration-300 cursor-pointer flex items-center gap-3
-                                           hover:shadow-sm hover:scale-[1.02] active:scale-[0.98]
-                                           border border-transparent hover:border-orange-100">
-                            <div className="p-1.5 rounded-lg group-hover:bg-orange-100 transition-colors">
-                                <Users className="w-5 h-5 text-gray-600 group-hover:text-orange-600 transition-colors" />
-                            </div>
-                            <span className="font-medium text-gray-700 group-hover:text-orange-700 transition-colors">
-                                Manajemen Siswa
-                            </span>
-                        </a>
-                        
-                        <a href="#" className="group rounded-xl px-4 py-3.5 hover:bg-gradient-to-r hover:from-orange-50 hover:to-orange-50/50
-                                           transition-all duration-300 cursor-pointer flex items-center gap-3
-                                           hover:shadow-sm hover:scale-[1.02] active:scale-[0.98]
-                                           border border-transparent hover:border-orange-100">
-                            <div className="p-1.5 rounded-lg group-hover:bg-orange-100 transition-colors">
-                                <BookMarked className="w-5 h-5 text-gray-600 group-hover:text-orange-600 transition-colors" />
-                            </div>
-                            <span className="font-medium text-gray-700 group-hover:text-orange-700 transition-colors">
-                                Mata Pelajaran
-                            </span>
-                        </a>
-                        
-                        <a href="#" className="group rounded-xl px-4 py-3.5 hover:bg-gradient-to-r hover:from-orange-50 hover:to-orange-50/50
-                                           transition-all duration-300 cursor-pointer flex items-center gap-3
-                                           hover:shadow-sm hover:scale-[1.02] active:scale-[0.98]
-                                           border border-transparent hover:border-orange-100">
-                            <div className="p-1.5 rounded-lg group-hover:bg-orange-100 transition-colors">
-                                <BarChart3 className="w-5 h-5 text-gray-600 group-hover:text-orange-600 transition-colors" />
-                            </div>
-                            <span className="font-medium text-gray-700 group-hover:text-orange-700 transition-colors">
-                                Laporan
-                            </span>
-                        </a>
-                        
-                        <a href="#" className="group rounded-xl px-4 py-3.5 hover:bg-gradient-to-r hover:from-orange-50 hover:to-orange-50/50
-                                           transition-all duration-300 cursor-pointer flex items-center gap-3
-                                           hover:shadow-sm hover:scale-[1.02] active:scale-[0.98]
-                                           border border-transparent hover:border-orange-100">
-                            <div className="p-1.5 rounded-lg group-hover:bg-orange-100 transition-colors">
-                                <Bolt className="w-5 h-5 text-gray-600 group-hover:text-orange-600 transition-colors" />
-                            </div>
-                            <span className="font-medium text-gray-700 group-hover:text-orange-700 transition-colors">
-                                Setelan
-                            </span>
-                        </a>
-                    </nav>
-                </section>
+                {isUser == 'admin' &&
+                    <section className="w-full px-5 pb-5">
+                        <nav className="flex flex-col gap-1.5">
+                            <a href="#" className="group bg-gradient-to-r from-orange-600 to-orange-500 text-white 
+                                            rounded-xl px-4 py-3.5 flex items-center gap-3 
+                                            shadow-md hover:shadow-lg transition-all duration-300
+                                            hover:scale-[1.02] active:scale-[0.98]">
+                                <div className="p-1.5 bg-white/20 rounded-lg">
+                                    <LayoutDashboard className="w-5 h-5" />
+                                </div>
+                                <span className="font-semibold">Dashboard</span>
+                            </a>
+                            
+                            <a href="#" className="group rounded-xl px-4 py-3.5 hover:bg-gradient-to-r hover:from-orange-50 hover:to-orange-50/50
+                                            transition-all duration-300 cursor-pointer flex items-center gap-3
+                                            hover:shadow-sm hover:scale-[1.02] active:scale-[0.98]
+                                            border border-transparent hover:border-orange-100">
+                                <div className="p-1.5 rounded-lg group-hover:bg-orange-100 transition-colors">
+                                    <Shapes className="w-5 h-5 text-gray-600 group-hover:text-orange-600 transition-colors" />
+                                </div>
+                                <span className="font-medium text-gray-700 group-hover:text-orange-700 transition-colors">
+                                    Manajemen Kelas
+                                </span>
+                            </a>
+                            
+                            <a href="#" className="group rounded-xl px-4 py-3.5 hover:bg-gradient-to-r hover:from-orange-50 hover:to-orange-50/50
+                                            transition-all duration-300 cursor-pointer flex items-center gap-3
+                                            hover:shadow-sm hover:scale-[1.02] active:scale-[0.98]
+                                            border border-transparent hover:border-orange-100">
+                                <div className="p-1.5 rounded-lg group-hover:bg-orange-100 transition-colors">
+                                    <Users className="w-5 h-5 text-gray-600 group-hover:text-orange-600 transition-colors" />
+                                </div>
+                                <span className="font-medium text-gray-700 group-hover:text-orange-700 transition-colors">
+                                    Manajemen Siswa
+                                </span>
+                            </a>
+                            
+                            <a href="#" className="group rounded-xl px-4 py-3.5 hover:bg-gradient-to-r hover:from-orange-50 hover:to-orange-50/50
+                                            transition-all duration-300 cursor-pointer flex items-center gap-3
+                                            hover:shadow-sm hover:scale-[1.02] active:scale-[0.98]
+                                            border border-transparent hover:border-orange-100">
+                                <div className="p-1.5 rounded-lg group-hover:bg-orange-100 transition-colors">
+                                    <BookMarked className="w-5 h-5 text-gray-600 group-hover:text-orange-600 transition-colors" />
+                                </div>
+                                <span className="font-medium text-gray-700 group-hover:text-orange-700 transition-colors">
+                                    Mata Pelajaran
+                                </span>
+                            </a>
+                            
+                            <a href="#" className="group rounded-xl px-4 py-3.5 hover:bg-gradient-to-r hover:from-orange-50 hover:to-orange-50/50
+                                            transition-all duration-300 cursor-pointer flex items-center gap-3
+                                            hover:shadow-sm hover:scale-[1.02] active:scale-[0.98]
+                                            border border-transparent hover:border-orange-100">
+                                <div className="p-1.5 rounded-lg group-hover:bg-orange-100 transition-colors">
+                                    <BarChart3 className="w-5 h-5 text-gray-600 group-hover:text-orange-600 transition-colors" />
+                                </div>
+                                <span className="font-medium text-gray-700 group-hover:text-orange-700 transition-colors">
+                                    Laporan
+                                </span>
+                            </a>
+                            
+                            <a href="#" className="group rounded-xl px-4 py-3.5 hover:bg-gradient-to-r hover:from-orange-50 hover:to-orange-50/50
+                                            transition-all duration-300 cursor-pointer flex items-center gap-3
+                                            hover:shadow-sm hover:scale-[1.02] active:scale-[0.98]
+                                            border border-transparent hover:border-orange-100">
+                                <div className="p-1.5 rounded-lg group-hover:bg-orange-100 transition-colors">
+                                    <Bolt className="w-5 h-5 text-gray-600 group-hover:text-orange-600 transition-colors" />
+                                </div>
+                                <span className="font-medium text-gray-700 group-hover:text-orange-700 transition-colors">
+                                    Setelan
+                                </span>
+                            </a>
+                        </nav>
+                    </section>
+                }
+                {isUser == 'teacher' &&
+                    <section className="w-full px-5 pb-5">
+                        <nav className="flex flex-col gap-1.5">
+                            <a href="#" className="group bg-gradient-to-r from-orange-600 to-orange-500 text-white 
+                                            rounded-xl px-4 py-3.5 flex items-center gap-3 
+                                            shadow-md hover:shadow-lg transition-all duration-300
+                                            hover:scale-[1.02] active:scale-[0.98]">
+                                <div className="p-1.5 bg-white/20 rounded-lg">
+                                    <LayoutDashboard className="w-5 h-5" />
+                                </div>
+                                <span className="font-semibold">Dashboard</span>
+                            </a>
+                            
+                            <a href="#" className="group rounded-xl px-4 py-3.5 hover:bg-gradient-to-r hover:from-orange-50 hover:to-orange-50/50
+                                            transition-all duration-300 cursor-pointer flex items-center gap-3
+                                            hover:shadow-sm hover:scale-[1.02] active:scale-[0.98]
+                                            border border-transparent hover:border-orange-100">
+                                <div className="p-1.5 rounded-lg group-hover:bg-orange-100 transition-colors">
+                                    <Shapes className="w-5 h-5 text-gray-600 group-hover:text-orange-600 transition-colors" />
+                                </div>
+                                <span className="font-medium text-gray-700 group-hover:text-orange-700 transition-colors">
+                                    Manajemen Kelas
+                                </span>
+                            </a>
+                            
+                            <a href="#" className="group rounded-xl px-4 py-3.5 hover:bg-gradient-to-r hover:from-orange-50 hover:to-orange-50/50
+                                            transition-all duration-300 cursor-pointer flex items-center gap-3
+                                            hover:shadow-sm hover:scale-[1.02] active:scale-[0.98]
+                                            border border-transparent hover:border-orange-100">
+                                <div className="p-1.5 rounded-lg group-hover:bg-orange-100 transition-colors">
+                                    <Users className="w-5 h-5 text-gray-600 group-hover:text-orange-600 transition-colors" />
+                                </div>
+                                <span className="font-medium text-gray-700 group-hover:text-orange-700 transition-colors">
+                                    Manajemen Siswa
+                                </span>
+                            </a>
+                            
+                            <a href="#" className="group rounded-xl px-4 py-3.5 hover:bg-gradient-to-r hover:from-orange-50 hover:to-orange-50/50
+                                            transition-all duration-300 cursor-pointer flex items-center gap-3
+                                            hover:shadow-sm hover:scale-[1.02] active:scale-[0.98]
+                                            border border-transparent hover:border-orange-100">
+                                <div className="p-1.5 rounded-lg group-hover:bg-orange-100 transition-colors">
+                                    <BookMarked className="w-5 h-5 text-gray-600 group-hover:text-orange-600 transition-colors" />
+                                </div>
+                                <span className="font-medium text-gray-700 group-hover:text-orange-700 transition-colors">
+                                    Mata Pelajaran
+                                </span>
+                            </a>
+                            
+                            <a href="#" className="group rounded-xl px-4 py-3.5 hover:bg-gradient-to-r hover:from-orange-50 hover:to-orange-50/50
+                                            transition-all duration-300 cursor-pointer flex items-center gap-3
+                                            hover:shadow-sm hover:scale-[1.02] active:scale-[0.98]
+                                            border border-transparent hover:border-orange-100">
+                                <div className="p-1.5 rounded-lg group-hover:bg-orange-100 transition-colors">
+                                    <BarChart3 className="w-5 h-5 text-gray-600 group-hover:text-orange-600 transition-colors" />
+                                </div>
+                                <span className="font-medium text-gray-700 group-hover:text-orange-700 transition-colors">
+                                    Laporan
+                                </span>
+                            </a>
+                            
+                            <a href="#" className="group rounded-xl px-4 py-3.5 hover:bg-gradient-to-r hover:from-orange-50 hover:to-orange-50/50
+                                            transition-all duration-300 cursor-pointer flex items-center gap-3
+                                            hover:shadow-sm hover:scale-[1.02] active:scale-[0.98]
+                                            border border-transparent hover:border-orange-100">
+                                <div className="p-1.5 rounded-lg group-hover:bg-orange-100 transition-colors">
+                                    <Bolt className="w-5 h-5 text-gray-600 group-hover:text-orange-600 transition-colors" />
+                                </div>
+                                <span className="font-medium text-gray-700 group-hover:text-orange-700 transition-colors">
+                                    Setelan
+                                </span>
+                            </a>
+                        </nav>
+                    </section>
+                }
+                {isUser == 'student' &&
+                    <section className="w-full px-5 pb-5">
+                        <nav className="flex flex-col gap-1.5">
+                            <a href="#" className="group bg-gradient-to-r from-orange-600 to-orange-500 text-white 
+                                            rounded-xl px-4 py-3.5 flex items-center gap-3 
+                                            shadow-md hover:shadow-lg transition-all duration-300
+                                            hover:scale-[1.02] active:scale-[0.98]">
+                                <div className="p-1.5 bg-white/20 rounded-lg">
+                                    <LayoutDashboard className="w-5 h-5" />
+                                </div>
+                                <span className="font-semibold">Dashboard</span>
+                            </a>
+                            
+                            <a href="#" className="group rounded-xl px-4 py-3.5 hover:bg-gradient-to-r hover:from-orange-50 hover:to-orange-50/50
+                                            transition-all duration-300 cursor-pointer flex items-center gap-3
+                                            hover:shadow-sm hover:scale-[1.02] active:scale-[0.98]
+                                            border border-transparent hover:border-orange-100">
+                                <div className="p-1.5 rounded-lg group-hover:bg-orange-100 transition-colors">
+                                    <BookMarked className="w-5 h-5 text-gray-600 group-hover:text-orange-600 transition-colors" />
+                                </div>
+                                <span className="font-medium text-gray-700 group-hover:text-orange-700 transition-colors">
+                                    Tugas
+                                </span>
+                            </a>
+
+                            <a href="#" className="group rounded-xl px-4 py-3.5 hover:bg-gradient-to-r hover:from-orange-50 hover:to-orange-50/50
+                                            transition-all duration-300 cursor-pointer flex items-center gap-3
+                                            hover:shadow-sm hover:scale-[1.02] active:scale-[0.98]
+                                            border border-transparent hover:border-orange-100">
+                                <div className="p-1.5 rounded-lg group-hover:bg-orange-100 transition-colors">
+                                    <BookMarked className="w-5 h-5 text-gray-600 group-hover:text-orange-600 transition-colors" />
+                                </div>
+                                <span className="font-medium text-gray-700 group-hover:text-orange-700 transition-colors">
+                                    Ujian
+                                </span>
+                            </a>
+
+                            <a href="#" className="group rounded-xl px-4 py-3.5 hover:bg-gradient-to-r hover:from-orange-50 hover:to-orange-50/50
+                                            transition-all duration-300 cursor-pointer flex items-center gap-3
+                                            hover:shadow-sm hover:scale-[1.02] active:scale-[0.98]
+                                            border border-transparent hover:border-orange-100">
+                                <div className="p-1.5 rounded-lg group-hover:bg-orange-100 transition-colors">
+                                    <BarChart3 className="w-5 h-5 text-gray-600 group-hover:text-orange-600 transition-colors" />
+                                </div>
+                                <span className="font-medium text-gray-700 group-hover:text-orange-700 transition-colors">
+                                    Nilai
+                                </span>
+                            </a>
+
+                            <a href="#" className="group rounded-xl px-4 py-3.5 hover:bg-gradient-to-r hover:from-orange-50 hover:to-orange-50/50
+                                            transition-all duration-300 cursor-pointer flex items-center gap-3
+                                            hover:shadow-sm hover:scale-[1.02] active:scale-[0.98]
+                                            border border-transparent hover:border-orange-100">
+                                <div className="p-1.5 rounded-lg group-hover:bg-orange-100 transition-colors">
+                                    <Calendar className="w-5 h-5 text-gray-600 group-hover:text-orange-600 transition-colors" />
+                                </div>
+                                <span className="font-medium text-gray-700 group-hover:text-orange-700 transition-colors">
+                                    Jadwal
+                                </span>
+                            </a>
+                            
+                            <a href="#" className="group rounded-xl px-4 py-3.5 hover:bg-gradient-to-r hover:from-orange-50 hover:to-orange-50/50
+                                            transition-all duration-300 cursor-pointer flex items-center gap-3
+                                            hover:shadow-sm hover:scale-[1.02] active:scale-[0.98]
+                                            border border-transparent hover:border-orange-100">
+                                <div className="p-1.5 rounded-lg group-hover:bg-orange-100 transition-colors">
+                                    <Bolt className="w-5 h-5 text-gray-600 group-hover:text-orange-600 transition-colors" />
+                                </div>
+                                <span className="font-medium text-gray-700 group-hover:text-orange-700 transition-colors">
+                                    Setelan
+                                </span>
+                            </a>
+                        </nav>
+                    </section>
+                }
             </div>
 
             {/* Bottom Actions */}
