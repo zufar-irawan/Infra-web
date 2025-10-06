@@ -11,6 +11,8 @@ import Tur from "./sections/tur";
 import Mitra from "./sections/mitra";
 import SocialBar from "./components/Social";
 import Jurusan from "./sections/jurusan";
+import Agenda from "./sections/agenda";
+import Testimoni from "./sections/testimoni";
 
 
 export default function Main() {
@@ -26,6 +28,10 @@ export default function Main() {
 			<Prestasi />
 			<Mitra />
 			<Tur />
+			<Agenda />
+			<Testimoni />
+
+
 			<Footer />
 		</div>
 	);

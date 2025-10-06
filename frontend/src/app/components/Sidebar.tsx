@@ -2,12 +2,17 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from "next/image";
-import {BellRing, Bolt, BookMarked, ChartNoAxesCombined, LayoutDashboard, LogOut, Shapes, Users} from "lucide-react";
+import {BellRing, Bolt, BookMarked, BarChart3, LayoutDashboard, LogOut, Shapes, Users, X} from "lucide-react";
 import axios from "axios";
 import {User} from "@/app/api/me/route";
 
 
-export default function Sidebar() {
+interface SidebarProps {
+    isOpen: boolean;
+    onClose: () => void;
+}
+
+export default function Sidebar({ isOpen, onClose }: SidebarProps) {
     const router = useRouter();
 
     const [user, setUser] = useState<User | null>(null)
@@ -34,89 +39,182 @@ export default function Sidebar() {
     
     const handleLogout = () => {
         if (typeof window !== 'undefined') {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
+            // Store state in memory instead of localStorage
             router.push('/edu/login');
         }
     };
 
     return (
-        <aside className="w-xs min-h-screen bg-white text-gray-700
-                 divide-y-1 divide-gray-200 border-r border-gray-200
-                 flex flex-col justify-between">
+        <>
+            {/* Overlay untuk mobile */}
+            {isOpen && (
+                <div 
+                    className="fixed inset-0 bg-black/25 bg-opacity-50 z-40 lg:hidden"
+                    onClick={onClose}
+                />
+            )}
+            
+            <aside className={`w-full fixed lg:relative max-w-xs min-h-screen bg-gradient-to-b from-slate-50 to-white text-gray-700
+                 border-r border-gray-200 shadow-sm
+                 flex flex-col justify-between z-50 transition-transform duration-300 ease-in-out
+                 ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
             <div>
-                <section className="w-full bg-orange-600 flex justify-center items-center  gap-2 p-5">
-                    <Image src="/smk.png" alt={"logo-smk"} width={55} height={55} />
-                    <h1 className="text-2xl tracking-tight font-bold text-white">Presma EDU</h1>
+                {/* Header with gradient */}
+                <section className="w-full bg-gradient-to-br from-orange-600 via-orange-500 to-orange-600 
+                                  flex justify-between items-center gap-3 p-6 shadow-lg relative overflow-hidden">
+                    <div className="absolute inset-0 bg-white/5 backdrop-blur-3xl"></div>
+                    <div className="relative z-10 flex items-center gap-3">
+                        <div className="bg-white/20 p-2 rounded-2xl backdrop-blur-sm shadow-lg">
+                            <Image src="/smk.png" alt={"logo-smk"} width={50} height={50} className="drop-shadow-md" />
+                        </div>
+                        <h1 className="text-2xl tracking-tight font-bold text-white drop-shadow-md">Presma EDU</h1>
+                    </div>
+                    
+                    {/* Tombol X untuk menutup sidebar */}
+                    <button 
+                        onClick={onClose}
+                        className="relative z-10 lg:hidden p-2 rounded-lg hover:bg-white/20 transition-colors"
+                    >
+                        <X className="w-6 h-6 text-white" />
+                    </button>
                 </section>
 
-                <section className="w-full flex p-5 gap-2 items-center">
-                    <div className="w-15 h-15 text-center rounded-4xl bg-orange-600
-                    text-white font-bold text-2xl items-center justify-center flex">
-                        {user?.name?.split(" ").map(n => n[0]?.toUpperCase()).join("") || "T"}
-                    </div>
+                {/* User Profile Card */}
+                <section className="w-full p-5">
+                    <div className="bg-white rounded-2xl p-4 shadow-md border border-gray-100 
+                                  hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5">
+                        <div className="flex gap-3 items-center">
+                            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600
+                                          text-white font-bold text-xl flex items-center justify-center
+                                          shadow-lg ring-4 ring-orange-100">
+                                {user?.name?.split(" ").map(n => n[0]?.toUpperCase()).join("") || "T"}
+                            </div>
 
-                    <div className={"flex flex-col"}>
-                        <h2 className="font-bold">
-                            {user?.name || "Tamu"}
-                        </h2>
-                        <p className="text-sm">
-                            {user?.role || "Tamu"}
-                        </p>
+                            <div className="flex flex-col flex-1 min-w-0">
+                                <h2 className="font-bold text-gray-800 truncate">
+                                    {user?.name || "Hafiz"}
+                                </h2>
+                                <p className="text-sm text-gray-500 flex items-center gap-1 overflow-hidden">
+                                    <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                                    {user?.role
+                                        ? user.role.length > 21
+                                            ? user.role.slice(0, 21) + "..."
+                                            : user.role
+                                        : "hafiz@smkprestasipri..."}
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </section>
 
-                <section className="w-full h-auto flex p-5">
-                    <div className="w-full flex flex-col gap-2">
-                        <a href="#" className="bg-orange-600 text-white rounded-lg px-4 py-3 flex items-center gap-2">
-                            <LayoutDashboard />
-                            Dashboard
+                {/* Navigation Menu */}
+                <section className="w-full px-5 pb-5">
+                    <nav className="flex flex-col gap-1.5">
+                        <a href="#" className="group bg-gradient-to-r from-orange-600 to-orange-500 text-white 
+                                           rounded-xl px-4 py-3.5 flex items-center gap-3 
+                                           shadow-md hover:shadow-lg transition-all duration-300
+                                           hover:scale-[1.02] active:scale-[0.98]">
+                            <div className="p-1.5 bg-white/20 rounded-lg">
+                                <LayoutDashboard className="w-5 h-5" />
+                            </div>
+                            <span className="font-semibold">Dashboard</span>
                         </a>
-                        <a href="#" className="rounded-lg px-4 py-3 hover:bg-gray-100 transition cursor-pointer flex items-center gap-2">
-                            <Shapes />
-                            Manajemen Kelas
+                        
+                        <a href="#" className="group rounded-xl px-4 py-3.5 hover:bg-gradient-to-r hover:from-orange-50 hover:to-orange-50/50
+                                           transition-all duration-300 cursor-pointer flex items-center gap-3
+                                           hover:shadow-sm hover:scale-[1.02] active:scale-[0.98]
+                                           border border-transparent hover:border-orange-100">
+                            <div className="p-1.5 rounded-lg group-hover:bg-orange-100 transition-colors">
+                                <Shapes className="w-5 h-5 text-gray-600 group-hover:text-orange-600 transition-colors" />
+                            </div>
+                            <span className="font-medium text-gray-700 group-hover:text-orange-700 transition-colors">
+                                Manajemen Kelas
+                            </span>
                         </a>
-                        <a href="#" className="rounded-lg px-4 py-3 hover:bg-gray-100 transition cursor-pointer flex items-center gap-2">
-                            <Users />
-                            Manajemen Siswa
+                        
+                        <a href="#" className="group rounded-xl px-4 py-3.5 hover:bg-gradient-to-r hover:from-orange-50 hover:to-orange-50/50
+                                           transition-all duration-300 cursor-pointer flex items-center gap-3
+                                           hover:shadow-sm hover:scale-[1.02] active:scale-[0.98]
+                                           border border-transparent hover:border-orange-100">
+                            <div className="p-1.5 rounded-lg group-hover:bg-orange-100 transition-colors">
+                                <Users className="w-5 h-5 text-gray-600 group-hover:text-orange-600 transition-colors" />
+                            </div>
+                            <span className="font-medium text-gray-700 group-hover:text-orange-700 transition-colors">
+                                Manajemen Siswa
+                            </span>
                         </a>
-                        <a href="#" className="rounded-lg px-4 py-3 hover:bg-gray-100 transition cursor-pointer flex items-center gap-2">
-                            <BookMarked />
-                            Mata Pelajaran
+                        
+                        <a href="#" className="group rounded-xl px-4 py-3.5 hover:bg-gradient-to-r hover:from-orange-50 hover:to-orange-50/50
+                                           transition-all duration-300 cursor-pointer flex items-center gap-3
+                                           hover:shadow-sm hover:scale-[1.02] active:scale-[0.98]
+                                           border border-transparent hover:border-orange-100">
+                            <div className="p-1.5 rounded-lg group-hover:bg-orange-100 transition-colors">
+                                <BookMarked className="w-5 h-5 text-gray-600 group-hover:text-orange-600 transition-colors" />
+                            </div>
+                            <span className="font-medium text-gray-700 group-hover:text-orange-700 transition-colors">
+                                Mata Pelajaran
+                            </span>
                         </a>
-                        <a href="#" className="rounded-lg px-4 py-3 hover:bg-gray-100 transition cursor-pointer flex items-center gap-2">
-                            <ChartNoAxesCombined />
-                            Laporan
+                        
+                        <a href="#" className="group rounded-xl px-4 py-3.5 hover:bg-gradient-to-r hover:from-orange-50 hover:to-orange-50/50
+                                           transition-all duration-300 cursor-pointer flex items-center gap-3
+                                           hover:shadow-sm hover:scale-[1.02] active:scale-[0.98]
+                                           border border-transparent hover:border-orange-100">
+                            <div className="p-1.5 rounded-lg group-hover:bg-orange-100 transition-colors">
+                                <BarChart3 className="w-5 h-5 text-gray-600 group-hover:text-orange-600 transition-colors" />
+                            </div>
+                            <span className="font-medium text-gray-700 group-hover:text-orange-700 transition-colors">
+                                Laporan
+                            </span>
                         </a>
-                        <a href="#" className="rounded-lg px-4 py-3 hover:bg-gray-100 transition cursor-pointer flex items-center gap-2">
-                            <Bolt />
-                            Setelan
+                        
+                        <a href="#" className="group rounded-xl px-4 py-3.5 hover:bg-gradient-to-r hover:from-orange-50 hover:to-orange-50/50
+                                           transition-all duration-300 cursor-pointer flex items-center gap-3
+                                           hover:shadow-sm hover:scale-[1.02] active:scale-[0.98]
+                                           border border-transparent hover:border-orange-100">
+                            <div className="p-1.5 rounded-lg group-hover:bg-orange-100 transition-colors">
+                                <Bolt className="w-5 h-5 text-gray-600 group-hover:text-orange-600 transition-colors" />
+                            </div>
+                            <span className="font-medium text-gray-700 group-hover:text-orange-700 transition-colors">
+                                Setelan
+                            </span>
                         </a>
-                    </div>
+                    </nav>
                 </section>
             </div>
 
-            <div>
-                <a href="#" className="w-full flex flex-col justify-center p-5 hover:bg-gray-100 transition">
-                    <div className="flex items-center justify-between">
-                        <span className="flex items-center gap-2">
-                            <BellRing />
+            {/* Bottom Actions */}
+            <div className="border-t border-gray-200 bg-gradient-to-b from-white to-slate-50">
+                <a href="#" className="group w-full flex items-center justify-between p-5 
+                                     hover:bg-orange-50 transition-all duration-300 cursor-pointer
+                                     border-b border-gray-100">
+                    <span className="flex items-center gap-3">
+                        <div className="p-1.5 rounded-lg group-hover:bg-orange-100 transition-colors">
+                            <BellRing className="w-5 h-5 text-gray-600 group-hover:text-orange-600 transition-colors" />
+                        </div>
+                        <span className="font-medium text-gray-700 group-hover:text-orange-700 transition-colors">
                             Notifikasi
                         </span>
-                        <span className="bg-red-600 text-white flex items-center justify-center w-8 h-8 rounded-full">2</span>
-                    </div>
+                    </span>
+                    <span className="bg-gradient-to-br from-red-500 to-red-600 text-white 
+                                   flex items-center justify-center w-7 h-7 rounded-full 
+                                   text-sm font-bold shadow-md ring-2 ring-red-200">
+                        2
+                    </span>
                 </a>
 
-                <a onClick={handleLogout} className="w-full flex flex-col justify-center p-5 hover:bg-gray-100 transition cursor-pointer">
-                    <div className="flex items-center justify-between">
-                        <span className="flex items-center gap-2">
-                            <LogOut />
-                            Keluar
-                        </span>
+                <a onClick={handleLogout} className="group w-full flex items-center gap-3 p-5 
+                                                   hover:bg-red-50 transition-all duration-300 cursor-pointer">
+                    <div className="p-1.5 rounded-lg group-hover:bg-red-100 transition-colors">
+                        <LogOut className="w-5 h-5 text-gray-600 group-hover:text-red-600 transition-colors" />
                     </div>
+                    <span className="font-medium text-gray-700 group-hover:text-red-700 transition-colors">
+                        Keluar
+                    </span>
                 </a>
             </div>
 
         </aside>
+        </>
     )
 }
