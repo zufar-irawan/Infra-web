@@ -5,21 +5,36 @@
 import React, {useEffect, useState} from "react";
 import {usePathname} from "next/navigation";
 import Sidebar from "@/components/Sidebar";
-import {User} from "@/app/api/me/route";
-import axios from "axios";
 
 export default function EduLayout(
     {children}: {children?: React.ReactNode}
 ) {
     const pathname = usePathname()
     const isLogin = pathname.includes("/login")
+    const [sidebarOpen, setSidebarOpen] = useState(false)
 
+    useEffect(() => {
+        const handleToggleSidebar = () => {
+            setSidebarOpen(prev => !prev)
+        }
+
+        window.addEventListener('toggleSidebar', handleToggleSidebar)
+        
+        return () => {
+            window.removeEventListener('toggleSidebar', handleToggleSidebar)
+        }
+    }, [])
 
     return (
         <div className="flex flex-row bg-gray-100">
-            { !isLogin && <Sidebar />}
+            { !isLogin && (
+                <Sidebar 
+                    isOpen={sidebarOpen} 
+                    onClose={() => setSidebarOpen(false)} 
+                />
+            )}
 
-            <div className={`flex-col ${isLogin && "w-full justify-center"}`}>
+            <div className="flex-col w-full">
                 {children}
             </div>
         </div>

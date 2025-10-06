@@ -2,12 +2,17 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from "next/image";
-import {BellRing, Bolt, BookMarked, BarChart3, LayoutDashboard, LogOut, Shapes, Users} from "lucide-react";
+import {BellRing, Bolt, BookMarked, BarChart3, LayoutDashboard, LogOut, Shapes, Users, X} from "lucide-react";
 import axios from "axios";
 import {User} from "@/app/api/me/route";
 
 
-export default function Sidebar() {
+interface SidebarProps {
+    isOpen: boolean;
+    onClose: () => void;
+}
+
+export default function Sidebar({ isOpen, onClose }: SidebarProps) {
     const router = useRouter();
 
     const [user, setUser] = useState<User | null>(null)
@@ -40,13 +45,23 @@ export default function Sidebar() {
     };
 
     return (
-        <aside className="w-xs min-h-screen bg-gradient-to-b from-slate-50 to-white text-gray-700
+        <>
+            {/* Overlay untuk mobile */}
+            {isOpen && (
+                <div 
+                    className="fixed inset-0 bg-black/25 bg-opacity-50 z-40 lg:hidden"
+                    onClick={onClose}
+                />
+            )}
+            
+            <aside className={`w-full fixed lg:relative max-w-xs min-h-screen bg-gradient-to-b from-slate-50 to-white text-gray-700
                  border-r border-gray-200 shadow-sm
-                 flex flex-col justify-between">
+                 flex flex-col justify-between z-50 transition-transform duration-300 ease-in-out
+                 ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
             <div>
                 {/* Header with gradient */}
                 <section className="w-full bg-gradient-to-br from-orange-600 via-orange-500 to-orange-600 
-                                  flex justify-center items-center gap-3 p-6 shadow-lg relative overflow-hidden">
+                                  flex justify-between items-center gap-3 p-6 shadow-lg relative overflow-hidden">
                     <div className="absolute inset-0 bg-white/5 backdrop-blur-3xl"></div>
                     <div className="relative z-10 flex items-center gap-3">
                         <div className="bg-white/20 p-2 rounded-2xl backdrop-blur-sm shadow-lg">
@@ -54,6 +69,14 @@ export default function Sidebar() {
                         </div>
                         <h1 className="text-2xl tracking-tight font-bold text-white drop-shadow-md">Presma EDU</h1>
                     </div>
+                    
+                    {/* Tombol X untuk menutup sidebar */}
+                    <button 
+                        onClick={onClose}
+                        className="relative z-10 lg:hidden p-2 rounded-lg hover:bg-white/20 transition-colors"
+                    >
+                        <X className="w-6 h-6 text-white" />
+                    </button>
                 </section>
 
                 {/* User Profile Card */}
@@ -69,11 +92,15 @@ export default function Sidebar() {
 
                             <div className="flex flex-col flex-1 min-w-0">
                                 <h2 className="font-bold text-gray-800 truncate">
-                                    {user?.name || "Tamu"}
+                                    {user?.name || "Hafiz"}
                                 </h2>
-                                <p className="text-sm text-gray-500 flex items-center gap-1">
+                                <p className="text-sm text-gray-500 flex items-center gap-1 overflow-hidden">
                                     <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                                    {user?.role || "Tamu"}
+                                    {user?.role
+                                        ? user.role.length > 21
+                                            ? user.role.slice(0, 21) + "..."
+                                            : user.role
+                                        : "hafiz@smkprestasipri..."}
                                 </p>
                             </div>
                         </div>
@@ -188,5 +215,6 @@ export default function Sidebar() {
             </div>
 
         </aside>
+        </>
     )
 }
