@@ -11,7 +11,7 @@ export default async function Page() {
     redirect('edu/dashboard');
   } else {
     // Jika belum login, redirect ke login
-    redirect('edu/login');
+    redirect('edu/login');  
   }
   return null;
 }
