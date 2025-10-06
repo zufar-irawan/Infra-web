@@ -9,6 +9,8 @@ export default function Prestasi() {
   const [current, setCurrent] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement | null>(null);
+  const autoSlideRef = useRef<NodeJS.Timeout | null>(null);
+  const touchStartX = useRef<number | null>(null);
 
   const achievements = [
     { img: "/pp2.png", title: "Juara Dua" },
@@ -16,7 +18,7 @@ export default function Prestasi() {
     { img: "/pp2.png", title: "Juara Satu" },
   ];
 
-  // observer animasi masuk
+  // animasi masuk
   useEffect(() => {
     const observer = new IntersectionObserver(
       entries => {
@@ -30,12 +32,47 @@ export default function Prestasi() {
     return () => observer.disconnect();
   }, []);
 
-  // next & prev slide
+  // autoplay
+  useEffect(() => {
+    autoSlideRef.current = setInterval(() => {
+      setCurrent(prev => (prev + 1) % achievements.length);
+    }, 4000);
+    return () => {
+      if (autoSlideRef.current) clearInterval(autoSlideRef.current);
+    };
+  }, [achievements.length]);
+
   const nextSlide = () => {
-    setCurrent((prev) => (prev + 1) % achievements.length);
+    if (autoSlideRef.current) clearInterval(autoSlideRef.current);
+    setCurrent(prev => (prev + 1) % achievements.length);
   };
+
   const prevSlide = () => {
-    setCurrent((prev) => (prev - 1 + achievements.length) % achievements.length);
+    if (autoSlideRef.current) clearInterval(autoSlideRef.current);
+    setCurrent(prev => (prev - 1 + achievements.length) % achievements.length);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    const diff = e.changedTouches[0].clientX - touchStartX.current;
+    if (Math.abs(diff) > 50) {
+      diff > 0 ? prevSlide() : nextSlide();
+    }
+    touchStartX.current = null;
+  };
+
+  // posisi kartu
+  const getTranslateX = (index: number) => {
+    const diff = (index - current + achievements.length) % achievements.length;
+    if (diff === 0) return "translate-x-0 scale-100 opacity-100 z-20";
+    if (diff === 1) return "translate-x-[110%] scale-95 opacity-80 z-10";
+    if (diff === achievements.length - 1)
+      return "-translate-x-[110%] scale-95 opacity-80 z-10";
+    return "opacity-0 scale-90 z-0";
   };
 
   return (
@@ -46,7 +83,7 @@ export default function Prestasi() {
         ref={sectionRef}
         className="relative overflow-hidden py-24 md:py-28 bg-white"
       >
-        {/* Background oranye miring */}
+        {/* Background miring oranye */}
         <div className="absolute top-120 left-0 right-0 h-100 bg-[#FE4D01] transform -skew-y-6 origin-top-left z-0"></div>
 
         <div className="relative z-10 container mx-auto px-6 md:px-12 lg:px-20">
@@ -68,21 +105,26 @@ export default function Prestasi() {
             </div>
 
             {/* Kanan: Slider */}
-            <div className="md:w-1/2 flex flex-col">
-              {/* Cards */}
-              <div className="flex gap-4 overflow-hidden transition-all duration-500 ease-in-out">
-                {achievements
-                  .slice(current, current + 2)
-                  .concat(
-                    current + 2 > achievements.length
-                      ? achievements.slice(0, (current + 2) % achievements.length)
-                      : []
-                  )
-                  .map((item, i) => (
+            <div className="md:w-1/2 flex flex-col items-center justify-center relative">
+              {/* Container */}
+              <div
+                className="relative w-full flex items-center justify-center overflow-hidden h-[380px] touch-pan-y"
+                onTouchStart={handleTouchStart}
+                onTouchEnd={handleTouchEnd}
+              >
+                {achievements.map((item, i) => (
+                  <div
+                    key={i}
+                    className={`absolute transition-all duration-700 ease-[cubic-bezier(0.68,-0.55,0.27,1.55)] ${getTranslateX(
+                      i
+                    )}`}
+                  >
                     <div
-                      key={i}
-                      className="bg-white rounded-xl shadow-md overflow-hidden flex-shrink-0 transform transition hover:scale-105 hover:shadow-xl"
-                      style={{ width: "295px", height: "369px" }}
+                      className="bg-white rounded-xl shadow-md overflow-hidden flex-shrink-0 transform transition hover:scale-105 hover:shadow-xl mx-auto"
+                      style={{
+                        width: "295px",
+                        height: "369px",
+                      }}
                     >
                       <Image
                         src={item.img}
@@ -92,11 +134,12 @@ export default function Prestasi() {
                         className="object-cover w-full h-full"
                       />
                     </div>
-                  ))}
+                  </div>
+                ))}
               </div>
 
               {/* Tombol Navigasi + Selengkapnya */}
-              <div className="flex items-center justify-between mt-6">
+              <div className="flex items-center justify-between mt-6 w-full">
                 <a
                   href="/profil/prestasi"
                   className="px-6 py-2 rounded-md bg-[#243771] text-white text-sm md:text-base font-semibold shadow hover:shadow-lg hover:bg-[#1a2a5c] transition"
@@ -126,14 +169,15 @@ export default function Prestasi() {
       </section>
 
       {/* === SECTION GEDUNG FULLSCREEN === */}
-      <section className="relative w-full bg-[#FE4D01]">
-        <div className="w-full h-screen relative">
+      <section className="relative w-full bg-[#FE4D01] overflow-hidden">
+        <div className="relative w-full h-[29vh] md:h-[50vh] lg:h-screen">
           <Image
-            src="svg/gedung.svg"
+            src="/svg/gedung.svg"
             alt="Gedung SMK Prestasi Prima"
             fill
             priority
-            className="object-cover object-center"
+            sizes="0vw"
+            className="object-contain md:object-cover object-center"
           />
         </div>
       </section>
