@@ -1,134 +1,152 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use App\Models\PresenceClass as Kelas;
-
+use App\Models\PresenceTeacher as Guru;
+use Illuminate\Http\Request;
+use App\Http\Requests\KelasRequest;
+use Yajra\DataTables\Facades\DataTables;
 
 class PresenceClassController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view kelas|create kelas|edit kelas|delete kelas', ['only' => ['index','show','datatable']]);
+        $this->middleware('permission:create kelas', ['only' => ['store']]);
+        $this->middleware('permission:edit kelas', ['only' => ['update']]);
+        $this->middleware('permission:delete kelas', ['only' => ['destroy']]);
+    }
+
+    /**
+     * GET /api/classes
+     * Menampilkan semua kelas (paginated)
+     */
     public function index()
     {
         $kelas = Kelas::with('guru')
             ->orderBy('created_at', 'DESC')
-            ->get()
-            ->map(function($k) {
-                return [
-                    'id' => $k->id,
-                    'nama' => $k->nama,
-                    'guru_nama' => $k->guru->nama ?? null,
-                    'guru_telepon' => $k->guru->telepon ?? null,
-                    'created_at' => $k->created_at
-                ];
-            });
+            ->paginate(15);
 
         return response()->json([
             'success' => true,
-            'data' => $kelas
+            'data'    => $kelas
         ]);
     }
 
     /**
-     * Store a newly created kelas
+     * GET /api/classes/{id}
+     * Detail satu kelas
+     */
+    public function show(Kelas $class)
+    {
+        $class->load('guru');
+
+        return response()->json([
+            'success' => true,
+            'data'    => $class
+        ]);
+    }
+
+    /**
+     * POST /api/classes
+     * Tambah kelas baru
      */
     public function store(KelasRequest $request)
     {
-        try {
-            $kelas = Kelas::create($request->all());
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Kelas created successfully',
-                'data' => $kelas->load('guru')
-            ], 201);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to create kelas',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
-     * Display the specified kelas
-     */
-    public function show($id)
-    {
-        $kelas = Kelas::with('guru')->find($id);
-
-        if (!$kelas) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Kelas not found'
-            ], 404);
-        }
+        $kelas = Kelas::create($request->validated());
 
         return response()->json([
             'success' => true,
-            'data' => $kelas
+            'message' => 'Kelas created successfully',
+            'data'    => $kelas
+        ], 201);
+    }
+
+    /**
+     * PUT /api/classes/{id}
+     * Update kelas
+     */
+    public function update(KelasRequest $request, Kelas $class)
+    {
+        $class->update($request->validated());
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Kelas updated successfully',
+            'data'    => $class
         ]);
     }
 
     /**
-     * Update the specified kelas
+     * DELETE /api/classes/{id}
+     * Hapus kelas
      */
-    public function update(KelasRequest $request, $id)
+    public function destroy(Kelas $class)
     {
-        try {
-            $kelas = Kelas::find($id);
+        $class->delete();
 
-            if (!$kelas) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Kelas not found'
-                ], 404);
-            }
-
-            $kelas->update($request->all());
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Kelas updated successfully',
-                'data' => $kelas->load('guru')
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to update kelas',
-                'error' => $e->getMessage()
-            ], 500);
-        }
+        return response()->json([
+            'success' => true,
+            'message' => 'Kelas deleted successfully'
+        ]);
     }
 
     /**
-     * Remove the specified kelas
+     * GET /api/datatable/classes
+     * Datatable server-side
      */
-    public function destroy($id)
+    public function datatable()
     {
-        try {
-            $kelas = Kelas::find($id);
+        $kelas = Kelas::with('guru')
+            ->orderBy('created_at', 'DESC');
 
-            if (!$kelas) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Kelas not found'
-                ], 404);
-            }
-
-            $kelas->delete();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Kelas deleted successfully'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to delete kelas',
-                'error' => $e->getMessage()
-            ], 500);
-        }
+        return DataTables::of($kelas)
+            ->addIndexColumn()
+            ->editColumn('nama', fn($k) =>
+                $k->nama ?: "<span class='badge badge-danger'>Nama Tidak Terdaftar</span>"
+            )
+            ->addColumn('guru_nama', fn($k) =>
+                $k->guru?->nama ?: "<span class='badge badge-danger'>Guru Tidak Ada</span>"
+            )
+            ->addColumn('guru_telepon', fn($k) =>
+                $k->guru?->telepon ?: "<span class='badge badge-secondary'>Tidak Ada Nomor</span>"
+            )
+            ->addColumn('action', function($k) {
+                $btn = '';
+                if(auth()->user()->hasPermissionTo('edit kelas')) {
+                    $btn .= '<a href="/classes/'.$k->id.'/edit" class="btn btn-warning btn-sm m-1"><i class="fas fa-edit"></i></a>';
+                }
+                if(auth()->user()->hasPermissionTo('delete kelas')) {
+                    $btn .= '<button onclick="deleteConfirm(\''.$k->id.'\')" class="btn btn-danger btn-sm m-1"><i class="fa fa-trash"></i></button>';
+                }
+                return $btn ?: '-';
+            })
+            ->rawColumns(['nama','guru_nama','guru_telepon','action'])
+            ->make(true);
     }
 }
+
+/*
+// Ambil semua kelas
+axios.get('/api/classes', {
+  headers: { Authorization: `Bearer ${token}` }
+}).then(res => console.log(res.data))
+
+// Tambah kelas baru
+axios.post('/api/classes', {
+  nama: 'X PPLG 1',
+  guru_id: 5
+}, { headers: { Authorization: `Bearer ${token}` } })
+
+// Update kelas
+axios.put('/api/classes/3', {
+  nama: 'X PPLG 2',
+  guru_id: 7
+}, { headers: { Authorization: `Bearer ${token}` } })
+
+// Hapus kelas
+axios.delete('/api/classes/3', {
+  headers: { Authorization: `Bearer ${token}` }
+}) */
