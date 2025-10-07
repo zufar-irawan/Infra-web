@@ -2,124 +2,118 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use App\Models\PresenceDevice as Device;
 use Illuminate\Http\Request;
-use App\Http\Requests\DeviceRequest;
 
-class PresenceDeviceController extends Controller
+class PresenceTeacherController extends Controller
 {
-    /**
-     * Get all devices (list).
-     */
     public function index()
     {
-        $devices = Device::orderBy('created_at', 'DESC')->get();
+        $guru = Guru::orderBy('created_at', 'DESC')->get();
 
         return response()->json([
             'success' => true,
-            'data' => $devices
+            'data' => $guru
         ]);
     }
 
     /**
-     * Store a newly created device
+     * Store a newly created guru
      */
-    public function store(DeviceRequest $request)
+    public function store(GuruRequest $request)
     {
         try {
-            $device = Device::create($request->all());
+            $guru = Guru::create($request->all());
 
             return response()->json([
                 'success' => true,
-                'message' => 'Device created successfully',
-                'data' => $device
+                'message' => 'Guru created successfully',
+                'data' => $guru
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to create device',
+                'message' => 'Failed to create guru',
                 'error' => $e->getMessage()
             ], 500);
         }
     }
 
     /**
-     * Display the specified device
+     * Display the specified guru
      */
     public function show($id)
     {
-        $device = Device::find($id);
+        $guru = Guru::find($id);
 
-        if (!$device) {
+        if (!$guru) {
             return response()->json([
                 'success' => false,
-                'message' => 'Device not found'
+                'message' => 'Guru not found'
             ], 404);
         }
 
         return response()->json([
             'success' => true,
-            'data' => $device
+            'data' => $guru
         ]);
     }
 
     /**
-     * Update the specified device
+     * Update the specified guru
      */
-    public function update(DeviceRequest $request, $id)
+    public function update(GuruRequest $request, $id)
     {
         try {
-            $device = Device::find($id);
+            $guru = Guru::find($id);
 
-            if (!$device) {
+            if (!$guru) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Device not found'
+                    'message' => 'Guru not found'
                 ], 404);
             }
 
-            $device->update($request->all());
+            $guru->update($request->all());
 
             return response()->json([
                 'success' => true,
-                'message' => 'Device updated successfully',
-                'data' => $device
+                'message' => 'Guru updated successfully',
+                'data' => $guru
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to update device',
+                'message' => 'Failed to update guru',
                 'error' => $e->getMessage()
             ], 500);
         }
     }
 
     /**
-     * Remove the specified device
+     * Remove the specified guru
      */
     public function destroy($id)
     {
         try {
-            $device = Device::find($id);
+            $guru = Guru::find($id);
 
-            if (!$device) {
+            if (!$guru) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Device not found'
+                    'message' => 'Guru not found'
                 ], 404);
             }
 
-            $device->delete();
+            $guru->delete();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Device deleted successfully'
+                'message' => 'Guru deleted successfully'
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to delete device',
+                'message' => 'Failed to delete guru',
                 'error' => $e->getMessage()
             ], 500);
         }

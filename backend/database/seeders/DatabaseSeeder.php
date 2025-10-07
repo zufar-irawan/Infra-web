@@ -14,13 +14,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
-
         LmsUser::create([
             'name' => 'Admin',
             'email' => 'admin@mail.com',
@@ -35,24 +28,24 @@ class DatabaseSeeder extends Seeder
             'name' => 'Teacher',
             'email' => 'guru@mail.com',
             'password' => bcrypt('12345678'),
-            'role' => 'teacher',
-            'phone' => '081234567890',
+            'role' => 'guru',
+            'phone' => '081256437890',
             'status' => true,
             'created_at' => now()
         ]);
 
         LmsUser::create([
             'name' => 'Student',
-            'email' => 'guru@mail.com',
+            'email' => 'siswa@mail.com',
             'password' => bcrypt('12345678'),
-            'role' => 'student',
-            'phone' => '081234567890',
+            'role' => 'siswa',
+            'phone' => '081256347890',
             'status' => true,
             'created_at' => now()
         ]);
 
         $this->call([
-            UserSeeder::class,
+            // UserSeeder::class,
             // KelasSeeder::class,
             // SiswaSeeder::class,
             // GuruSeeder::class,

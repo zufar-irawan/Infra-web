@@ -27,9 +27,22 @@ use App\Http\Controllers\LmsAssignmentController;
 use App\Http\Controllers\LmsAssignmentSubmissionController;
 use App\Http\Controllers\LmsExamController;
 use App\Http\Controllers\LmsExamResultController;
+use App\Http\Controllers\LmsExamQuestionController;
 use App\Http\Controllers\LmsAttendanceController;
 use App\Http\Controllers\LmsReportController;
 use App\Http\Controllers\LmsFinanceController;
+
+// --- PRESENCE SYSTEM ---
+use App\Http\Controllers\PresenceApiController;
+use App\Http\Controllers\PresenceUserController;
+use App\Http\Controllers\PresenceSettingController as SettingController;
+use App\Http\Controllers\PresenceRfidController as RfidController;
+use App\Http\Controllers\PresenceClassController as KelasController;
+use App\Http\Controllers\PresenceTeacherController as GuruController;
+use App\Http\Controllers\PresenceDeviceController as DeviceController;
+use App\Http\Controllers\PresenceStudentController as SiswaController;
+use App\Http\Controllers\PresenceDashboardController as DashboardController;
+use App\Http\Controllers\PresenceReportController as ReportController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -91,6 +104,7 @@ Route::prefix('lms')->group(function () {
         // Exams
         Route::apiResource('exams', LmsExamController::class);
         Route::apiResource('exam-results', LmsExamResultController::class)->only(['index','store','show']);
+        Route::apiResource('exam-questions', LmsExamQuestionController::class)->only(['index','store','show','update','destroy']);
 
         // Attendance
         Route::apiResource('attendance', LmsAttendanceController::class)->only(['index','store','show']);
@@ -101,37 +115,56 @@ Route::prefix('lms')->group(function () {
     });
 });
 
+
 Route::prefix('presence')->group(function () {
-    // Device Management
-    Route::apiResource('devices', App\Http\Controllers\PresenceDeviceController::class);
+    Route::post('/change-mode', [PresenceApiController::class, 'changeMode']);
+    Route::post('/', [PresenceApiController::class, 'presence']);
+    Route::apiResource('users', PresenceUserController::class);
 
-    // RFID Management
-    Route::get('rfids/datatable', [App\Http\Controllers\PresenceRfidController::class, 'datatable'])->name('rfids.datatable');
-    Route::apiResource('rfids', App\Http\Controllers\PresenceRfidController::class);
-
-    // Teacher Management
-    Route::get('guru/datatable', [App\Http\Controllers\GuruController::class, 'datatable'])->name('guru.datatable');
-    Route::apiResource('guru', App\Http\Controllers\GuruController::class);
-
-    // Class Management
-    Route::get('kelas/datatable', [App\Http\Controllers\KelasController::class, 'datatable'])->name('kelas.datatable');
-    Route::apiResource('kelas', App\Http\Controllers\KelasController::class);
-
-    // Student Management
-    Route::get('siswa/datatable', [App\Http\Controllers\SiswaController::class, 'datatable'])->name('siswa.datatable');
-    Route::apiResource('siswa', App\Http\Controllers\SiswaController::class);
-
-    // Attendance Management
-    Route::get('absensi/datatable', [App\Http\Controllers\AbsensiSiswaController::class, 'datatable'])->name('absensi.datatable');
-    Route::apiResource('absensi', App\Http\Controllers\AbsensiSiswaController::class)->only(['index','show','store']);
-
-    // Dashboard
-    Route::get('dashboard', [App\Http\Controllers\PresenceDashboardController::class, 'index'])->name('dashboard.index');
-
-    // Reports
-    Route::get('reports/school', [App\Http\Controllers\PresenceReportController::class, 'reportSchool'])->name('reports.school');
-    Route::get('reports/teacher', [App\Http\Controllers\PresenceReportController::class, 'reportTeacher'])->name('reports.teacher');
-    Route::get('reports/student', [App\Http\Controllers\PresenceReportController::class, 'reportStudent'])->name('reports.student');
-    Route::post('reports/school/datatable', [App\Http\Controllers\PresenceReportController::class, 'schoolDatatable'])->name('reports.school.datatable');
-    Route::post('reports/teacher/datatable', [App\Http\Controllers\PresenceReportController::class, 'teacherDatatable'])->name('reports.teacher.datatable');
+    // Protected routes (perlu authentication)
+    Route::middleware('auth:sanctum')->group(function () {
+    
+        // User routes
+        // Route::apiResource('users', UserController::class);
+        Route::get('roles', [PresenceUserController::class, 'roles']);
+        
+        // Setting routes
+        Route::get('settings', [SettingController::class, 'index']);
+        Route::post('settings', [SettingController::class, 'store']);
+        Route::put('settings/{id}', [SettingController::class, 'update']);
+        
+        // RFID routes
+        Route::apiResource('rfids', RfidController::class)->only(['index', 'show', 'destroy']);
+        
+        // Kelas routes
+        Route::apiResource('kelas', KelasController::class);
+        
+        // Guru routes
+        Route::apiResource('guru', GuruController::class);
+        
+        // Device routes
+        Route::apiResource('devices', DeviceController::class);
+        
+        // Siswa routes
+        Route::apiResource('siswa', SiswaController::class);
+        Route::post('siswa/daftar-rfid', [SiswaController::class, 'daftarRfid']);
+        
+        // Presence routes
+        Route::get('presences', [PresenceApiController::class, 'index']);
+        Route::get('presences/today', [PresenceApiController::class, 'today']);
+        
+        // Dashboard routes
+        Route::get('dashboard', [DashboardController::class, 'index']);
+        Route::get('dashboard/statistics', [DashboardController::class, 'statistics']);
+        
+        // Report routes
+        Route::get('reports/date', [ReportController::class, 'reportDate']);
+        Route::get('reports/student', [ReportController::class, 'reportStudent']);
+        Route::get('reports/student/{id}/presence', [ReportController::class, 'studentPresence']);
+        Route::get('reports/rekap-absensi', [ReportController::class, 'rekapAbsensiSiswa']);
+        Route::get('reports/detail-absensi', [ReportController::class, 'detailAbsensiSiswa']);
+        Route::post('reports/export/date', [ReportController::class, 'reportDateExport']);
+        Route::post('reports/export/rekap', [ReportController::class, 'rekapAbsensiSiswaExport']);
+        Route::post('reports/export/detail', [ReportController::class, 'detailAbsensiSiswaExport']);
+    });
 });
