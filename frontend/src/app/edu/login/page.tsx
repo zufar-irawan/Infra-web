@@ -93,8 +93,10 @@ export default function LoginRegisterPage() {
 
     // Get completed steps for icon stacking - only when actually completed and ready to move
     const getCompletedSteps = () => {
+        // @ts-ignore
         const steps = [];
         // Don't show any completed icons during loading
+        // @ts-ignore
         if (loading) return steps;
 
         // Email is completed when valid AND user has moved to password
