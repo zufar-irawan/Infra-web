@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import {useRouter} from "next/navigation";
-import api from "@/app/lib/api";
 import {showLoginSuccessAlert} from "@/components/LoginSuccess";
 import axios from "axios";
 
@@ -13,10 +12,30 @@ export default function LoginRegisterPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
-    const [success, setSuccess] = useState(false);
     const [loading, setLoading] = useState(false);
 
     const [activeTab, setActiveTab] = useState("masuk");
+
+    useEffect(() => {
+        // Cek token di localStorage/sessionStorage
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        if (token) {
+            // Validasi token ke backend (opsional, lebih aman)
+            axios.get('/api/me', {
+                headers: { Authorization: `Bearer ${token}` }
+            })
+            .then(res => {
+                if (res.data && res.data.user) {
+                    router.push('/edu/dashboard');
+                }
+            })
+            .catch(() => {
+                // Jika token tidak valid, hapus token
+                localStorage.removeItem('token');
+                sessionStorage.removeItem('token');
+            });
+        }
+    }, [router]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()

@@ -35,24 +35,24 @@ class DatabaseSeeder extends Seeder
             'name' => 'Teacher',
             'email' => 'guru@mail.com',
             'password' => bcrypt('12345678'),
-            'role' => 'teacher',
-            'phone' => '081234567890',
+            'role' => 'guru',
+            'phone' => '081234567891',
             'status' => true,
             'created_at' => now()
         ]);
 
         LmsUser::create([
             'name' => 'Student',
-            'email' => 'guru@mail.com',
+            'email' => 'siswa@mail.com',
             'password' => bcrypt('12345678'),
-            'role' => 'student',
-            'phone' => '081234567890',
+            'role' => 'siswa',
+            'phone' => '081234567892',
             'status' => true,
             'created_at' => now()
         ]);
 
         $this->call([
-            UserSeeder::class,
+            // UserSeeder::class,
             // KelasSeeder::class,
             // SiswaSeeder::class,
             // GuruSeeder::class,
