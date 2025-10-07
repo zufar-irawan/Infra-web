@@ -26,9 +26,9 @@ export default function EduLayout(
     }, [])
 
     return (
-        <div className="flex flex-row bg-gray-100">
+        <div className="flex flex-row min-h-screen bg-gray-100">
             { !isLogin && (
-                <Sidebar 
+                <Sidebar
                     isOpen={sidebarOpen} 
                     onClose={() => setSidebarOpen(false)} 
                 />

@@ -11,14 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('presence_users', function (Blueprint $table) {
+        Schema::create('lms_exam_questions', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            // $table->enum('role', ['admin', 'guru'])->default('guru');
-            $table->rememberToken();
+            $table->foreignId('exam_id')->constrained('lms_exams')->onDelete('cascade');
+            $table->enum('type', ['pg', 'essay'])->default('pg'); // tipe soal
+            $table->text('question_text'); // isi pertanyaan
+            $table->integer('points')->default(1); // bobot nilai
             $table->timestamps();
         });
     }
@@ -28,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('presence_users');
+        Schema::dropIfExists('lms_exam_questions');
     }
 };
