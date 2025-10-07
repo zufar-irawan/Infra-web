@@ -102,7 +102,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
                             <div className="flex flex-col flex-1 min-w-0">
                                 <h2 className="font-bold text-gray-800 truncate">
-                                    {user?.name || "Hafiz"}
+                                    {user?.name || "Loading..."}
                                 </h2>
                                 <p className="text-sm text-gray-500 flex items-center gap-1 overflow-hidden">
                                     <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
@@ -110,7 +110,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                                         ? user.email.length > 21
                                             ? user.email.slice(0, 21) + "..."
                                             : user.email
-                                        : "hafiz@smkprestasipri..."}
+                                        : "Loading..."}
                                 </p>
                             </div>
                         </div>
