@@ -9,7 +9,7 @@ export default function UjianSiswa() {
     const [open2, setOpen2] = useState(true);
 
     return (
-        <>
+        <div className="overflow-y-auto min-h-screen">
             <DashHeader />
             <section id="ujian-main-data" className="w-full grid grid-cols-1 2xl:grid-cols-2 gap-4 p-4">
                 {/* TASK */}
@@ -156,6 +156,6 @@ export default function UjianSiswa() {
                     )}
                 </div>
             </section>
-        </>
+        </div>
     )
 }

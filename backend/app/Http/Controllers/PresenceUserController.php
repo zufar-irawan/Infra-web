@@ -3,183 +3,130 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
-use App\Models\PresenceUser;
+use App\Http\Requests\UserRequest;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\DB;
+use Yajra\DataTables\DataTables;
 
 class PresenceUserController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view user|create user|edit user|delete user', ['only' => ['index','show','datatable']]);
+        $this->middleware('permission:create user', ['only' => ['store']]);
+        $this->middleware('permission:edit user', ['only' => ['update']]);
+        $this->middleware('permission:delete user', ['only' => ['destroy']]);
+    }
+
     /**
-     * Display a listing of the users
+     * GET /api/presence-users
      */
     public function index()
     {
-        $users = PresenceUser::with('roles')
-            ->orderBy('created_at', 'DESC')
-            ->get()
-            ->map(function ($user) {
-                return [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'role' => $user->roles->pluck('name')->first(),
-                    'created_at' => $user->created_at,
-                ];
-            });
+        $users = User::with('roles')
+            ->orderBy('created_at','desc')
+            ->paginate(15);
 
         return response()->json([
             'success' => true,
-            'data' => $users
+            'data'    => $users
         ]);
     }
 
     /**
-     * Store a newly created user
+     * GET /api/presence-users/{id}
      */
-    public function store(Request $request)
+    public function show(User $user)
     {
-        $request->validate([
-            'name'     => 'required|string|max:100',
-            'email'    => 'required|email|unique:presence_users,email',
-            'password' => 'required|string|min:6',
-            'role'     => 'required|string|exists:roles,name',
-        ]);
-
-        try {
-            $input = $request->all();
-            $input['password'] = bcrypt($input['password']);
-
-            $user = PresenceUser::create($input);
-            $user->assignRole($request->input('role'));
-
-            return response()->json([
-                'success' => true,
-                'message' => 'User created successfully',
-                'data' => $user->load('roles')
-            ], 201);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to create user',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
-     * Display the specified user
-     */
-    public function show($id)
-    {
-        $user = PresenceUser::with('roles')->find($id);
-
-        if (!$user) {
-            return response()->json([
-                'success' => false,
-                'message' => 'User not found'
-            ], 404);
-        }
+        $user->load('roles');
 
         return response()->json([
             'success' => true,
-            'data' => [
-                'id'         => $user->id,
-                'name'       => $user->name,
-                'email'      => $user->email,
-                'role'       => $user->roles->pluck('name')->first(),
-                'created_at' => $user->created_at
-            ]
+            'data'    => $user
         ]);
     }
 
     /**
-     * Update the specified user
+     * POST /api/presence-users
      */
-    public function update(Request $request, $id)
+    public function store(UserRequest $request)
     {
-        $request->validate([
-            'name'     => 'sometimes|string|max:100',
-            'email'    => 'sometimes|email|unique:presence_users,email,' . $id,
-            'password' => 'nullable|string|min:6',
-            'role'     => 'required|string|exists:roles,name',
-        ]);
+        $input = $request->validated();
+        $input['password'] = bcrypt($input['password']);
 
-        try {
-            $user = PresenceUser::find($id);
-
-            if (!$user) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'User not found'
-                ], 404);
-            }
-
-            $input = $request->all();
-            $input['password'] = $request->filled('password')
-                ? bcrypt($request->password)
-                : $user->password;
-
-            $user->update($input);
-
-            // Hapus role lama lalu assign role baru
-            DB::table('model_has_roles')->where('model_id', $user->id)->delete();
-            $user->assignRole($request->input('role'));
-
-            return response()->json([
-                'success' => true,
-                'message' => 'User updated successfully',
-                'data' => $user->load('roles')
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to update user',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
-     * Remove the specified user
-     */
-    public function destroy($id)
-    {
-        try {
-            $user = PresenceUser::find($id);
-
-            if (!$user) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'User not found'
-                ], 404);
-            }
-
-            $user->delete();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'User deleted successfully'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to delete user',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
-     * Get all roles
-     */
-    public function roles()
-    {
-        $roles = Role::all(['id', 'name']);
+        $user = User::create($input);
+        $user->assignRole($request->input('role'));
 
         return response()->json([
             'success' => true,
-            'data' => $roles
+            'message' => 'User created successfully',
+            'data'    => $user->load('roles')
+        ], 201);
+    }
+
+    /**
+     * PUT /api/presence-users/{id}
+     */
+    public function update(UserRequest $request, User $user)
+    {
+        $input = $request->validated();
+        $input['password'] = $request->password
+            ? bcrypt($request->password)
+            : $user->password;
+
+        $user->update($input);
+
+        // reset role lama
+        DB::table('model_has_roles')->where('model_id', $user->id)->delete();
+        $user->assignRole($request->input('role'));
+
+        return response()->json([
+            'success' => true,
+            'message' => 'User updated successfully',
+            'data'    => $user->load('roles')
         ]);
+    }
+
+    /**
+     * DELETE /api/presence-users/{id}
+     */
+    public function destroy(User $user)
+    {
+        $user->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'User deleted successfully'
+        ]);
+    }
+
+    /**
+     * GET /api/datatable/presence-users
+     * untuk DataTables server-side
+     */
+    public function datatable(Request $request)
+    {
+        $users = User::orderBy('created_at','DESC');
+
+        return DataTables::of($users)
+            ->addIndexColumn()
+            ->addColumn('role', fn($u) => $u->roles->pluck('name')->first())
+            ->addColumn('action', function($u){
+                $action = '';
+
+                if(auth()->user()->hasPermissionTo('edit user')) {
+                    $action .= '<a href="/users/'.$u->id.'/edit" class="btn btn-warning btn-sm m-1"><i class="fas fa-edit"></i></a>';
+                }
+
+                if(auth()->user()->hasPermissionTo('delete user')) {
+                    $action .= '<button onclick="deleteConfirm(\''.$u->id.'\')" class="btn btn-danger btn-sm m-1"><i class="fa fa-trash"></i></button>';
+                }
+
+                return $action ?: '-';
+            })
+            ->rawColumns(['action'])
+            ->make(true);
     }
 }

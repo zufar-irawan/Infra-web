@@ -41,7 +41,6 @@ use App\Http\Controllers\PresenceClassController as KelasController;
 use App\Http\Controllers\PresenceTeacherController as GuruController;
 use App\Http\Controllers\PresenceDeviceController as DeviceController;
 use App\Http\Controllers\PresenceStudentController as SiswaController;
-use App\Http\Controllers\PresenceDashboardController as DashboardController;
 use App\Http\Controllers\PresenceReportController as ReportController;
 
 Route::get('/user', function (Request $request) {
@@ -153,9 +152,9 @@ Route::prefix('presence')->group(function () {
         Route::get('presences', [PresenceApiController::class, 'index']);
         Route::get('presences/today', [PresenceApiController::class, 'today']);
         
-        // Dashboard routes
-        Route::get('dashboard', [DashboardController::class, 'index']);
-        Route::get('dashboard/statistics', [DashboardController::class, 'statistics']);
+        // // Dashboard routes
+        // Route::get('dashboard', [DashboardController::class, 'index']);
+        // Route::get('dashboard/statistics', [DashboardController::class, 'statistics']);
         
         // Report routes
         Route::get('reports/date', [ReportController::class, 'reportDate']);
