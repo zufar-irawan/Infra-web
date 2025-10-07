@@ -9,7 +9,7 @@ export default function TugasSiswa() {
     const [open2, setOpen2] = useState(true);
 
     return (
-        <>
+        <div className="overflow-y-auto min-h-screen">
             <DashHeader />
             <section id="mapel-main-data" className="w-full grid grid-cols-1 2xl:grid-cols-2 gap-4 p-4">
                 {/* TASK */}
@@ -152,44 +152,10 @@ export default function TugasSiswa() {
                                     </a>
                                 </div>
                             </div>
-                            <div className="flex items-start sm:items-center justify-between py-4 gap-2">
-                                <div className="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1">
-                                    <div>
-                                        <h3>ASESMEN FORMATIF NARRATIVE TEXT</h3>
-                                        <p className="text-black/60 text-sm">13 Nov 2025 - 22 Des 2025</p>
-                                    </div>
-                                    <p className="text-xs text-orange-700">Selesai diluar waktu</p>
-                                </div>
-                                <div className="flex flex-col sm:flex-row items-center gap-2">
-                                    <a href="" className="text-sm bg-emerald-400 text-white px-3 py-2 rounded-sm flex items-center gap-1 hover:bg-emerald-300 hover:shadow transition">
-                                        Selesai
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3 h-3">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                                        </svg>
-                                    </a>
-                                </div>
-                            </div>
-                            <div className="flex items-start sm:items-center justify-between py-4 gap-2">
-                                <div className="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1">
-                                    <div>
-                                        <h3>ASESMEN FORMATIF RECOUNT TEXT</h3>
-                                        <p className="text-black/60 text-sm">8 Sep 2025 - 8 Okt 2025</p>
-                                    </div>
-                                    <p className="text-xs text-orange-700">Selesai tepat waktu</p>
-                                </div>
-                                <div className="flex flex-col sm:flex-row items-center gap-2">
-                                    <a href="" className="text-sm bg-emerald-400 text-white px-3 py-2 rounded-sm flex items-center gap-1 hover:bg-emerald-300 hover:shadow transition">
-                                        Selesai
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3 h-3">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                                        </svg>
-                                    </a>
-                                </div>
-                            </div>
                         </div>
                     )}
                 </div>
             </section>
-        </>
+        </div>
     )
 }

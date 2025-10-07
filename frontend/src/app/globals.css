@@ -49,6 +49,14 @@ body {
   @apply bg-blue-700 text-white;
 }
 
+table#mapel-nilai td {
+  @apply text-end;
+}
+
+table#mapel-nilai td:first-child {
+  @apply text-start;
+}
+
 img, input, br, button, textarea {
   user-select: none;
 }
