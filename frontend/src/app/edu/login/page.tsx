@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import {useRouter} from "next/navigation";
-import api from "@/app/lib/api";
 import {showLoginSuccessAlert} from "@/components/LoginSuccess";
 import axios from "axios";
 
@@ -13,10 +12,30 @@ export default function LoginRegisterPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
-    const [success, setSuccess] = useState(false);
     const [loading, setLoading] = useState(false);
 
     const [activeTab, setActiveTab] = useState("masuk");
+
+    useEffect(() => {
+        // Cek token di localStorage/sessionStorage
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        if (token) {
+            // Validasi token ke backend (opsional, lebih aman)
+            axios.get('/api/me', {
+                headers: { Authorization: `Bearer ${token}` }
+            })
+            .then(res => {
+                if (res.data && res.data.user) {
+                    router.push('/edu/dashboard');
+                }
+            })
+            .catch(() => {
+                // Jika token tidak valid, hapus token
+                localStorage.removeItem('token');
+                sessionStorage.removeItem('token');
+            });
+        }
+    }, [router]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -88,7 +107,7 @@ export default function LoginRegisterPage() {
 
                 {/* Card */}
                 <div className="bg-white rounded-2xl shadow-xl p-8">
-                    <div className="flex mb-6 bg-[#243771] rounded-full p-1">
+                    {/* <div className="flex mb-6 bg-[#243771] rounded-full p-1">
                         <button onClick={() => setActiveTab('masuk')}
                                 className={`flex-1 py-2.5 px-4 rounded-full font-semibold transition-all cursor-pointer ${activeTab === 'masuk' 
                                     ? 'bg-orange-500 text-white' 
@@ -104,7 +123,7 @@ export default function LoginRegisterPage() {
                         >
                             Daftar
                         </button>
-                    </div>
+                    </div> */}
 
                     <div className="mb-6">
                         <h2 className="text-xl font-bold text-gray-900 mb-1">
