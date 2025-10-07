@@ -21,17 +21,30 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
     const [user, setUser] = useState<User | null>(null)
 
+    const handleLogout = () => {
+        if (typeof window !== 'undefined') {
+            // Hapus token/cookie autentikasi jika ada
+            localStorage.removeItem('token'); // jika pakai token di localStorage
+            sessionStorage.removeItem('token'); // jika pakai sessionStorage
+            // Jika pakai cookie, bisa tambahkan kode hapus cookie di sini
+            // document.cookie = 'token=; Max-Age=0; path=/;';
+            router.push('/edu/login');
+        }
+    };
+
     useEffect(() => {
         const fetchUser = async () => {
             try {
                 const res = await axios.get("/api/me");
-
                 setUser(res.data.user);
             } catch (e: any){
                 console.error(e);
+                // Jika error 401/403 atau user tidak ditemukan, logout otomatis
+                if (e.response && (e.response.status === 401 || e.response.status === 403)) {
+                    handleLogout();
+                }
             }
         }
-
         fetchUser();
     }, [])
 
@@ -41,13 +54,6 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         }
     }, [user]);
     
-    const handleLogout = () => {
-        if (typeof window !== 'undefined') {
-            // Store state in memory instead of localStorage
-            router.push('/edu/login');
-        }
-    };
-
     return (
         <>
             {/* Overlay untuk mobile */}
@@ -362,7 +368,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
             {/* Bottom Actions */}
             <div className="border-t border-gray-200 bg-gradient-to-b from-white to-slate-50">
-                <a href="#" className="group w-full flex items-center justify-between p-5 
+                <a href="" className="group w-full flex items-center justify-between p-5 
                                      hover:bg-orange-50 transition-all duration-300 cursor-pointer
                                      border-b border-gray-100">
                     <span className="flex items-center gap-3">
@@ -380,15 +386,18 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                     </span>
                 </a>
 
-                <a onClick={handleLogout} className="group w-full flex items-center gap-3 p-5 
-                                                   hover:bg-red-50 transition-all duration-300 cursor-pointer">
+                <button
+                    onClick={handleLogout}
+                    className="group w-full flex items-center gap-3 p-5 hover:bg-red-50 transition-all duration-300 cursor-pointer bg-transparent border-none text-left"
+                    type="button"
+                >
                     <div className="p-1.5 rounded-lg group-hover:bg-red-100 transition-colors">
                         <LogOut className="w-5 h-5 text-gray-600 group-hover:text-red-600 transition-colors" />
                     </div>
                     <span className="font-medium text-gray-700 group-hover:text-red-700 transition-colors">
                         Keluar
                     </span>
-                </a>
+                </button>
             </div>
 
         </aside>
