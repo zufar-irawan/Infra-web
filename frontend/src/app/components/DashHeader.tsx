@@ -62,7 +62,7 @@ export default function DashHeader() {
                 </button>
                 
                 <div>
-                    {/* <h1 className="text-lg sm:text-xl font-bold">
+                    {/* <h1 className="text-xl sm:text-2xl font-bold">
                         {pathname == '/edu/dashboard'
                             ? `Dashboard ${isUser === 'admin' ? "Admin" : isUser === 'teacher' ? "Guru" : "Siswa"}`
                         :pathname == '/edu/tugas'
@@ -75,7 +75,7 @@ export default function DashHeader() {
                         <>
                             {pathname == '/edu/dashboard' && (
                                 <>
-                                    <h1 className="text-lg sm:text-xl font-bold">
+                                    <h1 className="text-xl sm:text-2xl font-bold">
                                         Dashboard Siswa
                                     </h1>
                                     <p className="text-black/60 text-sm sm:text-base">
@@ -85,7 +85,7 @@ export default function DashHeader() {
                             )}
                             {pathname == '/edu/tugas' && (
                                 <>
-                                    <h1 className="text-lg sm:text-xl font-bold">
+                                    <h1 className="text-xl sm:text-2xl font-bold">
                                         Tugas Anda
                                     </h1>
                                     <p className="text-black/60 text-sm sm:text-base">
@@ -95,7 +95,7 @@ export default function DashHeader() {
                             )}
                             {pathname == '/edu/ujian' && (
                                 <>
-                                    <h1 className="text-lg sm:text-xl font-bold">
+                                    <h1 className="text-xl sm:text-2xl font-bold">
                                         Ujian Anda
                                     </h1>
                                     <p className="text-black/60 text-sm sm:text-base">
@@ -105,7 +105,7 @@ export default function DashHeader() {
                             )}
                             {pathname == '/edu/nilai' && (
                                 <>
-                                    <h1 className="text-lg sm:text-xl font-bold">
+                                    <h1 className="text-xl sm:text-2xl font-bold">
                                         Nilai Anda
                                     </h1>
                                     <p className="text-black/60 text-sm sm:text-base">
@@ -115,7 +115,7 @@ export default function DashHeader() {
                             )}
                             {pathname == '/edu/jadwal' && (
                                 <>
-                                    <h1 className="text-lg sm:text-xl font-bold">
+                                    <h1 className="text-xl sm:text-2xl font-bold">
                                         Jadwal Anda
                                     </h1>
                                     <p className="text-black/60 text-sm sm:text-base">

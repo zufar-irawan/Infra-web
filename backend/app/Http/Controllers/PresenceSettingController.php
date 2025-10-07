@@ -6,90 +6,92 @@ use Illuminate\Http\Request;
 
 class PresenceSettingController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view setting|edit setting', ['only' => ['index']]);
+        $this->middleware('permission:edit setting', ['only' => ['store', 'update']]);
+    }
+
+    /**
+     * GET /api/settings
+     * Tampilkan setting pertama
+     */
     public function index()
     {
         $setting = Setting::first();
 
-        if (!$setting) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Setting not found'
-            ], 404);
-        }
-
         return response()->json([
             'success' => true,
-            'data' => $setting
+            'data'    => $setting
         ]);
     }
 
     /**
-     * Update or create setting
+     * POST /api/settings
+     * Buat baru atau update record id=1
      */
     public function store(Request $request)
     {
-        try {
-            $data = $request->validate([
-                'mulai_masuk_siswa' => 'required',
-                'jam_masuk_siswa' => 'required',
-                'jam_pulang_siswa' => 'required',
-                'batas_pulang_siswa' => 'required',
-            ]);
+        $data = $request->validate([
+            'mulai_masuk_siswa' => 'required|date',
+            'jam_masuk_siswa'   => 'required|date_format:H:i',
+            'jam_pulang_siswa'  => 'required|date_format:H:i',
+            'batas_pulang_siswa'=> 'required|date_format:H:i',
+        ]);
 
-            $setting = Setting::updateOrCreate(
-                ['id' => 1],
-                $data
-            );
+        $setting = Setting::updateOrCreate(
+            ['id' => 1],
+            $data
+        );
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Setting saved successfully',
-                'data' => $setting
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to save setting',
-                'error' => $e->getMessage()
-            ], 500);
-        }
+        return response()->json([
+            'success' => true,
+            'message' => 'Setting berhasil disimpan!',
+            'data'    => $setting
+        ], 201);
     }
 
     /**
-     * Update existing setting
+     * PUT /api/settings/{id}
+     * Update by id
      */
     public function update(Request $request, $id)
     {
-        try {
-            $data = $request->validate([
-                'mulai_masuk_siswa' => 'required',
-                'jam_masuk_siswa' => 'required',
-                'jam_pulang_siswa' => 'required',
-                'batas_pulang_siswa' => 'required',
-            ]);
+        $data = $request->validate([
+            'mulai_masuk_siswa' => 'required|date',
+            'jam_masuk_siswa'   => 'required|date_format:H:i',
+            'jam_pulang_siswa'  => 'required|date_format:H:i',
+            'batas_pulang_siswa'=> 'required|date_format:H:i',
+        ]);
 
-            $setting = Setting::where('id', $id)->first();
+        $setting = Setting::findOrFail($id);
+        $setting->update($data);
 
-            if (!$setting) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Setting not found'
-                ], 404);
-            }
-
-            $setting->update($data);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Setting updated successfully',
-                'data' => $setting
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to update setting',
-                'error' => $e->getMessage()
-            ], 500);
-        }
+        return response()->json([
+            'success' => true,
+            'message' => 'Setting berhasil diupdate!',
+            'data'    => $setting
+        ]);
     }
 }
+
+/*
+
+// CONTROH REQUEST DI FRONTEND
+
+-- GET setting --
+axios.get('/api/settings', { headers:{ Authorization: `Bearer ${token}` } })
+     .then(res => console.log(res.data))
+
+-- POST create/update --
+axios.post('/api/settings', {
+   mulai_masuk_siswa: '2025-10-07',
+   jam_masuk_siswa: '07:00',
+   jam_pulang_siswa: '15:00',
+   batas_pulang_siswa: '17:00'
+}, { headers:{ Authorization: `Bearer ${token}` }})
+   .then(res => console.log(res.data))
+
+-- PUT update by id --
+axios.put('/api/settings/1', formData, { headers:{ Authorization: `Bearer ${token}` }})
+*/

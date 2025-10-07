@@ -5,6 +5,7 @@ import axios from "axios";
 import {User} from "@/app/api/me/route";
 import {BellRing, Bolt, BookMarked, BarChart3, LayoutDashboard, Users, LogOut, Shapes, X, Calendar} from "lucide-react";
 import Image from "next/image";
+import Swal from "sweetalert2";
 
 
 interface SidebarProps {
@@ -21,13 +22,45 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
     const [user, setUser] = useState<User | null>(null)
 
-    const handleLogout = () => {
-        if (typeof window !== 'undefined') {
-            // Hapus token/cookie autentikasi jika ada
-            localStorage.removeItem('token'); // jika pakai token di localStorage
-            sessionStorage.removeItem('token'); // jika pakai sessionStorage
-            // Jika pakai cookie, bisa tambahkan kode hapus cookie di sini
-            // document.cookie = 'token=; Max-Age=0; path=/;';
+    const handleLogout = async () => {
+        try {
+            const res = await axios.post("/api/logout");
+
+            // Cek apakah logout berhasil (baik sukses maupun dengan error tapi cookie terhapus)
+            if (res.status === 200 && res.data.logout) {
+                // Hapus token dari localStorage/sessionStorage juga (jika ada)
+                localStorage.removeItem('token');
+                sessionStorage.removeItem('token');
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: res.data.error ? `${res.data.error} - Namun Anda tetap berhasil logout` : 'Anda telah logout!',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+
+                // Redirect ke login
+                router.push('/edu/login');
+            } else {
+                throw new Error('Logout response tidak valid');
+            }
+        } catch (error: any) {
+            console.error("Logout error:", error);
+
+            // Force logout meski ada error
+            localStorage.removeItem('token');
+            sessionStorage.removeItem('token');
+
+            Swal.fire({
+                icon: 'warning',
+                title: 'Logout Paksa',
+                text: 'Terjadi error saat logout, namun Anda tetap akan di-logout dari sistem',
+                timer: 2000,
+                showConfirmButton: false
+            });
+
+            // Tetap redirect ke login
             router.push('/edu/login');
         }
     };
@@ -41,7 +74,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 console.error(e);
                 // Jika error 401/403 atau user tidak ditemukan, logout otomatis
                 if (e.response && (e.response.status === 401 || e.response.status === 403)) {
-                    handleLogout();
+                    await handleLogout();
                 }
             }
         }

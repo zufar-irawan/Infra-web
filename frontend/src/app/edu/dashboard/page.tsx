@@ -5,7 +5,7 @@ import DashHeader from "@/app/components/DashHeader"
 export default function Dashboard() {
     
     return (
-        <>
+        <div className="overflow-y-auto min-h-screen">
             <DashHeader />
             <section id="task" className="w-full grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-4 gap-4 p-4">
                 <div className="bg-white rounded-2xl p-4 shadow-md border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 flex items-center gap-2">
@@ -177,6 +177,6 @@ export default function Dashboard() {
                     </div>
                 </div>
             </section>
-        </>
+        </div>
     )
 }
