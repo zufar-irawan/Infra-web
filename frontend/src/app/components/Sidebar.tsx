@@ -1,10 +1,10 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from "next/image";
-import {BellRing, Bolt, BookMarked, BarChart3, LayoutDashboard, Users, LogOut, Shapes, X, Calendar} from "lucide-react";
 import axios from "axios";
 import {User} from "@/app/api/me/route";
+import {BellRing, Bolt, BookMarked, BarChart3, LayoutDashboard, Users, LogOut, Shapes, X, Calendar} from "lucide-react";
+import Image from "next/image";
 
 
 interface SidebarProps {
@@ -64,7 +64,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 />
             )}
             
-            <aside className={`w-full fixed lg:relative max-w-xs min-h-screen bg-gradient-to-b from-slate-50 to-white text-gray-700
+            <aside className={`w-full absolute lg:relative max-w-xs min-h-screen bg-gradient-to-b from-slate-50 to-white text-gray-700
                  border-r border-gray-200 shadow-sm
                  flex flex-col justify-between z-50 transition-transform duration-300 ease-in-out
                  ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
