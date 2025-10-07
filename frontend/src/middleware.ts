@@ -1,9 +1,7 @@
 import {NextRequest, NextResponse} from "next/server";
-import {cookies} from "next/headers";
 
 export function middleware(request: NextRequest) {
-    // @ts-ignore
-    const token = cookies().get("secure-auth-token")?.value;
+    const token = request.cookies.get("secure-auth-token")?.value;
     const { pathname } = request.nextUrl
 
     if(token) {
@@ -11,7 +9,18 @@ export function middleware(request: NextRequest) {
             return NextResponse.redirect(new URL('/edu/dashboard', request.url));
         }
 
+        if (pathname === '/edu') {
+            return NextResponse.redirect(new URL('/edu/dashboard', request.url));
+        }
         return NextResponse.next()
+    }
+
+    if (pathname === '/edu/login') {
+        return NextResponse.next();
+    }
+
+    if (pathname === '/edu') {
+        return NextResponse.redirect(new URL('/edu/login', request.url));
     }
 
     const loginUrl = new URL('/edu/login', request.url);
