@@ -14,13 +14,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
-
         LmsUser::create([
             'name' => 'Admin',
             'email' => 'admin@mail.com',
@@ -36,7 +29,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'guru@mail.com',
             'password' => bcrypt('12345678'),
             'role' => 'guru',
-            'phone' => '081234567891',
+            'phone' => '081256437890',
             'status' => true,
             'created_at' => now()
         ]);
@@ -46,7 +39,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'siswa@mail.com',
             'password' => bcrypt('12345678'),
             'role' => 'siswa',
-            'phone' => '081234567892',
+            'phone' => '081256347890',
             'status' => true,
             'created_at' => now()
         ]);

@@ -23,6 +23,11 @@ class LmsExam extends Model
         'created_by'
     ];
 
+    public function questions()
+    {
+        return $this->hasMany(LmsExamQuestion::class, 'exam_id');
+    }
+
     public function subject()
     {
         return $this->belongsTo(LmsSubject::class, 'subject_id');
