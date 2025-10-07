@@ -11,7 +11,44 @@ export default function UjianSiswa() {
     return (
         <>
             <DashHeader />
-            <section id="mapel-math" className="w-full grid grid-cols-1 gap-4 p-4 cursor-pointer" onClick={() => setOpen1((prev) => !prev)}>
+            <section id="ujian-main-data" className="w-full grid grid-cols-1 2xl:grid-cols-2 gap-4 p-4">
+                {/* TASK */}
+                <div className="bg-white rounded-2xl p-4 shadow-md border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 flex flex-col gap-4">
+                    <div>
+                        <h2 className="text-lg font-semibold">Ujian Belum Dikerjakan</h2>
+                        <p className="text-black/60 text-sm">Daftar ujian belum dikerjakan anda</p>
+                    </div>
+                    <div className="divide-y divide-black/10">
+                        <div className="flex items-start sm:items-center justify-between py-4 gap-2">
+                            <div className="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1">
+                                <div>
+                                    <h3>SPLDV & SPLTV</h3>
+                                    <p className="text-black/60 text-sm">Matematika &middot; John Doe, S.Pd.</p>
+                                </div>
+                                <p className="text-xs text-orange-700">Selesai tepat waktu</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="bg-white rounded-2xl p-4 shadow-md border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 flex flex-col gap-4">
+                    <div>
+                        <h2 className="text-lg font-semibold">Ujian Selesai</h2>
+                        <p className="text-black/60 text-sm">Daftar ujian selesai anda</p>
+                    </div>
+                    <div className="divide-y divide-black/10">
+                        <div className="flex items-start sm:items-center justify-between py-4 gap-2">
+                            <div className="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1">
+                                <div>
+                                    <h3>SPLDV & SPLTV</h3>
+                                    <p className="text-black/60 text-sm">Matematika &middot; John Doe, S.Pd.</p>
+                                </div>
+                                <p className="text-xs text-orange-700">Selesai tepat waktu</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section id="ujian-math" className="w-full grid grid-cols-1 gap-4 p-4 cursor-pointer" onClick={() => setOpen1((prev) => !prev)}>
                 <div className="bg-white rounded-2xl p-4 shadow-md border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 flex flex-col gap-4">
                     <div className="flex items-center justify-between">
                         <div>
@@ -48,7 +85,7 @@ export default function UjianSiswa() {
                     )}
                 </div>
             </section>
-            <section id="mapel-pkk" className="w-full grid grid-cols-1 gap-4 p-4 cursor-pointer" onClick={() => setOpen2((prev) => !prev)}>
+            <section id="ujian-pkk" className="w-full grid grid-cols-1 gap-4 p-4 cursor-pointer" onClick={() => setOpen2((prev) => !prev)}>
                 <div className="bg-white rounded-2xl p-4 shadow-md border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 flex flex-col gap-4">
                     <div className="flex items-center justify-between">
                         <div>

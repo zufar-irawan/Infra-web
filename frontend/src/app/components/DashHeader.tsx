@@ -103,6 +103,26 @@ export default function DashHeader() {
                                     </p>
                                 </>
                             )}
+                            {pathname == '/edu/nilai' && (
+                                <>
+                                    <h1 className="text-lg sm:text-xl font-bold">
+                                        Nilai Anda
+                                    </h1>
+                                    <p className="text-black/60 text-sm sm:text-base">
+                                        Daftar nilai anda selama pembelajaran.
+                                    </p>
+                                </>
+                            )}
+                            {pathname == '/edu/jadwal' && (
+                                <>
+                                    <h1 className="text-lg sm:text-xl font-bold">
+                                        Jadwal Anda
+                                    </h1>
+                                    <p className="text-black/60 text-sm sm:text-base">
+                                        Daftar jadwal anda selama pembelajaran.
+                                    </p>
+                                </>
+                            )}
                                 
                         </>
                     )}
