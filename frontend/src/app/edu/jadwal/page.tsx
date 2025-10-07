@@ -82,7 +82,7 @@ export default function JadwalSiswa() {
                             <button
                                 key={hari}
                                 onClick={() => setHariAktif(hari)}
-                                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap ${
+                                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer whitespace-nowrap ${
                                     hariAktif === hari
                                         ? "bg-orange-500 text-white shadow-md"
                                         : "bg-gray-100 text-gray-600 hover:bg-gray-200"
@@ -108,9 +108,9 @@ export default function JadwalSiswa() {
                             {jadwalHariIni.map((jadwal, index) => (
                                 <div
                                     key={index}
-                                    className={`p-4 rounded-xl border-2 transition-all duration-200 hover:shadow-md ${
+                                    className={`p-4 rounded-xl border-2 transition-all duration-200 hover:bg-gray-50 ${
                                         jadwal.status === "berlangsung" 
-                                            ? "bg-orange-50 border-orange-200 shadow-sm" 
+                                            ? "bg-orange-50 border-orange-200 hover:bg-orange-100" 
                                             : "bg-white border-gray-200"
                                     }`}
                                 >

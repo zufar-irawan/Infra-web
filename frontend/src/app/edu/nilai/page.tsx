@@ -9,8 +9,7 @@ export default function NilaiSiswa() {
         { mapel: "Matematika", total: 1095, rata: 84 },
         { mapel: "Bahasa Inggris", total: 1150, rata: 92 },
         { mapel: "DKV", total: 1200, rata: 95 },
-        { mapel: "Kewirausahaan", total: 980, rata: 75 },
-        { mapel: "PKK", total: 1050, rata: 80 },
+        { mapel: "Kewirausahaan", total: 980, rata: 75 }
     ];
 
     // Hitung ringkasan
@@ -39,13 +38,13 @@ export default function NilaiSiswa() {
                 </div>
                 {/* Tabel Nilai */}
                 <div className="bg-white rounded-2xl p-4 shadow-md border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 flex flex-col gap-4">
-                    <div className="flex items-center justify-between mb-2">
+                    {/* <div className="flex items-center justify-between mb-2">
                         <h2 className="text-lg font-semibold">Daftar Nilai Mata Pelajaran</h2>
-                        <span className="text-xs text-gray-400">Tahun ajaran 2025/2026</span>
-                    </div>
+                        <span className="text-xs text-gray-400">2025/2026</span>
+                    </div> */}
                     <div className="overflow-x-auto">
                         <table id="mapel-nilai" className="min-w-full text-sm">
-                            <thead className="font-semibold text-lg bg-gray-50">
+                            <thead className="font-semibold text-lg bg-gray-100">
                                 <tr>
                                     <th className="py-2 px-4 text-start">Mata Pelajaran</th>
                                     <th className="py-2 px-4 text-end">Total Nilai</th>
@@ -55,9 +54,9 @@ export default function NilaiSiswa() {
                             <tbody>
                                 {dataNilai.map((d, i) => (
                                     <tr key={d.mapel} className="group hover:bg-orange-50 transition">
-                                        <td className="py-2 px-4 font-medium text-gray-800">{d.mapel}</td>
-                                        <td className="py-2 px-4 text-end">{d.total}</td>
-                                        <td className="py-2 px-4 text-end">
+                                        <td className="py-3 px-4 font-medium text-gray-800">{d.mapel}</td>
+                                        <td className="py-3 px-4 text-end">{d.total}</td>
+                                        <td className="py-3 px-4 text-end">
                                             <span
                                                 className={
                                                     d.rata >= 90
