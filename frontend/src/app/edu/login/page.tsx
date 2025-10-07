@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import {useRouter} from "next/navigation";
-import api from "@/app/lib/api";
 import {showLoginSuccessAlert} from "@/components/LoginSuccess";
 import axios from "axios";
 
@@ -13,7 +12,6 @@ export default function LoginRegisterPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
-    const [success, setSuccess] = useState(false);
     const [loading, setLoading] = useState(false);
 
     const [activeTab, setActiveTab] = useState("masuk");
