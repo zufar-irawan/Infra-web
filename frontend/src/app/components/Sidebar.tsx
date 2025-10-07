@@ -100,10 +100,10 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                                 </h2>
                                 <p className="text-sm text-gray-500 flex items-center gap-1 overflow-hidden">
                                     <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                                    {user?.role
-                                        ? user.role.length > 21
-                                            ? user.role.slice(0, 21) + "..."
-                                            : user.role
+                                    {user?.email
+                                        ? user.email.length > 21
+                                            ? user.email.slice(0, 21) + "..."
+                                            : user.email
                                         : "hafiz@smkprestasipri..."}
                                 </p>
                             </div>
