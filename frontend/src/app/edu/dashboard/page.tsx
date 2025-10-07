@@ -1,33 +1,12 @@
 "use client"
 
-import { useState } from "react"
-import { Menu } from "lucide-react"
+import DashHeader from "@/app/components/DashHeader"
 
 export default function Dashboard() {
-    const [isUser] = useState('student')
-
+    
     return (
         <>
-            <section id="header" className="w-full flex items-center justify-between p-4">
-                <div className="flex items-center gap-4">
-                    {/* Tombol hamburger untuk mobile */}
-                    <button 
-                        className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
-                        onClick={() => {
-                            // Trigger sidebar open via custom event
-                            window.dispatchEvent(new CustomEvent('toggleSidebar'))
-                        }}
-                    >
-                        <Menu className="w-6 h-6" />
-                    </button>
-                    
-                    <div>
-                        <h1 className="text-lg sm:text-xl font-bold">Dashboard {isUser === 'admin' ? "Admin" : isUser === 'teacher' ? "Guru" : "Siswa"}</h1>
-                        <p className="text-black/60 text-sm sm:text-base">Selamat datang kembali, Hafiz!</p>
-                    </div>
-                </div>
-                <p className="bg-emerald-200 text-emerald-800 px-3 py-2 text-xs sm:text-sm rounded-sm">XII DKV 1</p>
-            </section>
+            <DashHeader />
             <section id="task" className="w-full grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-4 gap-4 p-4">
                 <div className="bg-white rounded-2xl p-4 shadow-md border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 flex items-center gap-2">
                     <div className="w-12 h-12 bg-orange-500 rounded-lg flex items-center text-center text-white">
