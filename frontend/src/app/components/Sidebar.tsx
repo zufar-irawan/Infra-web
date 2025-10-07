@@ -64,7 +64,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 />
             )}
             
-            <aside className={`w-full absolute lg:relative max-w-xs min-h-screen bg-gradient-to-b from-slate-50 to-white text-gray-700
+            <aside className={`w-full fixed lg:relative max-w-xs min-h-screen bg-gradient-to-b from-slate-50 to-white text-gray-700
                  border-r border-gray-200 shadow-sm
                  flex flex-col justify-between z-50 transition-transform duration-300 ease-in-out
                  ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
@@ -97,7 +97,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                             <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600
                                           text-white font-bold text-xl flex items-center justify-center
                                           shadow-lg ring-4 ring-orange-100">
-                                {user?.name?.split(" ").map(n => n[0]?.toUpperCase()).join("") || "T"}
+                                {user?.name?.split(" ").map(n => n[0]?.toUpperCase()).join("") || "..."}
                             </div>
 
                             <div className="flex flex-col flex-1 min-w-0">
@@ -368,7 +368,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
             {/* Bottom Actions */}
             <div className="border-t border-gray-200 bg-gradient-to-b from-white to-slate-50">
-                <a href="" className="group w-full flex items-center justify-between p-5 
+                {/* <a href="" className="group w-full flex items-center justify-between p-5 
                                      hover:bg-orange-50 transition-all duration-300 cursor-pointer
                                      border-b border-gray-100">
                     <span className="flex items-center gap-3">
@@ -384,7 +384,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                                    text-sm font-bold shadow-md ring-2 ring-red-200">
                         2
                     </span>
-                </a>
+                </a> */}
 
                 <button
                     onClick={handleLogout}
