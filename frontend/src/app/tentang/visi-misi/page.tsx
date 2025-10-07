@@ -14,6 +14,14 @@ export default function VisiMisi() {
   const visiRef = useRef<HTMLDivElement | null>(null);
   const misiRef = useRef<HTMLDivElement | null>(null);
 
+  // Pilih asset bilingual
+  const visiSrc = lang === "id" ? "/svg/visi.svg" : "/svg/visi-eng.svg";
+  const misiImgs = [
+    lang === "id" ? "/svg/misi1.svg" : "/svg/misi1-eng.svg",
+    lang === "id" ? "/svg/misi2.svg" : "/svg/misi2-eng.svg",
+    lang === "id" ? "/svg/misi3.svg" : "/svg/misi3-eng.svg",
+  ];
+
   // === animasi masuk saat scroll ===
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -48,7 +56,7 @@ export default function VisiMisi() {
             </Link>
             <span className="text-[#FE4D01]">{">"}</span>
             <Link
-              href="/tentang/visimisi"
+              href="/tentang/visi-misi"
               className="text-[#FE4D01] hover:underline"
             >
               {lang === "id" ? "Tentang Kami" : "About Us"}
@@ -97,8 +105,10 @@ export default function VisiMisi() {
               {lang === "id" ? "Visi" : "Vision"}
             </h3>
             <img
-              src="/svg/visi.svg"
+              src={visiSrc}
               alt={lang === "id" ? "Visi Sekolah" : "School Vision"}
+              loading="lazy"
+              decoding="async"
               className="
                 w-[80%] sm:w-[90%] max-w-[755px]
                 object-contain
@@ -123,17 +133,18 @@ export default function VisiMisi() {
               {lang === "id" ? "Misi" : "Mission"}
             </h3>
 
-            {/* Gambar misi */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
-              {[
-                { src: "/svg/misi1.svg", alt: "Misi 1" },
-                { src: "/svg/misi2.svg", alt: "Misi 2" },
-                { src: "/svg/misi3.svg", alt: "Misi 3" },
-              ].map((misi, idx) => (
+              {misiImgs.map((src, idx) => (
                 <img
                   key={idx}
-                  src={misi.src}
-                  alt={misi.alt}
+                  src={src}
+                  alt={
+                    lang === "id"
+                      ? `Misi ${idx + 1}`
+                      : `Mission ${idx + 1}`
+                  }
+                  loading="lazy"
+                  decoding="async"
                   className="
                     w-[50%] sm:w-[65%] md:w-[80%] lg:w-[90%]
                     max-w-[384px]
