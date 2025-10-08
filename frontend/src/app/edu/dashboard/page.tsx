@@ -1,10 +1,52 @@
 "use client"
 
 import DashHeader from "@/app/components/DashHeader"
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import axios from "axios";
+import {User} from "@/app/api/me/route";
 
 export default function Dashboard() {
-    
+    const [user, setUser] = useState<User | null>(null)
+
+    const router = useRouter();
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const res = await axios.get("/api/me");
+                setUser(res.data.user);
+            } catch (e: any){
+                console.error(e);
+                // Jika error 401/403 atau user tidak ditemukan, logout otomatis
+                if (e.response && (e.response.status === 401 || e.response.status === 403)) {
+                    handleLogout();
+                }
+            }
+        }
+        fetchUser();
+    }, [])
+
+    const handleLogout = () => {
+        if (typeof window !== 'undefined') {
+            // Hapus token/cookie autentikasi jika ada
+            localStorage.removeItem('token'); // jika pakai token di localStorage
+            sessionStorage.removeItem('token'); // jika pakai sessionStorage
+            // Jika pakai cookie, bisa tambahkan kode hapus cookie di sini
+            // document.cookie = 'token=; Max-Age=0; path=/;';
+            router.push('/edu/login');
+        }
+    };
+
+    useEffect(() => {
+        if(user) {
+            console.log(user)
+        }
+    }, [user]);
+
     return (
+        <>
+        { user?.role === 'siswa' && (
         <div className="overflow-y-auto min-h-screen">
             <DashHeader />
             <section id="task" className="w-full grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-4 gap-4 p-4">
@@ -178,5 +220,7 @@ export default function Dashboard() {
                 </div>
             </section>
         </div>
+        )}
+    </>
     )
 }
