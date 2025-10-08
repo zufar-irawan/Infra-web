@@ -5,13 +5,13 @@
 import React, {useEffect, useState} from "react";
 import {usePathname} from "next/navigation";
 import Sidebar from "@/components/Sidebar";
+import LoadingProvider, { useLoading } from "@/components/LoadingProvider";
 
-export default function EduLayout(
-    {children}: {children?: React.ReactNode}
-) {
+function EduLayoutContent({children}: {children?: React.ReactNode}) {
     const pathname = usePathname()
     const isLogin = pathname.includes("/login")
     const [sidebarOpen, setSidebarOpen] = useState(false)
+    const { isLoading } = useLoading()
 
     useEffect(() => {
         const handleToggleSidebar = () => {
@@ -27,7 +27,7 @@ export default function EduLayout(
 
     return (
         <div className="flex flex-row min-h-screen bg-gray-100">
-            { !isLogin && (
+            { !isLogin && !isLoading && (
                 <Sidebar
                     isOpen={sidebarOpen} 
                     onClose={() => setSidebarOpen(false)} 
@@ -38,5 +38,17 @@ export default function EduLayout(
                 {children}
             </div>
         </div>
+    )
+}
+
+export default function EduLayout(
+    {children}: {children?: React.ReactNode}
+) {
+    return (
+        <LoadingProvider>
+            <EduLayoutContent>
+                {children}
+            </EduLayoutContent>
+        </LoadingProvider>
     )
 }
