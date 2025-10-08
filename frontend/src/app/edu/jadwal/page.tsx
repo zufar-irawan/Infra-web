@@ -1,10 +1,50 @@
 "use client";
 
-import DashHeader from "@/app/components/DashHeader";
-import { useState } from "react";
-import { Clock, MapPin, User, ChevronLeft, ChevronRight } from "lucide-react";
+import { Clock, MapPin, ChevronLeft, ChevronRight } from "lucide-react";
+import DashHeader from "@/app/components/DashHeader"
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import axios from "axios";
+import {User} from "@/app/api/me/route";
 
 export default function JadwalSiswa() {
+    const [user, setUser] = useState<User | null>(null)
+
+    const router = useRouter();
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const res = await axios.get("/api/me");
+                setUser(res.data.user);
+            } catch (e: any){
+                console.error(e);
+                // Jika error 401/403 atau user tidak ditemukan, logout otomatis
+                if (e.response && (e.response.status === 401 || e.response.status === 403)) {
+                    handleLogout();
+                }
+            }
+        }
+        fetchUser();
+    }, [])
+
+    const handleLogout = () => {
+        if (typeof window !== 'undefined') {
+            // Hapus token/cookie autentikasi jika ada
+            localStorage.removeItem('token'); // jika pakai token di localStorage
+            sessionStorage.removeItem('token'); // jika pakai sessionStorage
+            // Jika pakai cookie, bisa tambahkan kode hapus cookie di sini
+            // document.cookie = 'token=; Max-Age=0; path=/;';
+            router.push('/edu/login');
+        }
+    };
+
+    useEffect(() => {
+        if(user) {
+            console.log(user)
+        }
+    }, [user]);
+
     const [hariAktif, setHariAktif] = useState("Senin");
 
     // Dummy data jadwal
@@ -66,6 +106,8 @@ export default function JadwalSiswa() {
     };
 
     return (
+        <>
+        {user?.role === 'siswa' && (
         <div className="overflow-y-auto min-h-screen">
             <DashHeader/>
             
@@ -82,7 +124,7 @@ export default function JadwalSiswa() {
                             <button
                                 key={hari}
                                 onClick={() => setHariAktif(hari)}
-                                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap ${
+                                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer whitespace-nowrap ${
                                     hariAktif === hari
                                         ? "bg-orange-500 text-white shadow-md"
                                         : "bg-gray-100 text-gray-600 hover:bg-gray-200"
@@ -108,9 +150,9 @@ export default function JadwalSiswa() {
                             {jadwalHariIni.map((jadwal, index) => (
                                 <div
                                     key={index}
-                                    className={`p-4 rounded-xl border-2 transition-all duration-200 hover:shadow-md ${
+                                    className={`p-4 rounded-xl border-2 transition-all duration-200 hover:bg-gray-50 ${
                                         jadwal.status === "berlangsung" 
-                                            ? "bg-orange-50 border-orange-200 shadow-sm" 
+                                            ? "bg-orange-50 border-orange-200 hover:bg-orange-100" 
                                             : "bg-white border-gray-200"
                                     }`}
                                 >
@@ -157,4 +199,6 @@ export default function JadwalSiswa() {
                 </div>
             </section>
         </div>
+        )}
+        </>
     )}

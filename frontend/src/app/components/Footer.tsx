@@ -40,7 +40,7 @@ export default function Footer() {
                 Jl. Hankam Raya No. 89, Cilangkap, Kec. Cipayung, Kota Jakarta Timur, Daerah Khusus Ibukota Jakarta 13870
               </p>
             </div>
-            <div className="flex items-center gap-2">
+            {/* <div className="flex items-center gap-2">
               <a
                 href="https://maps.google.com/?q=Jl.+Hankam+Raya+No.+89+Cilangkap+Jakarta+Timur"
                 target="_blank"
@@ -49,7 +49,7 @@ export default function Footer() {
               >
                 Lihat peta lebih besar
               </a>
-            </div>
+            </div> */}
           </div>
 
           {/* Yayasan Wahana Section */}

@@ -6,11 +6,12 @@ export async function POST(req: Request){
     const {email, password} = await req.json();
 
     try {
+        const cookieStore = await cookies()
         const res = await api.post("/lms/auth/login", {email, password});
 
         if(res.status === 200){
             // @ts-ignore
-            cookies().set("secure-auth-token", res.data.data.token, {
+            cookieStore.set("secure-auth-token", res.data.data.token, {
                 httpOnly: true,
                 path: "/",
                 secure: process.env.NODE_ENV === "production",

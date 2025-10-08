@@ -1,16 +1,57 @@
 "use client";
 
-import DashHeader from "@/app/components/DashHeader";
+import { Clock, MapPin, ChevronLeft, ChevronRight } from "lucide-react";
+import DashHeader from "@/app/components/DashHeader"
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import axios from "axios";
+import {User} from "@/app/api/me/route";
 
 export default function NilaiSiswa() {
+    const [user, setUser] = useState<User | null>(null)
+
+    const router = useRouter();
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const res = await axios.get("/api/me");
+                setUser(res.data.user);
+            } catch (e: any){
+                console.error(e);
+                // Jika error 401/403 atau user tidak ditemukan, logout otomatis
+                if (e.response && (e.response.status === 401 || e.response.status === 403)) {
+                    handleLogout();
+                }
+            }
+        }
+        fetchUser();
+    }, [])
+
+    const handleLogout = () => {
+        if (typeof window !== 'undefined') {
+            // Hapus token/cookie autentikasi jika ada
+            localStorage.removeItem('token'); // jika pakai token di localStorage
+            sessionStorage.removeItem('token'); // jika pakai sessionStorage
+            // Jika pakai cookie, bisa tambahkan kode hapus cookie di sini
+            // document.cookie = 'token=; Max-Age=0; path=/;';
+            router.push('/edu/login');
+        }
+    };
+
+    useEffect(() => {
+        if(user) {
+            console.log(user)
+        }
+    }, [user]);
+
     // Dummy data nilai
     const dataNilai = [
         { mapel: "Bahasa Indonesia", total: 1120, rata: 88 },
         { mapel: "Matematika", total: 1095, rata: 84 },
         { mapel: "Bahasa Inggris", total: 1150, rata: 92 },
         { mapel: "DKV", total: 1200, rata: 95 },
-        { mapel: "Kewirausahaan", total: 980, rata: 75 },
-        { mapel: "PKK", total: 1050, rata: 80 },
+        { mapel: "Kewirausahaan", total: 980, rata: 75 }
     ];
 
     // Hitung ringkasan
@@ -19,6 +60,8 @@ export default function NilaiSiswa() {
     const terendah = Math.min(...dataNilai.map(d => d.rata));
 
     return (
+        <>
+        {user?.role === 'siswa' && (
         <div className="overflow-y-auto min-h-screen">
             <DashHeader/>
             <section className="w-full grid grid-cols-1 gap-4 p-4">
@@ -39,13 +82,13 @@ export default function NilaiSiswa() {
                 </div>
                 {/* Tabel Nilai */}
                 <div className="bg-white rounded-2xl p-4 shadow-md border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 flex flex-col gap-4">
-                    <div className="flex items-center justify-between mb-2">
+                    {/* <div className="flex items-center justify-between mb-2">
                         <h2 className="text-lg font-semibold">Daftar Nilai Mata Pelajaran</h2>
-                        <span className="text-xs text-gray-400">Tahun ajaran 2025/2026</span>
-                    </div>
+                        <span className="text-xs text-gray-400">2025/2026</span>
+                    </div> */}
                     <div className="overflow-x-auto">
                         <table id="mapel-nilai" className="min-w-full text-sm">
-                            <thead className="font-semibold text-lg bg-gray-50">
+                            <thead className="font-semibold text-lg bg-gray-100">
                                 <tr>
                                     <th className="py-2 px-4 text-start">Mata Pelajaran</th>
                                     <th className="py-2 px-4 text-end">Total Nilai</th>
@@ -55,9 +98,9 @@ export default function NilaiSiswa() {
                             <tbody>
                                 {dataNilai.map((d, i) => (
                                     <tr key={d.mapel} className="group hover:bg-orange-50 transition">
-                                        <td className="py-2 px-4 font-medium text-gray-800">{d.mapel}</td>
-                                        <td className="py-2 px-4 text-end">{d.total}</td>
-                                        <td className="py-2 px-4 text-end">
+                                        <td className="py-3 px-4 font-medium text-gray-800">{d.mapel}</td>
+                                        <td className="py-3 px-4 text-end">{d.total}</td>
+                                        <td className="py-3 px-4 text-end">
                                             <span
                                                 className={
                                                     d.rata >= 90
@@ -78,5 +121,7 @@ export default function NilaiSiswa() {
                 </div>
             </section>
         </div>
+        )}
+        </>
     )
 }

@@ -71,7 +71,7 @@ export default function DashHeader() {
                         
                         </h1>
                     <p className="text-black/60 text-sm sm:text-base">Selamat datang kembali, {user?.name || "Loading..."}.</p> */}
-                    {isUser == 'student' && (
+                    {user?.role === 'siswa' && (
                         <>
                             {pathname == '/edu/dashboard' && (
                                 <>
@@ -124,6 +124,154 @@ export default function DashHeader() {
                                 </>
                             )}
                                 
+                        </>
+                    )}
+                    {user?.role === 'guru' && (
+                        <>
+                            {pathname == '/edu/dashboard' && (
+                                <>
+                                    <h1 className="text-xl sm:text-2xl font-bold">
+                                        Dashboard Guru
+                                    </h1>
+                                    <p className="text-black/60 text-sm sm:text-base">
+                                        Selamat datang kembali, {user?.name || "Loading..." }.
+                                    </p>
+                                </>
+                            )}
+                            {pathname == '/edu/tugas' && (
+                                <>
+                                    <h1 className="text-xl sm:text-2xl font-bold">
+                                        Manajemen Tugas
+                                    </h1>
+                                    <p className="text-black/60 text-sm sm:text-base">
+                                        Semua tugas yang anda buat berada disini.
+                                    </p>
+                                </>
+                            )}
+                            {pathname == '/edu/ujian' && (
+                                <>
+                                    <h1 className="text-xl sm:text-2xl font-bold">
+                                        Manajemen Ujian
+                                    </h1>
+                                    <p className="text-black/60 text-sm sm:text-base">
+                                        Semua ujian yang anda buat berada disini.
+                                    </p>
+                                </>
+                            )}
+                            {pathname == '/edu/nilai' && (
+                                <>
+                                    <h1 className="text-xl sm:text-2xl font-bold">
+                                        Manajemen Nilai
+                                    </h1>
+                                    <p className="text-black/60 text-sm sm:text-base">
+                                        Daftar nilai siswa selama pembelajaran.
+                                    </p>
+                                </>
+                            )}
+                            {pathname == '/edu/jadwal' && (
+                                <>
+                                    <h1 className="text-xl sm:text-2xl font-bold">
+                                        Manajemen Jadwal
+                                    </h1>
+                                    <p className="text-black/60 text-sm sm:text-base">
+                                        Daftar jadwal siswa selama pembelajaran.
+                                    </p>
+                                </>
+                            )}
+                            {pathname == '/edu/laporan' && (
+                                <>
+                                    <h1 className="text-xl sm:text-2xl font-bold">
+                                        Laporan
+                                    </h1>
+                                    <p className="text-black/60 text-sm sm:text-base">
+                                        Semua hasil laporan & monitoring pembelajaran siswa.
+                                    </p>
+                                </>
+                            )}
+                        </>
+                    )}
+                    {user?.role === 'admin' && (
+                        <>
+                            {pathname == '/edu/dashboard' && (
+                                <>
+                                    <h1 className="text-xl sm:text-2xl font-bold">
+                                        Dashboard Admin
+                                    </h1>
+                                    <p className="text-black/60 text-sm sm:text-base">
+                                        Selamat datang kembali, {user?.name || "Loading..." }.
+                                    </p>
+                                </>
+                            )}
+                            {pathname == '/edu/tugas' && (
+                                <>
+                                    <h1 className="text-xl sm:text-2xl font-bold">
+                                        Manajemen Tugas
+                                    </h1>
+                                    <p className="text-black/60 text-sm sm:text-base">
+                                        Semua tugas yang anda buat berada disini.
+                                    </p>
+                                </>
+                            )}
+                            {pathname == '/edu/ujian' && (
+                                <>
+                                    <h1 className="text-xl sm:text-2xl font-bold">
+                                        Manajemen Ujian
+                                    </h1>
+                                    <p className="text-black/60 text-sm sm:text-base">
+                                        Semua ujian yang anda buat berada disini.
+                                    </p>
+                                </>
+                            )}
+                            {pathname == '/edu/siswa' && (
+                                <>
+                                    <h1 className="text-xl sm:text-2xl font-bold">
+                                        Manajemen Siswa
+                                    </h1>
+                                    <p className="text-black/60 text-sm sm:text-base">
+                                        Daftar siswa yang anda buat berada disini.
+                                    </p>
+                                </>
+                            )}
+                            {pathname == '/edu/kelas' && (
+                                <>
+                                    <h1 className="text-xl sm:text-2xl font-bold">
+                                        Manajemen Kelas
+                                    </h1>
+                                    <p className="text-black/60 text-sm sm:text-base">
+                                        Daftar kelas yang anda buat berada disini.
+                                    </p>
+                                </>
+                            )}
+                            {pathname == '/edu/nilai' && (
+                                <>
+                                    <h1 className="text-xl sm:text-2xl font-bold">
+                                        Manajemen Nilai
+                                    </h1>
+                                    <p className="text-black/60 text-sm sm:text-base">
+                                        Daftar nilai siswa selama pembelajaran.
+                                    </p>
+                                </>
+                            )}
+                            {pathname == '/edu/jadwal' && (
+                                <>
+                                    <h1 className="text-xl sm:text-2xl font-bold">
+                                        Manajemen Jadwal
+                                    </h1>
+                                    <p className="text-black/60 text-sm sm:text-base">
+                                        Daftar jadwal siswa selama pembelajaran.
+                                    </p>
+                                </>
+                            )}
+                            {pathname == '/edu/laporan' && (
+                                <>
+                                    <h1 className="text-xl sm:text-2xl font-bold">
+                                        Laporan
+                                    </h1>
+                                    <p className="text-black/60 text-sm sm:text-base">
+                                        Semua hasil laporan & monitoring pembelajaran siswa.
+                                    </p>
+                                </>
+                            )}
                         </>
                     )}
                 </div>
