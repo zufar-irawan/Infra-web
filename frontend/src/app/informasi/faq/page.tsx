@@ -7,7 +7,7 @@ import { useLang } from "../../components/LangContext";
 import { useState, useRef, useEffect } from "react";
 
 /* -------------------- Halaman Tentang -------------------- */
-export default function Tentang() {
+export default function Faq() {
   const { lang } = useLang();
 
   return (

@@ -1,19 +1,49 @@
 "use client";
 
 import Link from "next/link";
-import Navbar from "@/components/Header";
-import Footer from "@/components/Footer";
 import { useLang } from "../../components/LangContext";
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 
-/* -------------------- Halaman Tentang -------------------- */
-export default function Tentang() {
+export default function Prestasi() {
   const { lang } = useLang();
+
+  // === DATA GAMBAR ===
+  const images = Array.from({ length: 12 }, (_, i) => ({
+    id: i + 1,
+    src: `/webp/p${i + 1}.webp`,
+  }));
+
+  // === PAGINATION ===
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 9;
+  const totalPages = Math.ceil(images.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentImages = images.slice(startIndex, startIndex + itemsPerPage);
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages) setCurrentPage(page);
+  };
+
+  // === ANIMASI FADE-IN ===
+  const sectionRef = useRef(null);
+  const [isVisible, setIsVisible] = useState(false);
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) setIsVisible(true);
+        });
+      },
+      { threshold: 0.2 }
+    );
+
+    if (sectionRef.current) observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <>
-
       {/* Spacer biar ga ketiban header */}
       <div className="h-[100px] bg-white" />
 
@@ -26,10 +56,10 @@ export default function Tentang() {
             </Link>
             <span className="text-[#FE4D01]">{">"}</span>
             <Link
-              href="/informasi-sekolah/tentang-kami"
+              href="/kehidupan-siswa/prestasi"
               className="text-[#FE4D01] hover:underline"
             >
-              {lang === "id" ? "Informasi Sekolah" : "School Information"}
+              {lang === "id" ? "Informasi" : "Information"}
             </Link>
             <span className="text-[#243771]">{">"}</span>
             <span className="text-[#243771]">
@@ -39,226 +69,132 @@ export default function Tentang() {
         </div>
       </section>
 
-      {/* Prestasi */}
-      <PrestasiSection />
+      {/* === SECTION PRESTASI === */}
+      <section
+        ref={sectionRef}
+        className={`py-16 bg-white transition-all duration-1000 ease-out ${
+          isVisible
+            ? "opacity-100 translate-y-0"
+            : "opacity-0 translate-y-10"
+        }`}
+      >
+        <div className="container mx-auto px-4">
+          <h2 className="text-center text-2xl sm:text-3xl font-bold text-[#243771] mb-2">
+            {lang === "id" ? "Prestasi" : "Achievements"}
+          </h2>
+          <p className="text-center text-gray-600 mb-10">
+            {lang === "id"
+              ? "Pencapaian dan kebanggaan SMK Prestasi Prima"
+              : "Achievements and pride of SMK Prestasi Prima"}
+          </p>
 
-      {/* FAQ Section */}
-      <FAQSection />
-    </>
-  );
-}
-
-/* -------------------- Prestasi Section -------------------- */
-function PrestasiSection() {
-  const { lang } = useLang();
-
-  const akademik = Array(9).fill("/pp2.png");
-  const nonAkademik = Array(9).fill("/pp2.png");
-
-  // animasi scroll masuk
-  const [visibleItems, setVisibleItems] = useState<number[]>([]);
-  const sectionRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const index = Number(entry.target.getAttribute("data-index"));
-            setVisibleItems((prev) => [...new Set([...prev, index])]);
-          }
-        });
-      },
-      { threshold: 0.2 }
-    );
-    const items = sectionRef.current?.querySelectorAll(".prestasi-card");
-    items?.forEach((el, i) => {
-      el.setAttribute("data-index", i.toString());
-      observer.observe(el);
-    });
-    return () => observer.disconnect();
-  }, []);
-
-  const CardGrid = ({ title, items }: { title: string; items: string[] }) => {
-    const [page, setPage] = useState(0);
-    const itemsPerPage = 9;
-    const totalPages = Math.ceil(items.length / itemsPerPage);
-
-    const startIdx = page * itemsPerPage;
-    const endIdx = startIdx + itemsPerPage;
-    const currentItems = items.slice(startIdx, endIdx);
-
-    const nextPage = () => setPage((prev) => (prev + 1) % totalPages);
-    const prevPage = () => setPage((prev) => (prev - 1 + totalPages) % totalPages);
-
-    return (
-      <div className="mb-14">
-        <h2 className="text-2xl sm:text-3xl font-bold text-[#243771] text-center mb-6">
-          {title}
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 justify-items-center">
-          {currentItems.map((img, i) => (
-            <div
-              key={i}
-              className={`prestasi-card bg-white rounded-[10px] overflow-hidden shadow-md transform transition-all duration-700 ease-out hover:scale-105 hover:shadow-xl ${visibleItems.includes(i)
-                  ? "opacity-100 translate-y-0"
-                  : "opacity-0 translate-y-8"
-                }`}
-              style={{
-                transitionDelay: `${i * 80}ms`,
-                width: "346px",
-                height: "402px",
-              }}
-            >
-              <Image
-                src={img}
-                alt={`Prestasi ${i}`}
-                width={346}
-                height={402}
-                className="w-full h-full object-cover"
-              />
-            </div>
-          ))}
-        </div>
-
-        {/* Navigasi bawah */}
-        <div className="flex justify-center gap-3 mt-8">
-          <button
-            onClick={prevPage}
-            className="px-4 py-2 border rounded-lg bg-white shadow hover:bg-[#FE4D01] hover:text-white transition focus:ring-2 focus:ring-[#FE4D01]"
-          >
-            ◀
-          </button>
-          <button
-            onClick={nextPage}
-            className="px-4 py-2 border rounded-lg bg-white shadow hover:bg-[#FE4D01] hover:text-white transition focus:ring-2 focus:ring-[#FE4D01]"
-          >
-            ▶
-          </button>
-        </div>
-      </div>
-    );
-  };
-
-  return (
-    <section
-      ref={sectionRef}
-      className="bg-white py-14 container mx-auto px-4"
-    >
-      <CardGrid
-        title={lang === "id" ? "Prestasi Akademik" : "Academic Achievements"}
-        items={akademik}
-      />
-      <CardGrid
-        title={
-          lang === "id" ? "Prestasi Non-Akademik" : "Non-Academic Achievements"
-        }
-        items={nonAkademik}
-      />
-    </section>
-  );
-}
-
-/* -------------------- FAQ Section -------------------- */
-function FAQSection() {
-  const { lang } = useLang();
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const containerRef = useRef<HTMLDivElement | null>(null);
-
-  const faq = [
-    {
-      q_id: "Dimana alamat SMK Prestasi Prima?",
-      a_id: "Alamat kami berada di Jl. Kayu Manis Timur No. 99, Jakarta Timur.",
-      q_en: "Where is SMK Prestasi Prima located?",
-      a_en: "Our address is Jl. Kayu Manis Timur No. 99, East Jakarta.",
-    },
-    {
-      q_id: "Apa saja jurusan yang tersedia?",
-      a_id: "Kami memiliki jurusan RPL, TJKT, DKV, dan lainnya.",
-      q_en: "What majors are available?",
-      a_en: "We offer majors such as Software Engineering, Network Engineering, Visual Communication Design, and more.",
-    },
-    {
-      q_id: "Apakah ada kegiatan ekstrakurikuler?",
-      a_id: "Ya, tersedia banyak ekstrakurikuler seperti futsal, basket, musik, dan robotik.",
-      q_en: "Are there extracurricular activities?",
-      a_en: "Yes, we provide many extracurriculars such as futsal, basketball, music, and robotics.",
-    },
-  ];
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
-      ) {
-        setOpenIndex(null);
-      }
-    };
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpenIndex(null);
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("touchstart", handleClickOutside);
-    document.addEventListener("keydown", handleEsc);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("touchstart", handleClickOutside);
-      document.removeEventListener("keydown", handleEsc);
-    };
-  }, []);
-
-  return (
-    <section className="py-14 bg-white">
-      <div className="container mx-auto px-4 max-w-3xl">
-        <h2 className="text-3xl sm:text-4xl font-bold text-[#243771] text-center mb-5">
-          {lang === "id" ? "FAQ SMK Prestasi Prima" : "SMK Prestasi Prima FAQ"}
-        </h2>
-        <p className="text-gray-600 text-center mb-8">
-          {lang === "id"
-            ? "Kami menyiapkan daftar pertanyaan yang sering diajukan..."
-            : "We provide a list of frequently asked questions..."}
-        </p>
-
-        <div className="space-y-3" ref={containerRef}>
-          {faq.map((item, i) => {
-            const isOpen = openIndex === i;
-            return (
+          {/* Grid Gambar */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 justify-center">
+            {currentImages.map((img) => (
               <div
-                key={i}
-                className="border rounded-lg shadow-sm overflow-hidden transition hover:shadow-md"
+                key={img.id}
+                className="w-full max-w-[295px] mx-auto bg-white rounded-md overflow-hidden shadow-[0_4px_4px_rgba(0,0,0,0.25)] hover:scale-[1.02] transition-transform duration-300"
               >
-                <button
-                  aria-expanded={isOpen}
-                  aria-controls={`faq-content-${i}`}
-                  id={`faq-btn-${i}`}
-                  className="w-full flex justify-between items-center p-4 font-medium text-[#243771] focus:outline-none"
-                  onClick={() => setOpenIndex(isOpen ? null : i)}
-                >
-                  <span className="text-left">
-                    {lang === "id" ? item.q_id : item.q_en}
-                  </span>
-                  <span className="text-lg ml-4">{isOpen ? "−" : "+"}</span>
-                </button>
-
-                <div
-                  id={`faq-content-${i}`}
-                  role="region"
-                  aria-labelledby={`faq-btn-${i}`}
-                  className={`overflow-hidden transition-[max-height] duration-500 ease-in-out ${isOpen ? "max-h-40" : "max-h-0"
-                    }`}
-                >
-                  <div className="p-4 pt-0 text-gray-600">
-                    {lang === "id" ? item.a_id : item.a_en}
-                  </div>
-                </div>
+                <Image
+                  src={img.src}
+                  alt={`Prestasi ${img.id}`}
+                  width={295}
+                  height={368}
+                  loading="lazy"
+                  className="w-full h-auto object-cover"
+                />
               </div>
-            );
-          })}
+            ))}
+          </div>
+
+          {/* Pagination Oranye */}
+          <div className="flex items-center justify-center gap-2 mt-10">
+            <button
+              type="button"
+              aria-label="Previous"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className={`mr-4 transition-all ${
+                currentPage === 1 ? "opacity-30 cursor-not-allowed" : "hover:scale-95"
+              }`}
+            >
+              <svg
+                width="9"
+                height="16"
+                viewBox="0 0 12 18"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M11 1L2 9.24242L11 17"
+                  stroke="#FE4D01"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </button>
+
+            <div className="flex gap-2 text-gray-500 text-sm md:text-base">
+              {Array.from({ length: totalPages }, (_, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => handlePageChange(i + 1)}
+                  className={`flex items-center justify-center active:scale-95 w-9 md:w-12 h-9 md:h-12 aspect-square rounded-md transition-all font-medium ${
+                    currentPage === i + 1
+                      ? "bg-[#FE4D01] text-white"
+                      : "bg-white border border-gray-200 text-[#FE4D01] hover:bg-[#FE4D01]/10"
+                  }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              aria-label="Next"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className={`ml-4 transition-all ${
+                currentPage === totalPages
+                  ? "opacity-30 cursor-not-allowed"
+                  : "hover:scale-95"
+              }`}
+            >
+              <svg
+                width="9"
+                height="16"
+                viewBox="0 0 12 18"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M1 1L10 9.24242L1 17"
+                  stroke="#FE4D01"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+
+      {/* === SECTION GEDUNG (pindah ke bawah) === */}
+      <main className="flex-1 w-full bg-white">
+        <section className="relative w-full bg-white overflow-hidden">
+          <img
+            src="/avif/gedung.avif"
+            alt={
+              lang === "id"
+                ? "Gedung SMK Prestasi Prima"
+                : "Prestasi Prima Building"
+            }
+            className="w-full h-[40vh] sm:h-[55vh] lg:h-screen object-cover object-center hover:scale-[1.02] transition-transform duration-700"
+          />
+        </section>
+      </main>
+    </>
   );
 }
