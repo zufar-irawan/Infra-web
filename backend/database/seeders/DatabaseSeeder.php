@@ -14,37 +14,38 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        LmsUser::create([
-            'name' => 'Admin',
-            'email' => 'admin@mail.com',
-            'password' => bcrypt('12345678'),
-            'role' => 'admin',
-            'phone' => '081234567890',
-            'status' => true,
-            'created_at' => now()
-        ]);
+        // LmsUser::create([
+        //     'name' => 'Admin',
+        //     'email' => 'admin@mail.com',
+        //     'password' => bcrypt('12345678'),
+        //     'role' => 'admin',
+        //     'phone' => '081234567890',
+        //     'status' => true,
+        //     'created_at' => now()
+        // ]);
 
-        LmsUser::create([
-            'name' => 'Teacher',
-            'email' => 'guru@mail.com',
-            'password' => bcrypt('12345678'),
-            'role' => 'guru',
-            'phone' => '081256437890',
-            'status' => true,
-            'created_at' => now()
-        ]);
+        // LmsUser::create([
+        //     'name' => 'Teacher',
+        //     'email' => 'guru@mail.com',
+        //     'password' => bcrypt('12345678'),
+        //     'role' => 'guru',
+        //     'phone' => '081256437890',
+        //     'status' => true,
+        //     'created_at' => now()
+        // ]);
 
-        LmsUser::create([
-            'name' => 'Student',
-            'email' => 'siswa@mail.com',
-            'password' => bcrypt('12345678'),
-            'role' => 'siswa',
-            'phone' => '081256347890',
-            'status' => true,
-            'created_at' => now()
-        ]);
+        // LmsUser::create([
+        //     'name' => 'Student',
+        //     'email' => 'siswa@mail.com',
+        //     'password' => bcrypt('12345678'),
+        //     'role' => 'siswa',
+        //     'phone' => '081256347890',
+        //     'status' => true,
+        //     'created_at' => now()
+        // ]);
 
         $this->call([
+            LmsSeeder::class,
             // UserSeeder::class,
             // KelasSeeder::class,
             // SiswaSeeder::class,

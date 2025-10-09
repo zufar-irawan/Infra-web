@@ -19,7 +19,6 @@ class LmsExam extends Model
         'date',
         'start_time',
         'end_time',
-        'room_id',
         'created_by'
     ];
 

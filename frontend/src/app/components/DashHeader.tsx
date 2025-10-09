@@ -6,46 +6,27 @@ import { useRouter } from 'next/navigation';
 import axios from "axios";
 import {User} from "@/app/api/me/route";
 
-export default function DashHeader() {
-    const [user, setUser] = useState<User | null>(null)
-
-    const [isUser] = useState('student')
-    const router = useRouter();
-
+export default function DashHeader({user} : {user: User | null}) {
     const pathname = typeof window !== "undefined" ? window.location.pathname : "";
+    const [studentClass, setStudentClass] = useState("Tidak ada kelas");
 
     useEffect(() => {
-        const fetchUser = async () => {
+        const fetchStudent = async () => {
             try {
-                const res = await axios.get("/api/me");
-                setUser(res.data.user);
-            } catch (e: any){
-                console.error(e);
-                // Jika error 401/403 atau user tidak ditemukan, logout otomatis
-                if (e.response && (e.response.status === 401 || e.response.status === 403)) {
-                    handleLogout();
-                }
+                const id = user?.id
+                const response = await axios.get("/api/student", {
+                    params: { id },
+                });
+
+
+                setStudentClass(response.data.class.name);
+            } catch (e) {
+                console.error("Error fetching student data:", e);
             }
         }
-        fetchUser();
-    }, [])
 
-    const handleLogout = () => {
-        if (typeof window !== 'undefined') {
-            // Hapus token/cookie autentikasi jika ada
-            localStorage.removeItem('token'); // jika pakai token di localStorage
-            sessionStorage.removeItem('token'); // jika pakai sessionStorage
-            // Jika pakai cookie, bisa tambahkan kode hapus cookie di sini
-            // document.cookie = 'token=; Max-Age=0; path=/;';
-            router.push('/edu/login');
-        }
-    };
-
-    useEffect(() => {
-        if(user) {
-            console.log(user)
-        }
-    }, [user]);
+        fetchStudent();
+    }, []);
 
     return (
         <section id="header" className="w-full flex items-center justify-between p-4">
@@ -276,7 +257,9 @@ export default function DashHeader() {
                     )}
                 </div>
             </div>
-            <p className="bg-emerald-200 text-emerald-800 px-3 py-2 text-xs sm:text-sm rounded-sm">XII DKV 1</p>
+            <p className="bg-emerald-200 text-emerald-800 px-3 py-2 text-xs sm:text-sm rounded-sm">
+                {studentClass.replaceAll("-", " ")}
+            </p>
         </section>
     )
 }
