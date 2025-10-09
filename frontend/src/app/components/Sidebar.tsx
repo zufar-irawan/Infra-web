@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from "axios";
 import {User} from "@/app/api/me/route";
-import {BellRing, Bolt, BookMarked, BarChart3, LayoutDashboard, Users, LogOut, Shapes, X, Calendar, Clipboard} from "lucide-react";
+import {Bolt, BookMarked, BarChart3, LayoutDashboard, Users, LogOut, Shapes, X, Calendar, Clipboard} from "lucide-react";
 import Image from "next/image";
 import Swal from "sweetalert2";
 
@@ -28,10 +28,6 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
             // Cek apakah logout berhasil (baik sukses maupun dengan error tapi cookie terhapus)
             if (res.status === 200 && res.data.logout) {
-                // Hapus token dari localStorage/sessionStorage juga (jika ada)
-                localStorage.removeItem('token');
-                sessionStorage.removeItem('token');
-
                 Swal.fire({
                     icon: 'success',
                     title: 'Berhasil',
@@ -47,21 +43,13 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             }
         } catch (error: any) {
             console.error("Logout error:", error);
-
-            // Force logout meski ada error
-            localStorage.removeItem('token');
-            sessionStorage.removeItem('token');
-
-            Swal.fire({
-                icon: 'warning',
-                title: 'Logout Paksa',
-                text: 'Terjadi error saat logout, namun Anda tetap akan di-logout dari sistem',
-                timer: 2000,
-                showConfirmButton: false
-            });
-
-            // Tetap redirect ke login
-            router.push('/edu/login');
+            // Swal.fire({
+            //     icon: 'warning',
+            //     title: 'Logout Paksa',
+            //     text: 'Terjadi error saat logout, namun Anda tetap akan di-logout dari sistem',
+            //     timer: 2000,
+            //     showConfirmButton: false
+            // });
         }
     };
 
@@ -80,12 +68,6 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         }
         fetchUser();
     }, [])
-
-    useEffect(() => {
-        if(user) {
-            console.log(user)
-        }
-    }, [user]);
     
     return (
         <>

@@ -1,32 +1,12 @@
 "use client";
 
 import { Menu } from "lucide-react"
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import axios from "axios";
-import {User} from "@/app/api/me/route";
+import React from 'react';
 
-export default function DashHeader({user} : {user: User | null}) {
+export default function DashHeader({tugas, user} : {tugas: any, user: any}) {
     const pathname = typeof window !== "undefined" ? window.location.pathname : "";
-    const [studentClass, setStudentClass] = useState("Tidak ada kelas");
-
-    useEffect(() => {
-        const fetchStudent = async () => {
-            try {
-                const id = user?.id
-                const response = await axios.get("/api/student", {
-                    params: { id },
-                });
-
-
-                setStudentClass(response.data.class.name);
-            } catch (e) {
-                console.error("Error fetching student data:", e);
-            }
-        }
-
-        fetchStudent();
-    }, []);
+    const classStudent = tugas?.class.name || "Tidak ada kelas";
+    const isUser = user?.role || "guest";
 
     return (
         <section id="header" className="w-full flex items-center justify-between p-4">
@@ -43,15 +23,15 @@ export default function DashHeader({user} : {user: User | null}) {
                 </button>
                 
                 <div>
-                    {/* <h1 className="text-xl sm:text-2xl font-bold">
-                        {pathname == '/edu/dashboard'
-                            ? `Dashboard ${isUser === 'admin' ? "Admin" : isUser === 'teacher' ? "Guru" : "Siswa"}`
-                        :pathname == '/edu/tugas'
-                            ? 'Tugas Anda': ""
-                        }
-                        
-                        </h1>
-                    <p className="text-black/60 text-sm sm:text-base">Selamat datang kembali, {user?.name || "Loading..."}.</p> */}
+                    {/*<h1 className="text-xl sm:text-2xl font-bold">*/}
+                    {/*    {pathname == '/edu/dashboard'*/}
+                    {/*        ? `Dashboard ${isUser === 'admin' ? "Admin" : isUser === 'teacher' ? "Guru" : "Siswa"}`*/}
+                    {/*    :pathname == '/edu/tugas'*/}
+                    {/*        ? 'Tugas Anda': ""*/}
+                    {/*    }*/}
+
+                    {/*    </h1>*/}
+                    {/*<p className="text-black/60 text-sm sm:text-base">Selamat datang kembali, {user?.name || "Loading..."}.</p>*/}
                     {user?.role === 'siswa' && (
                         <>
                             {pathname == '/edu/dashboard' && (
@@ -258,7 +238,7 @@ export default function DashHeader({user} : {user: User | null}) {
                 </div>
             </div>
             <p className="bg-emerald-200 text-emerald-800 px-3 py-2 text-xs sm:text-sm rounded-sm">
-                {studentClass.replaceAll("-", " ")}
+                {classStudent.replaceAll("-", " ")}
             </p>
         </section>
     )
