@@ -3,9 +3,9 @@
 import { Menu } from "lucide-react"
 import React from 'react';
 
-export default function DashHeader({tugas, user} : {tugas: any, user: any}) {
+export default function DashHeader({student, user} : {student: any, user: any}) {
     const pathname = typeof window !== "undefined" ? window.location.pathname : "";
-    const classStudent = tugas?.class.name || "Tidak ada kelas";
+    const classStudent = student?.class.name || "Tidak ada kelas";
     const isUser = user?.role || "guest";
 
     return (
@@ -23,220 +23,20 @@ export default function DashHeader({tugas, user} : {tugas: any, user: any}) {
                 </button>
                 
                 <div>
-                    {/*<h1 className="text-xl sm:text-2xl font-bold">*/}
-                    {/*    {pathname == '/edu/dashboard'*/}
-                    {/*        ? `Dashboard ${isUser === 'admin' ? "Admin" : isUser === 'teacher' ? "Guru" : "Siswa"}`*/}
-                    {/*    :pathname == '/edu/tugas'*/}
-                    {/*        ? 'Tugas Anda': ""*/}
-                    {/*    }*/}
+                    <h1 className="text-xl sm:text-2xl font-bold">
+                        {pathname == '/edu/dashboard'
+                            ? `Dashboard ${isUser === 'admin' ? "Admin" : isUser === 'teacher' ? "Guru" : "Siswa"}`
+                        :pathname == '/edu/tugas'
+                            ? 'Tugas Anda'
+                        :pathname == '/edu/ujian'
+                            ? 'Ujian Anda' : ''
+                        }
 
-                    {/*    </h1>*/}
-                    {/*<p className="text-black/60 text-sm sm:text-base">Selamat datang kembali, {user?.name || "Loading..."}.</p>*/}
-                    {user?.role === 'siswa' && (
-                        <>
-                            {pathname == '/edu/dashboard' && (
-                                <>
-                                    <h1 className="text-xl sm:text-2xl font-bold">
-                                        Dashboard Siswa
-                                    </h1>
-                                    <p className="text-black/60 text-sm sm:text-base">
-                                        Selamat datang kembali, {user?.name || "Loading..." }.
-                                    </p>
-                                </>
-                            )}
-                            {pathname == '/edu/tugas' && (
-                                <>
-                                    <h1 className="text-xl sm:text-2xl font-bold">
-                                        Tugas Anda
-                                    </h1>
-                                    <p className="text-black/60 text-sm sm:text-base">
-                                        Semua tugas anda berada disini.
-                                    </p>
-                                </>
-                            )}
-                            {pathname == '/edu/ujian' && (
-                                <>
-                                    <h1 className="text-xl sm:text-2xl font-bold">
-                                        Ujian Anda
-                                    </h1>
-                                    <p className="text-black/60 text-sm sm:text-base">
-                                        Semua ujian anda berada disini.
-                                    </p>
-                                </>
-                            )}
-                            {pathname == '/edu/nilai' && (
-                                <>
-                                    <h1 className="text-xl sm:text-2xl font-bold">
-                                        Nilai Anda
-                                    </h1>
-                                    <p className="text-black/60 text-sm sm:text-base">
-                                        Daftar nilai anda selama pembelajaran.
-                                    </p>
-                                </>
-                            )}
-                            {pathname == '/edu/jadwal' && (
-                                <>
-                                    <h1 className="text-xl sm:text-2xl font-bold">
-                                        Jadwal Anda
-                                    </h1>
-                                    <p className="text-black/60 text-sm sm:text-base">
-                                        Daftar jadwal anda selama pembelajaran.
-                                    </p>
-                                </>
-                            )}
-                                
-                        </>
-                    )}
-                    {user?.role === 'guru' && (
-                        <>
-                            {pathname == '/edu/dashboard' && (
-                                <>
-                                    <h1 className="text-xl sm:text-2xl font-bold">
-                                        Dashboard Guru
-                                    </h1>
-                                    <p className="text-black/60 text-sm sm:text-base">
-                                        Selamat datang kembali, {user?.name || "Loading..." }.
-                                    </p>
-                                </>
-                            )}
-                            {pathname == '/edu/tugas' && (
-                                <>
-                                    <h1 className="text-xl sm:text-2xl font-bold">
-                                        Manajemen Tugas
-                                    </h1>
-                                    <p className="text-black/60 text-sm sm:text-base">
-                                        Semua tugas yang anda buat berada disini.
-                                    </p>
-                                </>
-                            )}
-                            {pathname == '/edu/ujian' && (
-                                <>
-                                    <h1 className="text-xl sm:text-2xl font-bold">
-                                        Manajemen Ujian
-                                    </h1>
-                                    <p className="text-black/60 text-sm sm:text-base">
-                                        Semua ujian yang anda buat berada disini.
-                                    </p>
-                                </>
-                            )}
-                            {pathname == '/edu/nilai' && (
-                                <>
-                                    <h1 className="text-xl sm:text-2xl font-bold">
-                                        Manajemen Nilai
-                                    </h1>
-                                    <p className="text-black/60 text-sm sm:text-base">
-                                        Daftar nilai siswa selama pembelajaran.
-                                    </p>
-                                </>
-                            )}
-                            {pathname == '/edu/jadwal' && (
-                                <>
-                                    <h1 className="text-xl sm:text-2xl font-bold">
-                                        Manajemen Jadwal
-                                    </h1>
-                                    <p className="text-black/60 text-sm sm:text-base">
-                                        Daftar jadwal siswa selama pembelajaran.
-                                    </p>
-                                </>
-                            )}
-                            {pathname == '/edu/laporan' && (
-                                <>
-                                    <h1 className="text-xl sm:text-2xl font-bold">
-                                        Laporan
-                                    </h1>
-                                    <p className="text-black/60 text-sm sm:text-base">
-                                        Semua hasil laporan & monitoring pembelajaran siswa.
-                                    </p>
-                                </>
-                            )}
-                        </>
-                    )}
-                    {user?.role === 'admin' && (
-                        <>
-                            {pathname == '/edu/dashboard' && (
-                                <>
-                                    <h1 className="text-xl sm:text-2xl font-bold">
-                                        Dashboard Admin
-                                    </h1>
-                                    <p className="text-black/60 text-sm sm:text-base">
-                                        Selamat datang kembali, {user?.name || "Loading..." }.
-                                    </p>
-                                </>
-                            )}
-                            {pathname == '/edu/tugas' && (
-                                <>
-                                    <h1 className="text-xl sm:text-2xl font-bold">
-                                        Manajemen Tugas
-                                    </h1>
-                                    <p className="text-black/60 text-sm sm:text-base">
-                                        Semua tugas yang anda buat berada disini.
-                                    </p>
-                                </>
-                            )}
-                            {pathname == '/edu/ujian' && (
-                                <>
-                                    <h1 className="text-xl sm:text-2xl font-bold">
-                                        Manajemen Ujian
-                                    </h1>
-                                    <p className="text-black/60 text-sm sm:text-base">
-                                        Semua ujian yang anda buat berada disini.
-                                    </p>
-                                </>
-                            )}
-                            {pathname == '/edu/siswa' && (
-                                <>
-                                    <h1 className="text-xl sm:text-2xl font-bold">
-                                        Manajemen Siswa
-                                    </h1>
-                                    <p className="text-black/60 text-sm sm:text-base">
-                                        Daftar siswa yang anda buat berada disini.
-                                    </p>
-                                </>
-                            )}
-                            {pathname == '/edu/kelas' && (
-                                <>
-                                    <h1 className="text-xl sm:text-2xl font-bold">
-                                        Manajemen Kelas
-                                    </h1>
-                                    <p className="text-black/60 text-sm sm:text-base">
-                                        Daftar kelas yang anda buat berada disini.
-                                    </p>
-                                </>
-                            )}
-                            {pathname == '/edu/nilai' && (
-                                <>
-                                    <h1 className="text-xl sm:text-2xl font-bold">
-                                        Manajemen Nilai
-                                    </h1>
-                                    <p className="text-black/60 text-sm sm:text-base">
-                                        Daftar nilai siswa selama pembelajaran.
-                                    </p>
-                                </>
-                            )}
-                            {pathname == '/edu/jadwal' && (
-                                <>
-                                    <h1 className="text-xl sm:text-2xl font-bold">
-                                        Manajemen Jadwal
-                                    </h1>
-                                    <p className="text-black/60 text-sm sm:text-base">
-                                        Daftar jadwal siswa selama pembelajaran.
-                                    </p>
-                                </>
-                            )}
-                            {pathname == '/edu/laporan' && (
-                                <>
-                                    <h1 className="text-xl sm:text-2xl font-bold">
-                                        Laporan
-                                    </h1>
-                                    <p className="text-black/60 text-sm sm:text-base">
-                                        Semua hasil laporan & monitoring pembelajaran siswa.
-                                    </p>
-                                </>
-                            )}
-                        </>
-                    )}
+                        </h1>
+                    <p className="text-black/60 text-sm sm:text-base">Selamat datang kembali, {user?.name || "Loading..."}.</p>
                 </div>
             </div>
+
             <p className="bg-emerald-200 text-emerald-800 px-3 py-2 text-xs sm:text-sm rounded-sm">
                 {classStudent.replaceAll("-", " ")}
             </p>

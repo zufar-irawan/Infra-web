@@ -67,6 +67,7 @@ export default function Dashboard() {
                     const studentMe = student.find((s: { user_id: number | undefined; }) => s.user_id === user?.id);
 
                     setStudent(studentMe)
+                    console.log(studentMe)
                 })
                 .catch(err => {
                     console.error(err)
@@ -144,7 +145,7 @@ export default function Dashboard() {
         <>
         { user?.role === 'siswa' && (
         <div className="overflow-y-auto min-h-screen">
-            <DashHeader tugas={student} user={user} />
+            <DashHeader student={student} user={user} />
             <section id="task" className="w-full grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-4 gap-4 p-4">
                 { card ? (card.map((item, index) => (
                     <TugasCard value={item.value} title={item.tugas} key={index} />

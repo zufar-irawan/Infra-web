@@ -10,9 +10,11 @@ import {User} from "@/app/api/me/route";
 
 export default function UjianSiswa() {
     const [user, setUser] = useState<User | null>(null)
+    const [student, setStudent] = useState<any>()
 
     const router = useRouter();
 
+    // fetch user
     useEffect(() => {
         const fetchUser = async () => {
             try {
@@ -29,22 +31,38 @@ export default function UjianSiswa() {
         fetchUser();
     }, [])
 
-    const handleLogout = () => {
-        if (typeof window !== 'undefined') {
-            // Hapus token/cookie autentikasi jika ada
-            localStorage.removeItem('token'); // jika pakai token di localStorage
-            sessionStorage.removeItem('token'); // jika pakai sessionStorage
-            // Jika pakai cookie, bisa tambahkan kode hapus cookie di sini
-            // document.cookie = 'token=; Max-Age=0; path=/;';
-            router.push('/edu/login');
-        }
-    };
-
     useEffect(() => {
-        if(user) {
-            console.log(user)
+        if (!user) return
+
+        const fetchStudent = async () => {
+            await axios.get("/api/student")
+                .then((res) => {
+                    if(res.status === 200) {
+                        const data = res.data
+                        // @ts-ignore
+                        const studentMe = data.filter(item => item.user_id === user.id);
+                        setStudent(studentMe);
+                    }
+                })
+                .catch((err) => {
+                    console.error(err);
+                })
         }
+
+        fetchStudent();
     }, [user]);
+
+    const handleLogout = async () => {
+        await axios.post("/api/logout")
+            .then((res) => {
+                if(res.status === 200) {
+                    router.push("/login");
+                }
+            })
+            .catch((err) => {
+                console.error(err);
+            })
+    };
 
     const [open1, setOpen1] = useState(true);
     const [open2, setOpen2] = useState(true);
@@ -53,7 +71,7 @@ export default function UjianSiswa() {
         <>
         {user?.role === 'siswa' && (
         <div className="overflow-y-auto min-h-screen">
-            <DashHeader />
+            <DashHeader user={user} student={student} />
             <section id="ujian-main-data" className="w-full grid grid-cols-1 2xl:grid-cols-2 gap-4 p-4">
                 {/* TASK */}
                 <div className="bg-white rounded-2xl p-4 shadow-md border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 flex flex-col gap-4">
