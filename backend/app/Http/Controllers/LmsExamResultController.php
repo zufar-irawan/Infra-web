@@ -26,4 +26,9 @@ class LmsExamResultController extends Controller
         $result = LmsExamResult::create($request->all());
         return response()->json($result, 201);
     }
+
+    public function show(LmsExamResult $examResult)
+    {
+        return response()->json($examResult->load(['exam','student']));
+    }
 }
