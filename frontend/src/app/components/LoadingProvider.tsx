@@ -35,32 +35,32 @@ export default function LoadingProvider({ children }: LoadingProviderProps) {
     const [isLoading, setIsLoading] = useState(false);
     const pathname = usePathname();
 
-    useEffect(() => {
-        const fetchUser = async () => {
-            try {
-                const res = await axios.get("/api/me");
-                setUser(res.data.user);
-            } catch (e: any){
-                console.error(e);
-                // Jika error 401/403 atau user tidak ditemukan, logout otomatis
-                if (e.response && (e.response.status === 401 || e.response.status === 403)) {
-                    handleLogout();
-                }
-            }
-        }
-        fetchUser();
-    }, [])
+    // useEffect(() => {
+    //     const fetchUser = async () => {
+    //         try {
+    //             const res = await axios.get("/api/me");
+    //             setUser(res.data.user);
+    //         } catch (e: any){
+    //             console.error(e);
+    //             // Jika error 401/403 atau user tidak ditemukan, logout otomatis
+    //             if (e.response && (e.response.status === 401 || e.response.status === 403)) {
+    //                 handleLogout();
+    //             }
+    //         }
+    //     }
+    //     fetchUser();
+    // }, [])
 
-    const handleLogout = () => {
-        if (typeof window !== 'undefined') {
-            // Hapus token/cookie autentikasi jika ada
-            localStorage.removeItem('token'); // jika pakai token di localStorage
-            sessionStorage.removeItem('token'); // jika pakai sessionStorage
-            // Jika pakai cookie, bisa tambahkan kode hapus cookie di sini
-            // document.cookie = 'token=; Max-Age=0; path=/;';
-            router.push('/edu/login');
-        }
-    };
+    // const handleLogout = () => {
+    //     if (typeof window !== 'undefined') {
+    //         // Hapus token/cookie autentikasi jika ada
+    //         localStorage.removeItem('token'); // jika pakai token di localStorage
+    //         sessionStorage.removeItem('token'); // jika pakai sessionStorage
+    //         // Jika pakai cookie, bisa tambahkan kode hapus cookie di sini
+    //         // document.cookie = 'token=; Max-Age=0; path=/;';
+    //         router.push('/edu/login');
+    //     }
+    // };
 
     useEffect(() => {
         if (!pathname.startsWith('/edu/') || pathname !== '/edu/login' ) {
@@ -71,12 +71,6 @@ export default function LoadingProvider({ children }: LoadingProviderProps) {
             return () => clearTimeout(timer);
         }
     }, [pathname]);
-
-    useEffect(() => {
-        if (pathname.startsWith('/edu/')) {
-            setIsLoading(!user);
-        }
-    }, [user, pathname]);
 
     const setLoading = (loading: boolean) => {
         setIsLoading(loading);

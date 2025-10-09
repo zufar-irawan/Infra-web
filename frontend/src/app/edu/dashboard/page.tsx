@@ -5,9 +5,17 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from "axios";
 import {User} from "@/app/api/me/route";
+import Swal from "sweetalert2";
+import TugasCard from "@/components/subComponents/forDashboard/tugasCard";
 
 export default function Dashboard() {
     const [user, setUser] = useState<User | null>(null)
+    const [tugasSelesai, setTugasSelesai] = useState<number | null>(null)
+    const [tugasTerbaru, setTugasTerbaru] = useState<number | null>(null)
+    const [totalUjian, setTotalUjian] = useState<number | null>(null)
+    const [ujianSelesai, setUjianSelesai] = useState<number | null>(null)
+
+    const [card, setCard] = useState<{value: number, tugas: string}[] | undefined>(undefined)
 
     const router = useRouter();
 
@@ -20,80 +28,92 @@ export default function Dashboard() {
                 console.error(e);
                 // Jika error 401/403 atau user tidak ditemukan, logout otomatis
                 if (e.response && (e.response.status === 401 || e.response.status === 403)) {
-                    handleLogout();
+                    await handleLogout();
                 }
             }
         }
+
+        const fetchAssignments = async () => {
+            try {
+                const res = await axios.get("/api/tugas");
+                const assignments = res.data.data;
+
+                // @ts-ignore
+                const tugasTerbaru = assignments.filter(assignment =>
+                    !assignment.submissions || assignment.submissions.length === 0
+                );
+
+                // @ts-ignore
+                const tugasSelesai = assignments.filter(assignment =>
+                    assignment.submissions && assignment.submissions.length > 0
+                );
+
+                setTugasSelesai(tugasSelesai.length);
+                setTugasTerbaru(tugasTerbaru.length);
+            } catch (e: any) {
+                console.error(e);
+            }
+        }
+
+        const fetchExams = async () => {
+            try {
+                const res = await axios.get("/api/exam-card");
+
+                const exams = res.data;
+                setTotalUjian(exams.totalExams);
+                setUjianSelesai(exams.completedExams);
+            } catch (e) {
+
+            }
+        }
+        //
+        fetchExams();
+        fetchAssignments();
         fetchUser();
     }, [])
 
-    const handleLogout = () => {
-        if (typeof window !== 'undefined') {
-            // Hapus token/cookie autentikasi jika ada
-            localStorage.removeItem('token'); // jika pakai token di localStorage
-            sessionStorage.removeItem('token'); // jika pakai sessionStorage
-            // Jika pakai cookie, bisa tambahkan kode hapus cookie di sini
-            // document.cookie = 'token=; Max-Age=0; path=/;';
-            router.push('/edu/login');
+    useEffect(() => {
+        if(tugasSelesai !== null && tugasTerbaru !== null && totalUjian !== null && ujianSelesai !== null){
+            setCard([
+                { value: tugasSelesai, tugas: "Tugas Selesai" },
+                { value: tugasTerbaru, tugas: "Tugas Pending" },
+                { value: ujianSelesai, tugas: "Ujian Selesai" },
+                { value: totalUjian - ujianSelesai, tugas: "Ujian Pending" },
+            ])
+        }
+    }, [tugasSelesai, tugasTerbaru, totalUjian, ujianSelesai]);
+
+    const handleLogout = async () => {
+        try {
+            const res = await axios.post("/api/logout");
+
+            if(res.status === 200){
+                router.push("/edu/login");
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil Logout',
+                    text: res.data.message,
+                    timer: 2000,
+                    showConfirmButton: false,
+                })
+            }
+
+        } catch (e:any) {
+            console.error(e)
         }
     };
-
-    useEffect(() => {
-        if(user) {
-            console.log(user)
-        }
-    }, [user]);
 
     return (
         <>
         { user?.role === 'siswa' && (
         <div className="overflow-y-auto min-h-screen">
-            <DashHeader />
+            <DashHeader user={user} />
             <section id="task" className="w-full grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-4 gap-4 p-4">
-                <div className="bg-white rounded-2xl p-4 shadow-md border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 flex items-center gap-2">
-                    <div className="w-12 h-12 bg-orange-500 rounded-lg flex items-center text-center text-white">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 w-full">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
-                        </svg>
-                    </div>
-                    <div>
-                        <h2 className="text-xl font-semibold">12</h2>
-                        <p className="text-sm text-black/60">Tugas Terbaru</p>
-                    </div>
-                </div>
-                <div className="bg-white rounded-2xl p-4 shadow-md border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 flex items-center gap-2">
-                    <div className="w-12 h-12 bg-orange-500 rounded-lg flex items-center text-center text-white">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 w-full">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
-                        </svg>
-                    </div>
-                    <div>
-                        <h2 className="text-xl font-semibold">6</h2>
-                        <p className="text-sm text-black/60">Tugas Selesai</p>
-                    </div>
-                </div>
-                <div className="bg-white rounded-2xl p-4 shadow-md border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 flex items-center gap-2">
-                    <div className="w-12 h-12 bg-orange-500 rounded-lg flex items-center text-center text-white">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 w-full">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
-                        </svg>
-                    </div>
-                    <div>
-                        <h2 className="text-xl font-semibold">3</h2>
-                        <p className="text-sm text-black/60">Total Ujian</p>
-                    </div>
-                </div>
-                <div className="bg-white rounded-2xl p-4 shadow-md border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 flex items-center gap-2">
-                    <div className="w-12 h-12 bg-orange-500 rounded-lg flex items-center text-center text-white">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 w-full">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
-                        </svg>
-                    </div>
-                    <div>
-                        <h2 className="text-xl font-semibold">9</h2>
-                        <p className="text-sm text-black/60">Ujian Selesai</p>
-                    </div>
-                </div>
+                { card ? (card.map((item, index) => (
+                    <TugasCard value={item.value} title={item.tugas} key={index} />
+                ))) : (
+                    <TugasCard value={0} title={"Loading..."} />
+                )}
             </section>
             <section id="statistic" className="w-full grid grid-cols-1 2xl:grid-cols-2 gap-4 p-4">
                 {/* TASK */}
@@ -170,7 +190,7 @@ export default function Dashboard() {
                                     </svg>
                                 </a>
                             </div>
-                        </div>                       
+                        </div>
                     </div>
                 </div>
                 {/* EXAM */}
@@ -179,7 +199,7 @@ export default function Dashboard() {
                         <h2 className="text-lg font-semibold">Ujian Terbaru</h2>
                         <p className="text-black/60 text-sm">Dimohon untuk selesaikan ujian anda dengan tepat waktu</p>
                     </div>
-                    
+
                     <div className="divide-y divide-black/10">
                         <div className="flex items-start sm:items-center justify-between py-4 gap-2">
                             <div className="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1">
@@ -190,7 +210,7 @@ export default function Dashboard() {
                                 <p className="text-xs text-orange-700">Sampai 12 Des 2025</p>
                             </div>
                             <div className="flex flex-col sm:flex-row items-center gap-2">
-                                
+
                                 <a href="" className="text-sm bg-orange-500 text-white px-3 py-2 rounded-sm flex items-center gap-1 hover:bg-orange-400 hover:shadow transition">
                                     Kerjakan
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3 h-3">
@@ -215,7 +235,7 @@ export default function Dashboard() {
                                     </svg>
                                 </a>
                             </div>
-                        </div>               
+                        </div>
                     </div>
                 </div>
             </section>

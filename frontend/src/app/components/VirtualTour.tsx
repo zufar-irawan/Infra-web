@@ -27,25 +27,26 @@ interface Scene {
 const VirtualTour = () => {
   const viewerContainer = useRef<HTMLDivElement>(null);
   const viewerInstance = useRef<Viewer | null>(null);
+  // Set scene1 sebagai default scene yang akan dimuat pertama kali
   const [currentScene, setCurrentScene] = useState('scene1');
 
   // Definisi scene-scene dalam tour
   const scenes: Scene[] = [
     {
       id: 'scene1',
-      panorama: 'https://photo-sphere-viewer-data.netlify.app/assets/sphere.jpg',
-      name: 'Ruang Tamu',
+      panorama: '/360/v360-1.jpg',
+      name: 'Lapangan',
       markers: [
         {
           id: 'marker1',
-          position: { yaw: '0deg', pitch: '0deg' },
+          position: { yaw: 0, pitch: 0 },
           html: '<div class="custom-marker">→</div>',
           tooltip: 'Ke Dapur',
           data: { targetScene: 'scene2' }
         },
         {
           id: 'info1',
-          position: { yaw: '1.5rad', pitch: '-0.3rad' },
+          position: { yaw: 1.5, pitch: -0.3 },
           html: '<div class="info-marker">ℹ️</div>',
           tooltip: 'Ruang tamu dengan pemandangan luas'
         }
@@ -53,19 +54,39 @@ const VirtualTour = () => {
     },
     {
       id: 'scene2',
-      panorama: 'https://photo-sphere-viewer-data.netlify.app/assets/sphere-test.jpg',
-      name: 'Dapur',
+      panorama: '/360/v360-2.jpg',
+      name: 'Indoor',
       markers: [
         {
           id: 'marker2',
-          position: { yaw: '3.14rad', pitch: '0deg' },
+          position: { yaw: 3.14, pitch: 0 },
           html: '<div class="custom-marker">←</div>',
           tooltip: 'Kembali ke Ruang Tamu',
           data: { targetScene: 'scene1' }
         },
         {
           id: 'info2',
-          position: { yaw: '0.5rad', pitch: '-0.2rad' },
+          position: { yaw: 0.5, pitch: -0.2 },
+          html: '<div class="info-marker">ℹ️</div>',
+          tooltip: 'Dapur modern dengan peralatan lengkap'
+        }
+      ]
+    },
+    {
+      id: 'scene3',
+      panorama: '/360/v360-3.jpg',
+      name: 'Kelas',
+      markers: [
+        {
+          id: 'marker3',
+          position: { yaw: 3.14, pitch: 0 },
+          html: '<div class="custom-marker">←</div>',
+          tooltip: 'Kembali ke Ruang Tamu',
+          data: { targetScene: 'scene1' }
+        },
+        {
+          id: 'info3',
+          position: { yaw: 0.5, pitch: -0.2 },
           html: '<div class="info-marker">ℹ️</div>',
           tooltip: 'Dapur modern dengan peralatan lengkap'
         }
@@ -76,13 +97,16 @@ const VirtualTour = () => {
   useEffect(() => {
     if (!viewerContainer.current) return;
 
-    // Inisialisasi viewer
+    // Pastikan scene1 sebagai default panorama yang akan dimuat pertama kali
+    const defaultScene = scenes.find(scene => scene.id === 'scene1') || scenes[0];
+    
+    // Inisialisasi viewer dengan scene1 (Lapangan) sebagai default scene
     const viewer = new Viewer({
       container: viewerContainer.current,
-      panorama: scenes[0].panorama,
+      panorama: defaultScene.panorama,
       plugins: [
         [MarkersPlugin, {
-          markers: scenes[0].markers
+          markers: defaultScene.markers
         }]
       ],
       navbar: [
@@ -91,7 +115,7 @@ const VirtualTour = () => {
         'fullscreen',
         {
           id: 'scene-info',
-          content: `<div style="padding: 0 10px; color: white;">${scenes[0].name}</div>`,
+          content: `<div style="padding: 0 10px; color: white;">${defaultScene.name}</div>`,
           className: 'scene-info-button'
         }
       ]
@@ -116,24 +140,27 @@ const VirtualTour = () => {
     const scene = scenes.find(s => s.id === sceneId);
     if (!scene || !viewerInstance.current) return;
 
+    // Update state terlebih dahulu untuk memastikan tombol aktif ter-update
+    setCurrentScene(sceneId);
+
     const viewer = viewerInstance.current;
     const markersPlugin = viewer.getPlugin(MarkersPlugin);
 
     // Update panorama
     viewer.setPanorama(scene.panorama).then(() => {
       // Clear dan update markers
-      markersPlugin?.clearMarkers();
-      scene.markers.forEach(marker => {
-        markersPlugin?.addMarker(marker);
-      });
+      if (markersPlugin && 'clearMarkers' in markersPlugin) {
+        (markersPlugin as any).clearMarkers();
+        scene.markers.forEach(marker => {
+          (markersPlugin as any).addMarker(marker);
+        });
+      }
 
       // Update navbar info
       const navbar = viewer.navbar.getButton('scene-info');
       if (navbar) {
-        navbar.content = `<div style="padding: 0 10px; color: white;">${scene.name}</div>`;
+        (navbar as any).content = `<div style="padding: 0 10px; color: white;">${scene.name}</div>`;
       }
-
-      setCurrentScene(sceneId);
     });
   };
 
@@ -193,17 +220,27 @@ const VirtualTour = () => {
           color: white;
           border-radius: 4px;
           cursor: pointer;
-          transition: all 0.3s;
+          transition: all 0.3s ease;
           font-size: 13px;
+          outline: none;
         }
 
         .scene-selector button:hover {
           background: rgba(255, 255, 255, 0.2);
+          transform: translateY(-1px);
         }
 
         .scene-selector button.active {
-          background: rgba(59, 130, 246, 0.8);
-          border-color: rgba(59, 130, 246, 1);
+          background: rgba(59, 130, 246, 0.9) !important;
+          border-color: rgba(59, 130, 246, 1) !important;
+          color: white !important;
+          font-weight: 600;
+          box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+        }
+
+        .scene-selector button.active:hover {
+          background: rgba(59, 130, 246, 1) !important;
+          transform: translateY(-1px);
         }
 
         :global(.custom-marker) {
