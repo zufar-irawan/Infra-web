@@ -98,10 +98,10 @@ export default function Header() {
                   name_id: "Kehidupan Siswa",
                   name_en: "Student Life",
                   submenu: [
-                    { href: "/prestasi", id: "Prestasi", en: "Achievements" },
-                    { href: "/ekstrakurikuler", id: "Ekstrakurikuler", en: "Extracurricular" },
-                    { href: "/penerimaan", id: "Penerimaan Siswa", en: "Admissions" },
-                    { href: "/testimoni", id: "Testimoni", en: "Testimonials" },
+                    { href: "/kehidupan-siswa/prestasi", id: "Prestasi", en: "Achievements" },
+                    { href: "/kehidupan-siswa/ekstrakurikuler", id: "Ekstrakurikuler", en: "Extracurricular" },
+                    { href: "/kehidupan-siswa/penerimaan", id: "Penerimaan Siswa", en: "Admissions" },
+                    { href: "/kehidupan-siswa/testimoni", id: "Testimoni", en: "Testimonials" },
                   ],
                 },
                 {
@@ -109,9 +109,9 @@ export default function Header() {
                   name_id: "Informasi",
                   name_en: "Information",
                   submenu: [
-                    { href: "/berita", id: "Berita", en: "News" },
-                    { href: "/kegiatan", id: "Kegiatan", en: "Events" },
-                    { href: "/faq", id: "FAQ", en: "FAQ" },
+                    { href: "/informasi/berita", id: "Berita", en: "News" },
+                    { href: "/informasi/kegiatan", id: "Kegiatan", en: "Events" },
+                    { href: "/informasi/faq", id: "FAQ", en: "FAQ" },
                   ],
                 },
               ].map((menu) =>
