@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@photo-sphere-viewer/autorotate-plugin": "^5.14.0",
     "@photo-sphere-viewer/core": "^5.14.0",
     "@photo-sphere-viewer/markers-plugin": "^5.14.0",
     "@radix-ui/react-avatar": "^1.1.10",
