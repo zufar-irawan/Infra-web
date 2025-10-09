@@ -4,9 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Viewer } from '@photo-sphere-viewer/core';
 import { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
 import { AutorotatePlugin } from '@photo-sphere-viewer/autorotate-plugin';
-// @ts-ignore
 import '@photo-sphere-viewer/core/index.css';
-// @ts-ignore 
 import '@photo-sphere-viewer/markers-plugin/index.css';
 
 interface Marker {
@@ -48,12 +46,6 @@ export default function VirtualTour360() {
           tooltip: 'Ke Indoor',
           data: { targetScene: 'scene2' },
         },
-        {
-          id: 'infoLapangan',
-          position: { yaw: 1.5, pitch: -0.3 },
-          html: '<div class="info-marker">ℹ️</div>',
-          tooltip: 'Lapangan luas dan asri',
-        },
       ],
     },
     {
@@ -91,12 +83,6 @@ export default function VirtualTour360() {
           tooltip: 'Kembali ke Indoor',
           data: { targetScene: 'scene2' },
         },
-        {
-          id: 'infoKelas',
-          position: { yaw: 0.5, pitch: -0.2 },
-          html: '<div class="info-marker">ℹ️</div>',
-          tooltip: 'Ruang kelas dengan fasilitas lengkap',
-        },
       ],
     },
   ];
@@ -110,7 +96,6 @@ export default function VirtualTour360() {
 
     const initializeViewer = () => {
       if (isInitialized.current || !viewerContainer.current) return;
-
       try {
         const viewer = new Viewer({
           container: viewerContainer.current,
@@ -147,7 +132,6 @@ export default function VirtualTour360() {
           loadScene('scene1');
           setIsLoading(false);
         });
-
       } catch (error) {
         console.error('Error initializing viewer:', error);
         setIsLoading(false);
@@ -164,39 +148,48 @@ export default function VirtualTour360() {
   }, []);
 
   const loadScene = (sceneId: string) => {
-    const scene = scenes.find(s => s.id === sceneId);
     const viewer = viewerRef.current;
-    if (!scene || !viewer) return;
+    const scene = scenes.find(s => s.id === sceneId);
+    if (!viewer || !scene) return;
     const markersPlugin = viewer.getPlugin(MarkersPlugin);
     if (markersPlugin) {
-      // @ts-ignore
       markersPlugin.clearMarkers();
-      // @ts-ignore
       scene.markers.forEach(m => markersPlugin.addMarker(m));
     }
   };
 
   const changeScene = async (sceneId: string) => {
-    const scene = scenes.find(s => s.id === sceneId);
     const viewer = viewerRef.current;
-    if (!scene || !viewer || currentScene === sceneId || isTransitioning) return;
+    const scene = scenes.find(s => s.id === sceneId);
+    if (!viewer || !scene || currentScene === sceneId || isTransitioning) return;
     setIsTransitioning(true);
 
-    try {
-      const autorotatePlugin = viewer.getPlugin(AutorotatePlugin);
-      // @ts-ignore
-      if (autorotatePlugin && autoRotate) autorotatePlugin.stop();
+    const autorotate = viewer.getPlugin(AutorotatePlugin);
+    if (autorotate && autoRotate) autorotate.stop();
 
+    try {
       await viewer.setPanorama(scene.panorama);
       setCurrentScene(sceneId);
       loadScene(sceneId);
-
-      // @ts-ignore
-      if (autorotatePlugin && autoRotate) setTimeout(() => autorotatePlugin.start(), 1000);
+      if (autorotate && autoRotate) setTimeout(() => autorotate.start(), 1000);
     } catch (error) {
-      console.error('Error changing scene:', error);
+      console.error(error);
     } finally {
       setTimeout(() => setIsTransitioning(false), 500);
+    }
+  };
+
+  const toggleAutoRotate = () => {
+    const viewer = viewerRef.current;
+    if (!viewer) return;
+    const autorotatePlugin = viewer.getPlugin(AutorotatePlugin);
+    if (!autorotatePlugin) return;
+    if (autoRotate) {
+      autorotatePlugin.stop();
+      setAutoRotate(false);
+    } else {
+      autorotatePlugin.start();
+      setAutoRotate(true);
     }
   };
 
@@ -223,7 +216,7 @@ export default function VirtualTour360() {
 
         {/* Transition Overlay */}
         {isTransitioning && (
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-40"></div>
+          <div className="absolute inset-0 \z-40 transition-opacity duration-300"></div>
         )}
 
         {/* Scene Info */}
@@ -243,12 +236,89 @@ export default function VirtualTour360() {
             </div>
           </div>
         )}
+
+        {/* Auto Rotate Button */}
+        {!isLoading && (
+          <div className="absolute top-6 right-6 z-30">
+            <button
+              onClick={toggleAutoRotate}
+              className={`bg-black/70 backdrop-blur-md rounded-full p-3 shadow-lg transition-all duration-300 hover:bg-black/80 ${
+                autoRotate ? 'ring-2 ring-orange-500' : ''
+              }`}
+            >
+              <svg
+                className={`w-6 h-6 transition-all duration-300 ${
+                  autoRotate ? 'text-orange-400 animate-spin-slow' : 'text-white/70'
+                }`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                />
+              </svg>
+            </button>
+          </div>
+        )}
+
+        {/* Navigation Panel */}
+        {!isLoading && (
+          <div className="absolute top-6 left-6 z-30">
+            <div className="bg-gradient-to-br from-[#1a0e00]/90 to-[#2b1600]/80 backdrop-blur-lg rounded-2xl p-5 shadow-2xl border border-orange-500/30">
+              <div className="flex items-center gap-2 mb-4">
+                <svg className="w-4 h-4 text-orange-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"/>
+                </svg>
+                <h3 className="text-orange-400 text-xs font-bold uppercase tracking-wider">Navigasi</h3>
+              </div>
+              <div className="flex flex-col gap-2">
+                {scenes.map((scene) => (
+                  <button
+                    key={scene.id}
+                    onClick={() => changeScene(scene.id)}
+                    disabled={isTransitioning}
+                    className={`relative px-5 py-3 rounded-xl text-sm font-semibold transition-all duration-300 overflow-hidden ${
+                      currentScene === scene.id
+                        ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg scale-105'
+                        : 'bg-white/5 text-orange-200 hover:bg-orange-500/10 hover:text-orange-100'
+                    }`}
+                  >
+                    <span className="flex items-center justify-between">
+                      {scene.name}
+                      {currentScene === scene.id && (
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path
+                            fillRule="evenodd"
+                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      )}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Global Styling */}
       <style jsx global>{`
         .psv-loader, .psv-loader-text {
           display: none !important;
+        }
+
+        @keyframes spin-slow {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+
+        .animate-spin-slow {
+          animation: spin-slow 3s linear infinite;
         }
 
         .custom-marker {
@@ -256,20 +326,20 @@ export default function VirtualTour360() {
           height: 50px !important;
           background: linear-gradient(135deg, #FE4D01, #FF7F32) !important;
           border-radius: 50% !important;
+          color: white !important;
+          font-size: 24px !important;
           display: flex !important;
           align-items: center !important;
           justify-content: center !important;
-          font-size: 24px !important;
-          color: white !important;
           cursor: pointer !important;
-          transition: all 0.3s ease !important;
           box-shadow: 0 10px 25px rgba(254,77,1,0.4) !important;
+          transition: all 0.3s ease !important;
           animation: pulse-marker 2s infinite !important;
         }
 
-        .custom-marker:hover {
-          transform: scale(1.25) rotate(10deg) !important;
-          box-shadow: 0 15px 40px rgba(255,127,50,0.7) !important;
+        @keyframes pulse-marker {
+          0%,100% { transform: scale(1); box-shadow: 0 0 15px rgba(254,77,1,0.4); }
+          50% { transform: scale(1.1); box-shadow: 0 0 30px rgba(255,127,50,0.6); }
         }
 
         .info-marker {
@@ -282,23 +352,12 @@ export default function VirtualTour360() {
           display: flex !important;
           align-items: center !important;
           justify-content: center !important;
-          transition: all 0.3s ease !important;
           box-shadow: 0 8px 25px rgba(255,150,0,0.5) !important;
+          transition: all 0.3s ease !important;
         }
 
         .info-marker:hover {
           transform: scale(1.2) rotate(360deg) !important;
-        }
-
-        @keyframes pulse-marker {
-          0%, 100% {
-            transform: scale(1);
-            box-shadow: 0 0 20px rgba(254,77,1,0.3);
-          }
-          50% {
-            transform: scale(1.1);
-            box-shadow: 0 0 30px rgba(255,127,50,0.6);
-          }
         }
 
         .psv-container {
