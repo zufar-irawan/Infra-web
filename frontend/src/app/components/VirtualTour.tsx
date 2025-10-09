@@ -33,8 +33,8 @@ const VirtualTour = () => {
   const scenes: Scene[] = [
     {
       id: 'scene1',
-      panorama: 'https://photo-sphere-viewer-data.netlify.app/assets/sphere.jpg',
-      name: 'Ruang Tamu',
+      panorama: '/360/v360-1.jpg',
+      name: 'Lapangan',
       markers: [
         {
           id: 'marker1',
@@ -53,8 +53,8 @@ const VirtualTour = () => {
     },
     {
       id: 'scene2',
-      panorama: 'https://photo-sphere-viewer-data.netlify.app/assets/sphere-test.jpg',
-      name: 'Dapur',
+      panorama: '/360/v360-2.jpg',
+      name: 'Indoor',
       markers: [
         {
           id: 'marker2',
@@ -65,6 +65,26 @@ const VirtualTour = () => {
         },
         {
           id: 'info2',
+          position: { yaw: '0.5rad', pitch: '-0.2rad' },
+          html: '<div class="info-marker">ℹ️</div>',
+          tooltip: 'Dapur modern dengan peralatan lengkap'
+        }
+      ]
+    },
+    {
+      id: 'scene3',
+      panorama: '/360/v360-3.jpg',
+      name: 'Kelas',
+      markers: [
+        {
+          id: 'marker3',
+          position: { yaw: '3.14rad', pitch: '0deg' },
+          html: '<div class="custom-marker">←</div>',
+          tooltip: 'Kembali ke Ruang Tamu',
+          data: { targetScene: 'scene1' }
+        },
+        {
+          id: 'info3',
           position: { yaw: '0.5rad', pitch: '-0.2rad' },
           html: '<div class="info-marker">ℹ️</div>',
           tooltip: 'Dapur modern dengan peralatan lengkap'
