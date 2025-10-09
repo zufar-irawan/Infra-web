@@ -1,10 +1,8 @@
 import {cookies} from "next/headers";
-import {NextRequest, NextResponse} from "next/server";
+import {NextResponse} from "next/server";
 import api from "@/app/lib/api";
 
-export async function GET(res: NextRequest) {
-    const { searchParams } = new URL(res.url);
-    const id = searchParams.get("id");
+export async function GET() {
     const cookieStore = cookies()
     //@ts-ignore
     const token = cookieStore.get("secure-auth-token")?.value;
@@ -12,7 +10,7 @@ export async function GET(res: NextRequest) {
     if(!token) return NextResponse.json({ error: "Token tidak ada!" }, { status: 401 });
 
     try {
-        const res = await api.get("/lms/students/" + id, {
+        const res = await api.get(`lms/students`, {
             headers : {
                 Authorization: `Bearer ${token}`
             }

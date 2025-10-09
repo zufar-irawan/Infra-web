@@ -36,12 +36,14 @@ export async function GET() {
             const totalExams = exams.length;
             // @ts-ignore
             const completedExams = exams.filter(exam => completedExamIds.has(exam.id)).length;
+            const uncompletedExams = exams.filter((exam: { id: number; }) => !completedExamIds.has(exam.id));
             const pendingExams = totalExams - completedExams;
 
             return NextResponse.json({
                 totalExams,
                 completedExams,
-                pendingExams
+                pendingExams,
+                uncompletedExams
             });
         }
     } catch (e) {

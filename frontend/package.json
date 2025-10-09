@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@photo-sphere-viewer/autorotate-plugin": "^5.14.0",
     "@photo-sphere-viewer/core": "^5.14.0",
     "@photo-sphere-viewer/markers-plugin": "^5.14.0",
     "@radix-ui/react-avatar": "^1.1.10",
@@ -22,6 +23,7 @@
     "@radix-ui/themes": "^3.2.1",
     "axios": "^1.12.2",
     "class-variance-authority": "^0.7.1",
+    "date-fns": "^4.1.0",
     "framer-motion": "^12.23.22",
     "lucide-react": "^0.544.0",
     "next": "15.5.3",
