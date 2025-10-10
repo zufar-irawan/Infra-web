@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('lms_devices', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->timestamps();
             $table->softDeletes();
             $table->string('name');
             $table->string('mode');
             $table->tinyInteger('is_active');
+            $table->timestamps();
         });
     }
 

@@ -30,7 +30,6 @@ use App\Http\Controllers\LmsExamResultController;
 use App\Http\Controllers\LmsExamQuestionController;
 use App\Http\Controllers\LmsAttendanceController;
 use App\Http\Controllers\LmsReportController;
-use App\Http\Controllers\LmsFinanceController;
 use App\Http\Controllers\LmsDeviceController;
 
 // --- PRESENCE SYSTEM ---
@@ -107,7 +106,8 @@ Route::prefix('lms')->group(function () {
         Route::apiResource('exam-questions', LmsExamQuestionController::class)->only(['index','store','show','update','destroy']);
 
         // Attendance
-        Route::apiResource('attendance', LmsAttendanceController::class)->only(['index','store','show']);
+        Route::apiResource('attendance', LmsAttendanceController::class);
+        Route::get('attendance-filter', [LmsAttendanceController::class, 'filter']);
 
         // LMS Device Management
         Route::apiResource('devices', LmsDeviceController::class);
@@ -116,6 +116,5 @@ Route::prefix('lms')->group(function () {
 
         // Reports & Finance
         Route::apiResource('reports', LmsReportController::class)->only(['index','store','show']);
-        Route::apiResource('finance', LmsFinanceController::class)->only(['index','store','show']);
     });
 });

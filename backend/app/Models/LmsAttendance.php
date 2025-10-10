@@ -9,8 +9,6 @@ class LmsAttendance extends Model
 {
     use HasFactory;
 
-    protected $table = 'lms_attendance';
-
     protected $fillable = [
         'class_id',
         'student_id',

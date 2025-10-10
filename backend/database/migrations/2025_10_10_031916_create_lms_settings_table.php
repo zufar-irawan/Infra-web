@@ -11,14 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('presence_classes', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+        Schema::create('lms_settings', function (Blueprint $table) {
+            $table->id();
+            $table->time('mulai_masuk_siswa')->nullable();
+            $table->time('jam_masuk_siswa')->nullable();
+            $table->time('jam_pulang_siswa')->nullable();
+            $table->time('batas_pulang_siswa')->nullable();
             $table->timestamps();
-            $table->softDeletes();
-            $table->string('nama');
-            $table->uuid('guru_id');
-
-            $table->foreign('guru_id')->references('id')->on('presence_teachers')->onDelete('cascade');
         });
     }
 
@@ -27,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('presence_classes');
+        Schema::dropIfExists('lms_settings');
     }
 };

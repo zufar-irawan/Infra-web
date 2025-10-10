@@ -6,10 +6,11 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Builder;
+use Spatie\Permission\Traits\HasRoles;
 
 class LmsUser extends Authenticatable
 {
-    use HasApiTokens, Notifiable;
+    use HasApiTokens, Notifiable, HasRoles;
 
     protected $table = 'lms_users';
 
@@ -24,6 +25,8 @@ class LmsUser extends Authenticatable
     protected $casts = [
         'password' => 'hashed',
     ];
+
+    protected $guard_name = 'lms_api';  
 
     public function student()
     {

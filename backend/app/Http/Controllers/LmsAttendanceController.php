@@ -2,27 +2,242 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\LmsAttendance;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class LmsAttendanceController extends Controller
 {
-    public function index()
+    /**
+     * Display a listing of attendance records.
+     */
+    public function index(Request $request)
     {
-        return response()->json(LmsAttendance::with(['class','student'])->paginate(15));
+        $user = auth('lms_api')->user();
+
+        // kalau bukan admin/guru → hanya tampilkan absensinya sendiri
+        if (!$user->hasRole(['admin', 'guru'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Access denied: only admin or guru can view all attendance records',
+            ], 403);
+        }
+
+        $attendances = LmsAttendance::with(['class', 'student'])->get();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'List of all attendance records',
+            'data'    => $attendances
+        ], 200);
     }
 
+    /**
+     * Store a newly created attendance record.
+     */
     public function store(Request $request)
     {
-        $request->validate([
-            'class_id' => 'required|exists:lms_classes,id',
-            'student_id' => 'required|exists:lms_students,id',
-            'date' => 'required|date',
-            'status' => 'required|in:hadir,izin,sakit,alpha',
+        $user = auth('lms_api')->user();
+
+        if (!$user->hasRole(['admin', 'guru'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Access denied: only admin or guru can create attendance records',
+            ], 403);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'class_id'           => 'required|exists:lms_classes,id',
+            'student_id'         => 'required|exists:lms_students,id',
+            'date'               => 'required|date',
+            'attendance_status'  => 'required|in:tidak_absen_masuk,tidak_absen_pulang,absen_masuk,absen_pulang',
+            'time_in'            => 'nullable|date_format:H:i',
+            'time_out'           => 'nullable|date_format:H:i',
+            'status'             => 'required|in:telat,tepat_waktu,sakit,izin,alfa',
+            'description'        => 'nullable|string',
         ]);
 
-        $attendance = LmsAttendance::create($request->all());
-        return response()->json($attendance, 201);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors'  => $validator->errors()
+            ], 422);
+        }
+
+        $attendance = LmsAttendance::create($request->only([
+            'class_id',
+            'student_id',
+            'date',
+            'attendance_status',
+            'time_in',
+            'time_out',
+            'status',
+            'description'
+        ]));
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Attendance record created successfully',
+            'data'    => $attendance
+        ], 201);
+    }
+
+    /**
+     * Display the specified attendance record.
+     */
+    public function show(Request $request, $id)
+    {
+        $user = auth('lms_api')->user();
+
+        if (!$user->hasRole(['admin', 'guru'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Access denied: only admin or guru can view attendance details',
+            ], 403);
+        }
+
+        $attendance = LmsAttendance::with(['class', 'student'])->find($id);
+
+        if (!$attendance) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Attendance record not found'
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Attendance record details',
+            'data'    => $attendance
+        ], 200);
+    }
+
+    /**
+     * Update the specified attendance record.
+     */
+    public function update(Request $request, $id)
+    {
+        $user = auth('lms_api')->user();
+
+        if (!$user->hasRole(['admin', 'guru'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Access denied: only admin or guru can update attendance records',
+            ], 403);
+        }
+
+        $attendance = LmsAttendance::find($id);
+
+        if (!$attendance) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Attendance record not found'
+            ], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'class_id'           => 'sometimes|required|exists:lms_classes,id',
+            'student_id'         => 'sometimes|required|exists:lms_students,id',
+            'date'               => 'sometimes|required|date',
+            'attendance_status'  => 'sometimes|required|in:tidak_absen_masuk,tidak_absen_pulang,absen_masuk,absen_pulang',
+            'time_in'            => 'nullable|date_format:H:i',
+            'time_out'           => 'nullable|date_format:H:i',
+            'status'             => 'sometimes|required|in:telat,tepat_waktu,sakit,izin,alfa',
+            'description'        => 'nullable|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors'  => $validator->errors()
+            ], 422);
+        }
+
+        $attendance->update($request->only([
+            'class_id',
+            'student_id',
+            'date',
+            'attendance_status',
+            'time_in',
+            'time_out',
+            'status',
+            'description'
+        ]));
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Attendance record updated successfully',
+            'data'    => $attendance
+        ], 200);
+    }
+
+    /**
+     * Remove the specified attendance record (soft delete).
+     */
+    public function destroy(Request $request, $id)
+    {
+        $user = auth('lms_api')->user();
+
+        if (!$user->hasRole(['admin', 'guru'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Access denied: only admin or guru can delete attendance records',
+            ], 403);
+        }
+
+        $attendance = LmsAttendance::find($id);
+
+        if (!$attendance) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Attendance record not found'
+            ], 404);
+        }
+
+        $attendance->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Attendance record deleted successfully'
+        ], 200);
+    }
+
+    /**
+     * Filter attendance by class, student, or date (optional endpoint).
+     */
+    public function filter(Request $request)
+    {
+        $user = auth('lms_api')->user();
+
+        if (!$user->hasRole(['admin', 'guru'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Access denied: only admin or guru can filter attendance records',
+            ], 403);
+        }
+
+        $query = LmsAttendance::with(['class', 'student']);
+
+        if ($request->has('class_id')) {
+            $query->where('class_id', $request->class_id);
+        }
+
+        if ($request->has('student_id')) {
+            $query->where('student_id', $request->student_id);
+        }
+
+        if ($request->has('date')) {
+            $query->whereDate('date', $request->date);
+        }
+
+        $result = $query->get();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Filtered attendance records',
+            'data'    => $result
+        ], 200);
     }
 }
