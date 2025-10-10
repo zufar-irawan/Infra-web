@@ -31,17 +31,8 @@ use App\Http\Controllers\LmsExamQuestionController;
 use App\Http\Controllers\LmsAttendanceController;
 use App\Http\Controllers\LmsReportController;
 use App\Http\Controllers\LmsDeviceController;
-
-// --- PRESENCE SYSTEM ---
-use App\Http\Controllers\PresenceApiController;
-use App\Http\Controllers\PresenceUserController;
-use App\Http\Controllers\PresenceSettingController as SettingController;
-use App\Http\Controllers\PresenceRfidController as RfidController;
-use App\Http\Controllers\PresenceClassController as KelasController;
-use App\Http\Controllers\PresenceTeacherController as GuruController;
-use App\Http\Controllers\PresenceDeviceController as DeviceController;
-use App\Http\Controllers\PresenceStudentController as SiswaController;
-use App\Http\Controllers\PresenceReportController as ReportController;
+use App\Http\Controllers\LmsSettingController;
+use App\Http\Controllers\LmsRfidController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -109,10 +100,16 @@ Route::prefix('lms')->group(function () {
         Route::apiResource('attendance', LmsAttendanceController::class);
         Route::get('attendance-filter', [LmsAttendanceController::class, 'filter']);
 
+        // RFID
+        Route::apiResource('rfid', LmsRfidController::class)->only(['index','destroy']);
+
         // LMS Device Management
         Route::apiResource('devices', LmsDeviceController::class);
         Route::patch('devices/{id}/toggle', [LmsDeviceController::class, 'toggleActive']);
         Route::patch('devices/{id}/mode', [LmsDeviceController::class, 'updateMode']);
+
+        // Settings
+        Route::apiResource('settings', LmsSettingController::class);
 
         // Reports & Finance
         Route::apiResource('reports', LmsReportController::class)->only(['index','store','show']);
