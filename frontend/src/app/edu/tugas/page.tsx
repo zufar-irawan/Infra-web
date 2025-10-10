@@ -16,6 +16,11 @@ export default function TugasSiswa() {
     const [tugas, setTugas] = useState<any>()
     const [currentIndex, setCurrentIndex] = useState(0)
 
+    // Search and filter states
+    const [searchQuery, setSearchQuery] = useState("")
+    const [filterMataPelajaran, setFilterMataPelajaran] = useState("all")
+    const [filterStatus, setFilterStatus] = useState("all")
+
     const router = useRouter();
 
     useEffect(() => {
@@ -103,9 +108,40 @@ export default function TugasSiswa() {
         }
     };
 
-    const [open1, setOpen1] = useState(true);
-    const [open2, setOpen2] = useState(true);
     const [openSubjects, setOpenSubjects] = useState<{ [key: string]: boolean }>({});
+
+    // Get unique mata pelajaran for filter dropdown
+    const getUniqueMataPelajaran = () => {
+        if (!tugas) return [];
+        const specializations = tugas.map((t: any) => t.teacher?.specialization || 'Mata Pelajaran Lain');
+        return [...new Set(specializations)];
+    };
+
+    // Filter tugas based on search query and filters
+    const getFilteredTugas = () => {
+        if (!tugas) return [];
+
+        return tugas.filter((item: any) => {
+            const specialization = item.teacher?.specialization || 'Mata Pelajaran Lain';
+            const isCompleted = item.submissions && item.submissions.length > 0;
+
+            // Search filter - search in mata pelajaran and title
+            const matchesSearch = searchQuery === "" ||
+                specialization.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                item.title.toLowerCase().includes(searchQuery.toLowerCase());
+
+            // Mata pelajaran filter
+            const matchesMataPelajaran = filterMataPelajaran === "all" ||
+                specialization === filterMataPelajaran;
+
+            // Status filter
+            const matchesStatus = filterStatus === "all" ||
+                (filterStatus === "selesai" && isCompleted) ||
+                (filterStatus === "belum" && !isCompleted);
+
+            return matchesSearch && matchesMataPelajaran && matchesStatus;
+        });
+    };
 
     return (
         <>
@@ -113,7 +149,6 @@ export default function TugasSiswa() {
         <div className="overflow-y-auto min-h-screen">
             <DashHeader user={user} student={student} />
 
-            {/* MAIN CONTENT - Flex layout responsive */}
             <div className="w-full p-4 flex flex-col lg:flex-row gap-4">
                 {/* TASK PENDING DETAILS */}
                 <div className="lg:flex-1 bg-white rounded-2xl p-4 shadow-md border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 flex flex-col gap-4 h-[200px]">
@@ -177,9 +212,9 @@ export default function TugasSiswa() {
                     </div>
                 </div>
 
-                {/* TASK COUNTS - Always side by side */}
+                {/* Jumlah tugas */}
                 <div className="w-full lg:w-auto lg:min-w-[400px] grid grid-cols-2 gap-4">
-                    {/* TASK COUNT - BELUM SELESAI */}
+                    {/* tugas belum selesai */}
                     <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 flex flex-col items-center justify-center text-center h-[200px]">
                         <div className="bg-red-100 p-3 rounded-full mb-4">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-8 h-8 text-red-600">
@@ -191,7 +226,7 @@ export default function TugasSiswa() {
                         <p className="text-xs text-gray-500 mt-1">Perlu dikerjakan</p>
                     </div>
 
-                    {/* TASK COUNT - SUDAH SELESAI */}
+                    {/* Tugas sudah selesai */}
                     <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 flex flex-col items-center justify-center text-center h-[200px]">
                         <div className="bg-green-100 p-3 rounded-full mb-4">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-8 h-8 text-green-600">
@@ -205,105 +240,201 @@ export default function TugasSiswa() {
                 </div>
             </div>
 
-            {/* LIST TUGAS - Per Mata Pelajaran dengan Dropdown */}
-            <section id="list-tugas" className="w-full grid grid-cols-1 gap-4 p-4">
-                {tugas && tugas.length > 0 ? (
-                    // Group tugas by specialization (mata pelajaran)
-                    Object.entries(
-                        tugas.reduce((acc: Record<string, any[]>, item: any) => {
-                            const specialization = item.teacher?.specialization || 'Mata Pelajaran Lain';
-                            if (!acc[specialization]) {
-                                acc[specialization] = [];
-                            }
-                            acc[specialization].push(item);
-                            return acc;
-                        }, {})
-                    ).map(([specialization, tugasList]) => (
-                        <div key={specialization} className="bg-white rounded-2xl p-4 shadow-md border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 flex flex-col gap-4">
-                            <div
-                                className="flex items-center justify-between cursor-pointer"
-                                onClick={() => setOpenSubjects(prev => ({
-                                    ...prev,
-                                    [specialization]: !prev[specialization]
-                                }))}
-                            >
-                                <div>
-                                    <h2 className="text-lg font-semibold">{specialization}</h2>
-                                    <p className="text-black/60 text-sm">{
-                                        // @ts-ignore
-                                        tugasList.length} Tugas • {tugasList[0]?.teacher?.user?.name || 'Guru'
-                                    }</p>
-                                </div>
-                                <span
-                                    className="p-1 rounded hover:bg-gray-100 transition"
-                                    aria-label={openSubjects[specialization] ? "Tutup" : "Buka"}
-                                >
-                                    {openSubjects[specialization] ?
-                                        <ChevronUp className="w-5 h-5" /> :
-                                        <ChevronDown className="w-5 h-5" />
-                                    }
-                                </span>
+            {/*Search & filter*/}
+            <section className="w-full px-4 pb-4">
+                <div className="bg-white rounded-2xl p-4 shadow-md border border-gray-100">
+                    <div className="flex flex-col sm:flex-row gap-4 items-center">
+                        {/* Search Bar */}
+                        <div className="relative flex-1 w-full">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-gray-400">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                                </svg>
                             </div>
+                            <input
+                                type="text"
+                                placeholder="Cari berdasarkan mata pelajaran atau judul tugas..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 text-sm"
+                            />
+                        </div>
 
-                            {openSubjects[specialization] && (
-                                <div className="divide-y divide-black/10 transition-all duration-300">
-                                    { // @ts-ignore
-                                        tugasList.map((item) => (
-                                        <div key={item.id} className="flex items-start sm:items-center justify-between py-4 gap-2">
-                                            <div className="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1">
-                                                <div>
-                                                    <h3 className="font-medium">{item.title}</h3>
-                                                    <p className="text-black/60 text-sm">
-                                                        Deadline: {new Date(item.deadline).toLocaleDateString('id-ID', {
-                                                            day: '2-digit',
-                                                            month: 'long',
-                                                            year: 'numeric'
-                                                        })}
+                        {/* Filter Mata Pelajaran */}
+                        <div className="w-full sm:w-auto">
+                            <select
+                                value={filterMataPelajaran}
+                                onChange={(e) => setFilterMataPelajaran(e.target.value)}
+                                className="w-full sm:w-48 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 text-sm bg-white"
+                            >
+                                <option value="all">Semua Mata Pelajaran</option>
+                                {getUniqueMataPelajaran().map((mataPelajaran) => (
+                                    // @ts-ignore
+                                    <option key={mataPelajaran} value={mataPelajaran}>
+                                        {/* @ts-ignore */}
+                                        { mataPelajaran }
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Filter Status */}
+                        <div className="w-full sm:w-auto">
+                            <select
+                                value={filterStatus}
+                                onChange={(e) => setFilterStatus(e.target.value)}
+                                className="w-full sm:w-40 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 text-sm bg-white"
+                            >
+                                <option value="all">Semua Status</option>
+                                <option value="belum">Belum Dikerjakan</option>
+                                <option value="selesai">Sudah Selesai</option>
+                            </select>
+                        </div>
+
+                        {/* Clear Filters Button */}
+                        {(searchQuery !== "" || filterMataPelajaran !== "all" || filterStatus !== "all") && (
+                            <button
+                                onClick={() => {
+                                    setSearchQuery("");
+                                    setFilterMataPelajaran("all");
+                                    setFilterStatus("all");
+                                }}
+                                className="w-full sm:w-auto px-4 py-3 bg-gray-100 text-gray-600 rounded-xl hover:bg-gray-200 transition-colors duration-200 text-sm font-medium flex items-center justify-center gap-2"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                </svg>
+                                Reset
+                            </button>
+                        )}
+                    </div>
+                </div>
+            </section>
+
+            {/* List tugas */}
+            <section id="list-tugas" className="w-full grid grid-cols-1 gap-4 p-4">
+                {(() => {
+                    const filteredTugas = getFilteredTugas();
+                    return filteredTugas && filteredTugas.length > 0 ? (
+                        // Group filtered tugas by specialization (mata pelajaran)
+                        Object.entries(
+                            filteredTugas.reduce((acc: Record<string, any[]>, item: any) => {
+                                const specialization = item.teacher?.specialization || 'Mata Pelajaran Lain';
+                                if (!acc[specialization]) {
+                                    acc[specialization] = [];
+                                }
+                                acc[specialization].push(item);
+                                return acc;
+                            }, {})
+                        ).map(([specialization, tugasList]) => (
+                            <div key={specialization} className="bg-white rounded-2xl p-4 shadow-md border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 flex flex-col gap-4">
+                                <div
+                                    className="flex items-center justify-between cursor-pointer"
+                                    onClick={() => setOpenSubjects(prev => ({
+                                        ...prev,
+                                        [specialization]: !prev[specialization]
+                                    }))}
+                                >
+                                    <div>
+                                        <h2 className="text-lg font-semibold">{specialization}</h2>
+                                        <p className="text-black/60 text-sm">{
+                                            // @ts-ignore
+                                            tugasList.length} Tugas • {tugasList[0]?.teacher?.user?.name || 'Guru'
+                                        }</p>
+                                    </div>
+                                    <span
+                                        className="p-1 rounded hover:bg-gray-100 transition"
+                                        aria-label={openSubjects[specialization] ? "Tutup" : "Buka"}
+                                    >
+                                        {openSubjects[specialization] ?
+                                            <ChevronUp className="w-5 h-5" /> :
+                                            <ChevronDown className="w-5 h-5" />
+                                        }
+                                    </span>
+                                </div>
+
+                                {openSubjects[specialization] && (
+                                    <div className="divide-y divide-black/10 transition-all duration-300">
+                                        { // @ts-ignore
+                                            tugasList.map((item) => (
+                                            <div key={item.id} className="flex items-start sm:items-center justify-between py-4 gap-2">
+                                                <div className="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1">
+                                                    <div>
+                                                        <h3 className="font-medium">{item.title}</h3>
+                                                        <p className="text-black/60 text-sm">
+                                                            Deadline: {new Date(item.deadline).toLocaleDateString('id-ID', {
+                                                                day: '2-digit',
+                                                                month: 'long',
+                                                                year: 'numeric'
+                                                            })}
+                                                        </p>
+                                                    </div>
+                                                    <p className={`text-xs ${
+                                                        item.submissions && item.submissions.length > 0 
+                                                            ? "text-emerald-600" 
+                                                            : "text-orange-700"
+                                                    }`}>
+                                                        {item.submissions && item.submissions.length > 0
+                                                            ? "Selesai"
+                                                            : "Belum dikerjakan"
+                                                        }
                                                     </p>
                                                 </div>
-                                                <p className={`text-xs ${
-                                                    item.submissions && item.submissions.length > 0 
-                                                        ? "text-emerald-600" 
-                                                        : "text-orange-700"
-                                                }`}>
-                                                    {item.submissions && item.submissions.length > 0
-                                                        ? "Selesai"
-                                                        : "Belum dikerjakan"
-                                                    }
-                                                </p>
+                                                <div className="flex flex-col sm:flex-row items-center gap-2">
+                                                    {item.submissions && item.submissions.length > 0 ? (
+                                                        <a href="#" className="text-sm bg-emerald-400 text-white px-3 py-2 rounded-sm flex items-center gap-1 hover:bg-emerald-300 hover:shadow transition">
+                                                            Selesai
+                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3 h-3">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                                            </svg>
+                                                        </a>
+                                                    ) : (
+                                                        <a href="#" className="text-sm bg-orange-500 text-white px-3 py-2 rounded-sm flex items-center gap-1 hover:bg-orange-400 hover:shadow transition">
+                                                            Kerjakan
+                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
+                                                            </svg>
+                                                        </a>
+                                                    )}
+                                                </div>
                                             </div>
-                                            <div className="flex flex-col sm:flex-row items-center gap-2">
-                                                {item.submissions && item.submissions.length > 0 ? (
-                                                    <a href="#" className="text-sm bg-emerald-400 text-white px-3 py-2 rounded-sm flex items-center gap-1 hover:bg-emerald-300 hover:shadow transition">
-                                                        Selesai
-                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3 h-3">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                                                        </svg>
-                                                    </a>
-                                                ) : (
-                                                    <a href="#" className="text-sm bg-orange-500 text-white px-3 py-2 rounded-sm flex items-center gap-1 hover:bg-orange-400 hover:shadow transition">
-                                                        Kerjakan
-                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
-                                                        </svg>
-                                                    </a>
-                                                )}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        ))
+                    ) : (
+                        <div className="w-full flex flex-col items-center justify-center py-8 bg-gray-50 rounded-xl border border-dashed border-orange-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-12 h-12 text-orange-400 mb-3">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                            </svg>
+                            <h3 className="text-lg font-semibold text-orange-600 mb-1">
+                                {(searchQuery !== "" || filterMataPelajaran !== "all" || filterStatus !== "all")
+                                    ? "Tidak ada tugas yang sesuai filter"
+                                    : "Tidak ada tugas tersedia"
+                                }
+                            </h3>
+                            <p className="text-black/60 text-sm text-center max-w-md">
+                                {(searchQuery !== "" || filterMataPelajaran !== "all" || filterStatus !== "all")
+                                    ? "Coba ubah kata kunci pencarian atau filter untuk melihat tugas lainnya"
+                                    : "Silakan cek kembali nanti untuk tugas yang baru"
+                                }
+                            </p>
+                            {(searchQuery !== "" || filterMataPelajaran !== "all" || filterStatus !== "all") && (
+                                <button
+                                    onClick={() => {
+                                        setSearchQuery("");
+                                        setFilterMataPelajaran("all");
+                                        setFilterStatus("all");
+                                    }}
+                                    className="mt-3 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors duration-200 text-sm font-medium"
+                                >
+                                    Reset Filter
+                                </button>
                             )}
                         </div>
-                    ))
-                ) : (
-                    <div className="w-full flex flex-col items-center justify-center py-4 bg-gray-50 rounded-xl border border-dashed border-orange-200">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 text-orange-400 mb-1">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                        </svg>
-                        <h3 className="text-sm font-semibold text-orange-600 mb-0.5">Tidak ada tugas tersedia</h3>
-                        <p className="text-black/60 text-xs">Silakan cek kembali nanti</p>
-                    </div>
-                )}
+                    );
+                })()}
             </section>
         </div>
         )}

@@ -38,12 +38,15 @@ export async function GET() {
             const completedExams = exams.filter(exam => completedExamIds.has(exam.id)).length;
             const uncompletedExams = exams.filter((exam: { id: number; }) => !completedExamIds.has(exam.id));
             const pendingExams = totalExams - completedExams;
+            const selesaiExams = exams.filter((exam: { id: number; }) => completedExamIds.has(exam.id))
 
             return NextResponse.json({
                 totalExams,
                 completedExams,
                 pendingExams,
-                uncompletedExams
+                selesaiExams,
+                uncompletedExams,
+                exams
             });
         }
     } catch (e) {
