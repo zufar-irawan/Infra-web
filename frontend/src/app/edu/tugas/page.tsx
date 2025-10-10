@@ -13,6 +13,7 @@ export default function TugasSiswa() {
     const [student, setStudent] = useState<any>()
     const [tugasPending, setTugasPending] = useState<any>()
     const [tugasSelesai, setTugasSelesai] = useState<any>()
+    const [currentIndex, setCurrentIndex] = useState(0)
 
     const router = useRouter();
 
@@ -90,6 +91,11 @@ export default function TugasSiswa() {
         fetchTugas();
     }, [student]);
 
+    // Reset carousel index when tugasPending changes
+    useEffect(() => {
+        setCurrentIndex(0);
+    }, [tugasPending]);
+
     const handleLogout = async () => {
         await axios.post("/api/logout")
             .then(res => {
@@ -102,6 +108,19 @@ export default function TugasSiswa() {
             })
     };
 
+    // Carousel functions
+    const nextSlide = () => {
+        if (tugasPending && tugasPending.length > 0) {
+            setCurrentIndex((prev) => (prev + 1) % tugasPending.length);
+        }
+    };
+
+    const prevSlide = () => {
+        if (tugasPending && tugasPending.length > 0) {
+            setCurrentIndex((prev) => (prev - 1 + tugasPending.length) % tugasPending.length);
+        }
+    };
+
     const [open1, setOpen1] = useState(true);
     const [open2, setOpen2] = useState(true);
 
@@ -110,56 +129,94 @@ export default function TugasSiswa() {
         {user?.role === 'siswa' && (
         <div className="overflow-y-auto min-h-screen">
             <DashHeader user={user} student={student} />
-            <section id="mapel-main-data" className="w-full grid grid-cols-1 2xl:grid-cols-2 gap-4 p-4">
-                {/* TASK */}
-                <div className="bg-white rounded-2xl p-4 shadow-md border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 flex flex-col gap-4">
-                    <div>
-                        <h2 className="text-lg font-semibold">Tugas Belum Dikerjakan</h2>
-                        <p className="text-black/60 text-sm">Daftar tugas belum dikerjakan anda</p>
-                    </div>
-
-                    <div className="divide-y divide-black/10">
-
-                        { tugasPending && tugasPending.length > 0 ? (
-                            tugasPending.map((item: any, index: number) => (
-                                <TugasPending tugas={item} key={index} />
-                            ))
-                        ) : (
-                            <div className="flex flex-col items-center justify-center py-8 bg-gray-50 rounded-xl border border-dashed border-orange-200">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-12 h-12 text-orange-400 mb-2">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                                </svg>
-                                <h3 className="text-lg font-semibold text-orange-600 mb-1">Semua tugas sudah selesai!</h3>
-                                <p className="text-black/60 text-sm">Tidak ada tugas pending. Pertahankan prestasimu!</p>
+            {/* TASK PENDING DETAILS - Full width on all screens */}
+            <section className="w-full p-4">
+                <div className="2xl:col-span-2 bg-white rounded-2xl p-4 shadow-md border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 flex flex-col gap-4 h-[200px]">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h2 className="text-lg font-semibold">Tugas Belum Dikerjakan</h2>
+                            <p className="text-black/60 text-sm">Daftar tugas belum dikerjakan anda</p>
+                        </div>
+                        {tugasPending && tugasPending.length > 1 && (
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={prevSlide}
+                                    className="p-1 rounded-full hover:bg-gray-100 transition-colors"
+                                    disabled={tugasPending.length <= 1}
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                                    </svg>
+                                </button>
+                                <span className="text-xs text-gray-500">
+                                    {currentIndex + 1} / {tugasPending.length}
+                                </span>
+                                <button
+                                    onClick={nextSlide}
+                                    className="p-1 rounded-full hover:bg-gray-100 transition-colors"
+                                    disabled={tugasPending.length <= 1}
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                                    </svg>
+                                </button>
                             </div>
                         )}
+                    </div>
 
+                    <div className="flex-1 flex items-center">
+                        {tugasPending && tugasPending.length > 0 ? (
+                            <div className="w-full overflow-hidden">
+                                <div
+                                    className="flex transition-transform duration-300 ease-in-out"
+                                    style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+                                >
+                                    {tugasPending.map((item: any, index: number) => (
+                                        <div key={index} className="w-full flex-shrink-0">
+                                            <div className="border-t border-black/10 pt-4">
+                                                <TugasPending tugas={item} />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="w-full flex flex-col items-center justify-center py-4 bg-gray-50 rounded-xl border border-dashed border-orange-200 h-[80px]">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 text-orange-400 mb-1">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                </svg>
+                                <h3 className="text-sm font-semibold text-orange-600 mb-0.5">Semua tugas sudah selesai!</h3>
+                                <p className="text-black/60 text-xs">Tidak ada tugas pending. Pertahankan prestasimu!</p>
+                            </div>
+                        )}
                     </div>
                 </div>
+            </section>
 
-                <div className="bg-white rounded-2xl p-4 shadow-md border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 flex flex-col gap-4">
-                    <div>
-                        <h2 className="text-lg font-semibold">Tugas Selesai</h2>
-                        <p className="text-black/60 text-sm">Daftar tugas selesai anda</p>
+            {/* TASK COUNTS - Always side by side */}
+            <section className="w-full grid grid-cols-2 gap-4 px-4 pb-4">
+                {/* TASK COUNT - BELUM SELESAI */}
+                <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 flex flex-col items-center justify-center text-center h-[200px]">
+                    <div className="bg-red-100 p-3 rounded-full mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-8 h-8 text-red-600">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                        </svg>
                     </div>
+                    <h3 className="text-3xl font-bold text-red-600 mb-2">{tugasPending ? tugasPending.length : 0}</h3>
+                    <p className="text-sm font-medium text-gray-700">Tugas Belum Selesai</p>
+                    <p className="text-xs text-gray-500 mt-1">Perlu dikerjakan</p>
+                </div>
 
-                    <div className="divide-y divide-black/10">
-
-                        { tugasSelesai && tugasSelesai.length > 0 ? (
-                            tugasSelesai.map((item: any, index: number) => (
-                                <TugasPending tugas={item} key={index} />
-                            ))
-                        ) : (
-                            <div className="flex flex-col items-center justify-center py-8 bg-gray-50 rounded-xl border border-dashed border-orange-200">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-12 h-12 text-orange-400 mb-2">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                                </svg>
-                                <h3 className="text-lg font-semibold text-orange-600 mb-1">Semua tugas sudah selesai!</h3>
-                                <p className="text-black/60 text-sm">Tidak ada tugas pending. Pertahankan prestasimu!</p>
-                            </div>
-                        )}
+                {/* TASK COUNT - SUDAH SELESAI */}
+                <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 flex flex-col items-center justify-center text-center h-[200px]">
+                    <div className="bg-green-100 p-3 rounded-full mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-8 h-8 text-green-600">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                        </svg>
                     </div>
-
+                    <h3 className="text-3xl font-bold text-green-600 mb-2">{tugasSelesai ? tugasSelesai.length : 0}</h3>
+                    <p className="text-sm font-medium text-gray-700">Tugas Sudah Selesai</p>
+                    <p className="text-xs text-gray-500 mt-1">Sudah dikumpulkan</p>
                 </div>
             </section>
             <section id="mapel-math" className="w-full grid grid-cols-1 gap-4 p-4 cursor-pointer" onClick={() => setOpen1((prev) => !prev)}>
