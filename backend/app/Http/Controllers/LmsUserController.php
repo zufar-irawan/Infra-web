@@ -51,7 +51,7 @@ class LmsUserController extends Controller
         ]);
 
         // Ambil user dari tabel lms_users
-        $user = \App\Models\LmsUser::where('email', $data['email'])->first();
+        $user = LmsUser::where('email', $data['email'])->first();
 
         if (!$user || !Hash::check($data['password'], $user->password)) {
             return response()->json(
