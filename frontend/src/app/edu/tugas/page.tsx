@@ -13,83 +13,65 @@ export default function TugasSiswa() {
     const [student, setStudent] = useState<any>()
     const [tugasPending, setTugasPending] = useState<any>()
     const [tugasSelesai, setTugasSelesai] = useState<any>()
+    const [tugas, setTugas] = useState<any>()
     const [currentIndex, setCurrentIndex] = useState(0)
 
     const router = useRouter();
 
-    // fetch user
     useEffect(() => {
-        const fetchUser = async () => {
+        const fetchAll = async () => {
             try {
-                const res = await axios.get("/api/me");
-                setUser(res.data.user);
-            } catch (e: any){
+                // Fetch current user
+                const meRes = await axios.get("/api/me");
+                const userData = meRes.data.user;
+                setUser(userData);
+
+                // Fetch student data
+                const studentRes = await axios.get("/api/student");
+                const studentList = studentRes.data.data;
+                const studentMe = studentList.find(
+                    (s: any) => s.user_id === userData.id
+                );
+                if (!studentMe) return;
+                setStudent(studentMe);
+
+                // Fetch tugas for student's class
+                const tugasRes = await axios.get("/api/tugas");
+                const tugasList = tugasRes.data.data.filter(
+                    (t: any) => t.class_id === studentMe.class.id
+                );
+
+                // Fetch teachers and merge with tugas
+                const teacherRes = await axios.get("/api/teachers");
+                const teachers = teacherRes.data;
+                const tugasWithTeacher = tugasList.map((t: any) => {
+                    const teacher = teachers.find((g: any) => g.id === t.created_by);
+                    return { ...t, teacher };
+                });
+
+                // Separate pending and completed
+                const belumSelesai = tugasWithTeacher.filter(
+                    (t: any) => !t.submissions || t.submissions.length === 0
+                );
+                const sudahSelesai = tugasWithTeacher.filter(
+                    (t: any) => t.submissions && t.submissions.length > 0
+                );
+
+                // Set states once after all data fetched
+                console.log(tugasWithTeacher);
+                setTugas(tugasWithTeacher);
+                setTugasPending(belumSelesai);
+                setTugasSelesai(sudahSelesai);
+            } catch (e: any) {
                 console.error(e);
-                // Jika error 401/403 atau user tidak ditemukan, logout otomatis
                 if (e.response && (e.response.status === 401 || e.response.status === 403)) {
                     handleLogout();
                 }
             }
-        }
-        fetchUser();
-    }, [])
+        };
 
-    // fetch student
-    useEffect(() => {
-        if(!user) return
-
-        const fetchStudent = async() => {
-            await axios.get('/api/student')
-                .then(res => {
-                    if(res.status === 200) {
-                        const data = res.data.data
-                        const studentme = data.find((s: any) => s.user_id === user.id)
-                        setStudent(studentme)
-                        console.log(studentme)
-                    }
-                })
-                .catch(err => {
-                    console.error(err);
-                })
-        }
-
-        fetchStudent();
-
-    }, [user]);
-
-    // fetch tugas
-    useEffect(() => {
-        if(!student) return
-
-        const fetchTugas = async() => {
-            await axios.get('/api/tugas')
-                .then(res => {
-                    if(res.status === 200) {
-                        const data = res.data.data
-                        const tugas = data.filter((s: { class_id: any; }) => s.class_id === student.class.id);
-
-                        // @ts-ignore
-                        const tugasBelumSelesai = tugas.filter(assignment =>
-                            !assignment.submissions || assignment.submissions.length === 0
-                        );
-
-                        // @ts-ignore
-                        const tugasSelesai = tugas.filter(assignment =>
-                            assignment.submissions && assignment.submissions.length > 0
-                        );
-
-                        setTugasPending(tugasBelumSelesai)
-                        setTugasSelesai(tugasSelesai)
-
-                    }
-                })
-                .catch(err => {
-                    console.error(err);
-                })
-        }
-
-        fetchTugas();
-    }, [student]);
+        fetchAll();
+    }, []);
 
     // Reset carousel index when tugasPending changes
     useEffect(() => {
@@ -123,15 +105,18 @@ export default function TugasSiswa() {
 
     const [open1, setOpen1] = useState(true);
     const [open2, setOpen2] = useState(true);
+    const [openSubjects, setOpenSubjects] = useState<{ [key: string]: boolean }>({});
 
     return (
         <>
         {user?.role === 'siswa' && (
         <div className="overflow-y-auto min-h-screen">
             <DashHeader user={user} student={student} />
-            {/* TASK PENDING DETAILS - Full width on all screens */}
-            <section className="w-full p-4">
-                <div className="2xl:col-span-2 bg-white rounded-2xl p-4 shadow-md border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 flex flex-col gap-4 h-[200px]">
+
+            {/* MAIN CONTENT - Flex layout responsive */}
+            <div className="w-full p-4 flex flex-col lg:flex-row gap-4">
+                {/* TASK PENDING DETAILS */}
+                <div className="lg:flex-1 bg-white rounded-2xl p-4 shadow-md border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 flex flex-col gap-4 h-[200px]">
                     <div className="flex items-center justify-between">
                         <div>
                             <h2 className="text-lg font-semibold">Tugas Belum Dikerjakan</h2>
@@ -191,142 +176,134 @@ export default function TugasSiswa() {
                         )}
                     </div>
                 </div>
-            </section>
 
-            {/* TASK COUNTS - Always side by side */}
-            <section className="w-full grid grid-cols-2 gap-4 px-4 pb-4">
-                {/* TASK COUNT - BELUM SELESAI */}
-                <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 flex flex-col items-center justify-center text-center h-[200px]">
-                    <div className="bg-red-100 p-3 rounded-full mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-8 h-8 text-red-600">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                {/* TASK COUNTS - Always side by side */}
+                <div className="w-full lg:w-auto lg:min-w-[400px] grid grid-cols-2 gap-4">
+                    {/* TASK COUNT - BELUM SELESAI */}
+                    <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 flex flex-col items-center justify-center text-center h-[200px]">
+                        <div className="bg-red-100 p-3 rounded-full mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-8 h-8 text-red-600">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            </svg>
+                        </div>
+                        <h3 className="text-3xl font-bold text-red-600 mb-2">{tugasPending ? tugasPending.length : 0}</h3>
+                        <p className="text-sm font-medium text-gray-700">Tugas Belum Selesai</p>
+                        <p className="text-xs text-gray-500 mt-1">Perlu dikerjakan</p>
+                    </div>
+
+                    {/* TASK COUNT - SUDAH SELESAI */}
+                    <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 flex flex-col items-center justify-center text-center h-[200px]">
+                        <div className="bg-green-100 p-3 rounded-full mb-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-8 h-8 text-green-600">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            </svg>
+                        </div>
+                        <h3 className="text-3xl font-bold text-green-600 mb-2">{tugasSelesai ? tugasSelesai.length : 0}</h3>
+                        <p className="text-sm font-medium text-gray-700">Tugas Sudah Selesai</p>
+                        <p className="text-xs text-gray-500 mt-1">Sudah dikumpulkan</p>
+                    </div>
+                </div>
+            </div>
+
+            {/* LIST TUGAS - Per Mata Pelajaran dengan Dropdown */}
+            <section id="list-tugas" className="w-full grid grid-cols-1 gap-4 p-4">
+                {tugas && tugas.length > 0 ? (
+                    // Group tugas by specialization (mata pelajaran)
+                    Object.entries(
+                        tugas.reduce((acc: Record<string, any[]>, item: any) => {
+                            const specialization = item.teacher?.specialization || 'Mata Pelajaran Lain';
+                            if (!acc[specialization]) {
+                                acc[specialization] = [];
+                            }
+                            acc[specialization].push(item);
+                            return acc;
+                        }, {})
+                    ).map(([specialization, tugasList]) => (
+                        <div key={specialization} className="bg-white rounded-2xl p-4 shadow-md border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 flex flex-col gap-4">
+                            <div
+                                className="flex items-center justify-between cursor-pointer"
+                                onClick={() => setOpenSubjects(prev => ({
+                                    ...prev,
+                                    [specialization]: !prev[specialization]
+                                }))}
+                            >
+                                <div>
+                                    <h2 className="text-lg font-semibold">{specialization}</h2>
+                                    <p className="text-black/60 text-sm">{
+                                        // @ts-ignore
+                                        tugasList.length} Tugas • {tugasList[0]?.teacher?.user?.name || 'Guru'
+                                    }</p>
+                                </div>
+                                <span
+                                    className="p-1 rounded hover:bg-gray-100 transition"
+                                    aria-label={openSubjects[specialization] ? "Tutup" : "Buka"}
+                                >
+                                    {openSubjects[specialization] ?
+                                        <ChevronUp className="w-5 h-5" /> :
+                                        <ChevronDown className="w-5 h-5" />
+                                    }
+                                </span>
+                            </div>
+
+                            {openSubjects[specialization] && (
+                                <div className="divide-y divide-black/10 transition-all duration-300">
+                                    { // @ts-ignore
+                                        tugasList.map((item) => (
+                                        <div key={item.id} className="flex items-start sm:items-center justify-between py-4 gap-2">
+                                            <div className="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1">
+                                                <div>
+                                                    <h3 className="font-medium">{item.title}</h3>
+                                                    <p className="text-black/60 text-sm">
+                                                        Deadline: {new Date(item.deadline).toLocaleDateString('id-ID', {
+                                                            day: '2-digit',
+                                                            month: 'long',
+                                                            year: 'numeric'
+                                                        })}
+                                                    </p>
+                                                </div>
+                                                <p className={`text-xs ${
+                                                    item.submissions && item.submissions.length > 0 
+                                                        ? "text-emerald-600" 
+                                                        : "text-orange-700"
+                                                }`}>
+                                                    {item.submissions && item.submissions.length > 0
+                                                        ? "Selesai"
+                                                        : "Belum dikerjakan"
+                                                    }
+                                                </p>
+                                            </div>
+                                            <div className="flex flex-col sm:flex-row items-center gap-2">
+                                                {item.submissions && item.submissions.length > 0 ? (
+                                                    <a href="#" className="text-sm bg-emerald-400 text-white px-3 py-2 rounded-sm flex items-center gap-1 hover:bg-emerald-300 hover:shadow transition">
+                                                        Selesai
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3 h-3">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                                        </svg>
+                                                    </a>
+                                                ) : (
+                                                    <a href="#" className="text-sm bg-orange-500 text-white px-3 py-2 rounded-sm flex items-center gap-1 hover:bg-orange-400 hover:shadow transition">
+                                                        Kerjakan
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
+                                                        </svg>
+                                                    </a>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    ))
+                ) : (
+                    <div className="w-full flex flex-col items-center justify-center py-4 bg-gray-50 rounded-xl border border-dashed border-orange-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 text-orange-400 mb-1">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                         </svg>
+                        <h3 className="text-sm font-semibold text-orange-600 mb-0.5">Tidak ada tugas tersedia</h3>
+                        <p className="text-black/60 text-xs">Silakan cek kembali nanti</p>
                     </div>
-                    <h3 className="text-3xl font-bold text-red-600 mb-2">{tugasPending ? tugasPending.length : 0}</h3>
-                    <p className="text-sm font-medium text-gray-700">Tugas Belum Selesai</p>
-                    <p className="text-xs text-gray-500 mt-1">Perlu dikerjakan</p>
-                </div>
-
-                {/* TASK COUNT - SUDAH SELESAI */}
-                <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 flex flex-col items-center justify-center text-center h-[200px]">
-                    <div className="bg-green-100 p-3 rounded-full mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-8 h-8 text-green-600">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                        </svg>
-                    </div>
-                    <h3 className="text-3xl font-bold text-green-600 mb-2">{tugasSelesai ? tugasSelesai.length : 0}</h3>
-                    <p className="text-sm font-medium text-gray-700">Tugas Sudah Selesai</p>
-                    <p className="text-xs text-gray-500 mt-1">Sudah dikumpulkan</p>
-                </div>
-            </section>
-            <section id="mapel-math" className="w-full grid grid-cols-1 gap-4 p-4 cursor-pointer" onClick={() => setOpen1((prev) => !prev)}>
-                <div className="bg-white rounded-2xl p-4 shadow-md border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 flex flex-col gap-4">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <h2 className="text-lg font-semibold">Matematika</h2>
-                            <p className="text-black/60 text-sm">XII DKV 1 &middot; John Doe, S.Pd.</p>
-                        </div>
-                        <span
-                            className="p-1 rounded hover:bg-gray-100 transition"
-                            aria-label={open1 ? "Tutup" : "Buka"}
-                        >
-                            {open1 ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-                        </span>
-                    </div>
-                    {open1 && (
-                        <div className="divide-y divide-black/10 transition-all duration-300">
-                            <div className="flex items-start sm:items-center justify-between py-4 gap-2">
-                                <div className="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1">
-                                    <div>
-                                        <h3>PENGAYAAN MATEMATIKA</h3>
-                                        <p className="text-black/60 text-sm">25 Nov 2025 - 9 Des 2025</p>
-                                    </div>
-                                    <p className="text-xs text-orange-700">Belum dikerjakan</p>
-                                </div>
-                                <div className="flex flex-col sm:flex-row items-center gap-2">
-                                    <a href="" className="text-sm bg-orange-500 text-white px-3 py-2 rounded-sm flex items-center gap-1 hover:bg-orange-400 hover:shadow transition">
-                                        Kerjakan
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3 h-3">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
-                                        </svg>
-                                    </a>
-                                </div>
-                            </div>
-
-                            <div className="flex items-start sm:items-center justify-between py-4 gap-2">
-                                <div className="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1">
-                                    <div>
-                                        <h3>ASESMEN FORMATIF 5 MATEMATIKA</h3>
-                                        <p className="text-black/60 text-sm">13 Nov 2025 - 22 Des 2025</p>
-                                    </div>
-                                    <p className="text-xs text-orange-700">Selesai tepat waktu</p>
-                                </div>
-                                <div className="flex flex-col sm:flex-row items-center gap-2">
-                                    <a href="" className="text-sm bg-emerald-400 text-white px-3 py-2 rounded-sm flex items-center gap-1 hover:bg-emerald-300 hover:shadow transition">
-                                        Selesai
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3 h-3">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                                        </svg>
-                                    </a>
-                                </div>
-                            </div>
-                            <div className="flex items-start sm:items-center justify-between py-4 gap-2">
-                                <div className="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1">
-                                    <div>
-                                        <h3>ASESMEN FORMATIF 4 MATEMATIKA</h3>
-                                        <p className="text-black/60 text-sm">13 Nov 2025 - 22 Des 2025</p>
-                                    </div>
-                                    <p className="text-xs text-orange-700">Selesai diluar waktu</p>
-                                </div>
-                                <div className="flex flex-col sm:flex-row items-center gap-2">
-                                    <a href="" className="text-sm bg-emerald-400 text-white px-3 py-2 rounded-sm flex items-center gap-1 hover:bg-emerald-300 hover:shadow transition">
-                                        Selesai
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3 h-3">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                                        </svg>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            </section>
-            <section id="mapel-pkk" className="w-full grid grid-cols-1 gap-4 p-4 cursor-pointer" onClick={() => setOpen2((prev) => !prev)}>
-                <div className="bg-white rounded-2xl p-4 shadow-md border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 flex flex-col gap-4">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <h2 className="text-lg font-semibold">Bahasa Inggris</h2>
-                            <p className="text-black/60 text-sm">XII DKV 1 &middot; Jane Doe, S.S.</p>
-                        </div>
-                        <span
-                            className="p-1 rounded hover:bg-gray-100 transition"
-                            aria-label={open2 ? "Tutup" : "Buka"}
-                        >
-                            {open2 ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-                        </span>
-                    </div>
-                    {open2 && (
-                        <div className="divide-y divide-black/10 transition-all duration-300">
-                            <div className="flex items-start sm:items-center justify-between py-4 gap-2">
-                                <div className="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1">
-                                    <div>
-                                        <h3>PENGAYAAN ENGLISH</h3>
-                                        <p className="text-black/60 text-sm">25 Nov 2025 - 9 Des 2025</p>
-                                    </div>
-                                    <p className="text-xs text-orange-700">Selesai tepat waktu</p>
-                                </div>
-                                <div className="flex flex-col sm:flex-row items-center gap-2">
-                                    <a href="" className="text-sm bg-emerald-400 text-white px-3 py-2 rounded-sm flex items-center gap-1 hover:bg-emerald-300 hover:shadow transition">
-                                        Selesai
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3 h-3">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                                        </svg>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                </div>
+                )}
             </section>
         </div>
         )}
