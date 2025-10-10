@@ -5,8 +5,13 @@ import { Mail, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+import axios from "axios";
 
 const MySwal = withReactContent(Swal);
+
+// ✅ gunakan satu sumber URL (dari .env.local)
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
 export default function SecureLoginPage() {
   const [email, setEmail] = useState("");
@@ -15,6 +20,7 @@ export default function SecureLoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!email.trim()) {
       MySwal.fire({
         icon: "warning",
@@ -28,29 +34,63 @@ export default function SecureLoginPage() {
     }
 
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+
+    try {
+      // ✅ panggil endpoint Laravel
+      const res = await axios.post(`${API_BASE_URL}/auth/request-code`, {
+        email,
+      });
+
+      if (res.data.success) {
+        MySwal.fire({
+          icon: "success",
+          title: "Kode Verifikasi Dikirim!",
+          html: `<p class="text-sm text-gray-200">Kami telah mengirimkan kode 6 digit ke <b>${email}</b>.</p>`,
+          confirmButtonText: "Verifikasi Sekarang",
+          confirmButtonColor: "#FE4D01",
+          background: "#1e2b63",
+          color: "#fff",
+        }).then(() => {
+          sessionStorage.setItem("verifyEmail", email);
+          router.push(`/portal/verify?email=${encodeURIComponent(email)}`);
+        });
+      } else {
+        MySwal.fire({
+          icon: "error",
+          title: "Gagal Mengirim!",
+          text:
+            res.data.message ||
+            "Terjadi kesalahan saat mengirim kode verifikasi.",
+          confirmButtonColor: "#FE4D01",
+          background: "#1e2b63",
+          color: "#fff",
+        });
+      }
+    } catch (error: any) {
+      console.error("Login error:", error);
       MySwal.fire({
-        icon: "success",
-        title: "Kode Verifikasi Dikirim!",
-        html: `<p class="text-sm text-gray-200">Kami telah mengirimkan kode 6 digit ke <b>${email}</b>.</p>`,
-        confirmButtonText: "Verifikasi Sekarang",
+        icon: "error",
+        title: "Gagal Terhubung ke Server",
+        text:
+          error.response?.data?.message ||
+          "Pastikan backend Laravel kamu sedang berjalan dan CORS sudah diaktifkan.",
         confirmButtonColor: "#FE4D01",
         background: "#1e2b63",
         color: "#fff",
-      }).then(() => {
-        sessionStorage.setItem("verifyEmail", email);
-        router.push("/portal/verify");
       });
-    }, 1200);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-[#243771] relative">
+      {/* background gradasi */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#243771] via-[#1e2b63] to-[#111b45]" />
       <div className="absolute w-[400px] h-[400px] bg-[#FE4D01]/20 rounded-full blur-[120px] -top-20 -left-20" />
       <div className="absolute w-[300px] h-[300px] bg-[#FE4D01]/10 rounded-full blur-[100px] bottom-0 right-0" />
 
+      {/* card login */}
       <div className="relative z-10 bg-white/10 backdrop-blur-xl border border-white/10 rounded-2xl p-8 sm:p-10 w-[90%] max-w-md shadow-[0_8px_30px_rgba(0,0,0,0.4)] animate-fadeIn">
         <div className="text-center mb-8">
           <img

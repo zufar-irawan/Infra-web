@@ -1,104 +1,116 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Swal from "sweetalert2";
-import withReactContent from "sweetalert2-react-content";
-import { useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
+import { Loader2, Lock, ChevronLeft } from "lucide-react";
 
-const MySwal = withReactContent(Swal);
-
-export default function VerifyPage() {
+export default function VerifyCodePage() {
   const router = useRouter();
-  const [code, setCode] = useState<string[]>(Array(6).fill(""));
-  const inputs = useRef<(HTMLInputElement | null)[]>([]);
+  const searchParams = useSearchParams();
+  const emailFromParam = searchParams.get("email") || "";
+
+  const [email, setEmail] = useState(emailFromParam);
+  const [code, setCode] = useState(["", "", "", "", "", ""]);
   const [loading, setLoading] = useState(false);
-  const email = typeof window !== "undefined" ? sessionStorage.getItem("verifyEmail") : "";
 
-  // pindah fokus otomatis
-  const handleChange = (value: string, index: number) => {
-    if (!/^\d*$/.test(value)) return;
+  // Handle input per-digit
+  const handleChange = (val: string, index: number) => {
+    if (!/^\d?$/.test(val)) return;
     const newCode = [...code];
-    newCode[index] = value;
+    newCode[index] = val;
     setCode(newCode);
-
-    if (value && index < 5) inputs.current[index + 1]?.focus();
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
-    if (e.key === "Backspace" && !code[index] && index > 0) {
-      inputs.current[index - 1]?.focus();
+    if (val && index < 5) {
+      document.getElementById(`code-${index + 1}`)?.focus();
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const fullCode = code.join("");
 
-    if (fullCode.length < 6) {
-      MySwal.fire({
-        icon: "warning",
-        title: "Kode belum lengkap!",
-        text: "Masukkan 6 digit kode verifikasi.",
-        confirmButtonColor: "#FE4D01",
-        background: "#1e2b63",
-        color: "#fff",
-      });
+    const fullCode = code.join("");
+    if (fullCode.length !== 6) {
+      Swal.fire("Kode Tidak Lengkap", "Masukkan 6 digit kode verifikasi.", "warning");
       return;
     }
 
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      MySwal.fire({
-        icon: "success",
-        title: "Verifikasi Berhasil!",
-        html: `<p class="text-sm text-gray-200">Selamat datang, <b>${email}</b>.</p>`,
-        confirmButtonColor: "#FE4D01",
-        background: "#1e2b63",
-        color: "#fff",
-      }).then(() => {
-        router.push("/portal/dashboard");
+
+    try {
+      const res = await fetch("http://localhost:8000/api/auth/verify-code", {
+        method: "POST",
+        mode: "cors", // penting untuk komunikasi antar-origin
+        credentials: "include", // penting jika kamu pakai Sanctum atau cookies
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, code: fullCode }),
       });
-    }, 1000);
+
+      let data;
+      try {
+        data = await res.json();
+      } catch {
+        throw new Error("Server tidak merespons dengan format JSON (kemungkinan CORS)");
+      }
+
+      if (!res.ok) {
+        Swal.fire("Gagal", data.message || "Verifikasi gagal.", "error");
+      } else {
+        Swal.fire({
+          title: "Berhasil!",
+          text: "Kode verifikasi benar. Anda akan diarahkan ke dashboard.",
+          icon: "success",
+          showConfirmButton: false,
+          timer: 2000,
+        });
+        localStorage.setItem("admin_token", data.token);
+        router.push("/portal/dashboard");
+      }
+    } catch (err: any) {
+      Swal.fire("Kesalahan", err.message || "Tidak dapat terhubung ke server.", "error");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  useEffect(() => {
-    inputs.current[0]?.focus();
-  }, []);
-
   return (
-    <main className="min-h-screen flex items-center justify-center bg-[#243771] relative">
-      <div className="absolute inset-0 bg-gradient-to-br from-[#243771] via-[#1e2b63] to-[#111b45]" />
-      <div className="absolute w-[400px] h-[400px] bg-[#FE4D01]/20 rounded-full blur-[120px] -top-20 -left-20" />
-      <div className="absolute w-[300px] h-[300px] bg-[#FE4D01]/10 rounded-full blur-[100px] bottom-0 right-0" />
+    <main className="min-h-screen flex items-center justify-center bg-[#243771] relative overflow-hidden">
+      {/* Background Glow */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#243771] via-[#1e2b63] to-[#111b45]"></div>
+      <div className="absolute w-[400px] h-[400px] bg-[#FE4D01]/20 rounded-full blur-[120px] -top-20 -left-20"></div>
+      <div className="absolute w-[300px] h-[300px] bg-[#FE4D01]/10 rounded-full blur-[100px] bottom-0 right-0"></div>
 
-      <div className="relative z-10 bg-white/10 backdrop-blur-xl border border-white/10 rounded-2xl p-8 sm:p-10 w-[90%] max-w-md shadow-[0_8px_30px_rgba(0,0,0,0.4)] animate-fadeIn text-center">
-        <img
-          src="/webp/smk.webp"
-          alt="SMK Prestasi Prima"
-          className="w-16 h-16 mx-auto mb-4 drop-shadow-lg"
-        />
-        <h1 className="text-2xl font-bold text-white mb-2">
-          Verifikasi Kode
-        </h1>
-        <p className="text-white/70 text-sm mb-6">
-          Masukkan 6 digit kode yang dikirim ke <br />
-          <span className="text-[#FE4D01] font-medium">{email}</span>
-        </p>
+      {/* Card */}
+      <div className="relative z-10 bg-white/10 backdrop-blur-xl border border-white/10 rounded-2xl p-8 sm:p-10 w-[90%] max-w-md shadow-[0_8px_30px_rgba(0,0,0,0.4)] text-center">
+        <button
+          onClick={() => router.push("/portal/login")}
+          className="absolute left-6 top-6 text-white/70 hover:text-white transition"
+        >
+          <ChevronLeft size={22} />
+        </button>
+
+        <div className="flex flex-col items-center mb-8">
+          <Lock size={46} className="text-[#FE4D01] mb-3" />
+          <h1 className="text-2xl font-bold text-white mb-1">Verifikasi Kode</h1>
+          <p className="text-white/70 text-sm max-w-xs">
+            Masukkan 6 digit kode yang dikirim ke <br />
+            <span className="text-[#FE4D01] font-semibold">{email}</span>
+          </p>
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="flex justify-between gap-2">
+          <div className="flex justify-center gap-3 sm:gap-4">
             {code.map((num, i) => (
               <input
                 key={i}
-                ref={(el) => (inputs.current[i] = el)}
+                id={`code-${i}`}
                 type="text"
                 maxLength={1}
                 value={num}
                 onChange={(e) => handleChange(e.target.value, i)}
-                onKeyDown={(e) => handleKeyDown(e, i)}
-                className="w-10 h-12 sm:w-12 sm:h-14 text-center text-xl font-bold text-white bg-white/20 border border-white/20 rounded-md focus:ring-2 focus:ring-[#FE4D01] outline-none transition"
+                className="w-10 h-12 sm:w-12 sm:h-14 rounded-md bg-white/20 text-white text-center text-lg sm:text-2xl font-semibold 
+                focus:ring-2 focus:ring-[#FE4D01] outline-none transition-all"
               />
             ))}
           </div>
@@ -112,7 +124,7 @@ export default function VerifyPage() {
           >
             {loading ? (
               <>
-                <Loader2 size={18} className="animate-spin" /> Memverifikasi...
+                <Loader2 size={18} className="animate-spin" /> Verifikasi...
               </>
             ) : (
               "Verifikasi Sekarang"
@@ -120,8 +132,15 @@ export default function VerifyPage() {
           </button>
         </form>
 
-        <p className="text-xs text-center text-white/50 mt-8">
-          © {new Date().getFullYear()} SMK Prestasi Prima • Secure Portal
+        <p className="text-xs text-white/50 mt-8">
+          Tidak menerima email?{" "}
+          <button
+            type="button"
+            onClick={() => router.push("/portal/login")}
+            className="text-[#FE4D01] hover:underline"
+          >
+            Kirim ulang kode
+          </button>
         </p>
       </div>
     </main>
