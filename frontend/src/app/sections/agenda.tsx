@@ -51,7 +51,7 @@ export default function Agenda() {
   return (
     <section
       id="agenda"
-      className="py-20 bg-[#1e2a5e] relative overflow-hidden flex flex-col items-center justify-center"
+      className="py-20 bg-[#243771] relative overflow-hidden flex flex-col items-center justify-center"
     >
       <div className="container mx-auto px-6 md:px-12 lg:px-20 text-center relative z-10">
         {/* Title */}

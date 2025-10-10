@@ -46,7 +46,7 @@ export default function Ekstrakurikuler() {
             </Link>
             <span className="text-[#FE4D01]">{">"}</span>
             <Link
-              href="/kehidupan-siswa"
+              href="/kehidupan-siswa/ekstrakurikuler"
               className="text-[#FE4D01] hover:underline"
             >
               {lang === "id" ? "Kehidupan Siswa" : "Student Life"}
