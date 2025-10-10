@@ -3,20 +3,19 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useLang } from "../../components/LangContext";
+import { useEffect, useState } from "react"; // 🟢 Tambahan integrasi backend
 
 export default function Berita() {
   const { lang } = useLang();
 
-  // === Data Berita (contoh) ===
-  const beritaList = [
+  // === Data Berita (contoh lokal / fallback) ===
+  const beritaListStatic = [
     {
       id: 1,
       date_id: "17 Agustus 2025",
       date_en: "August 17, 2025",
-      title_id:
-        "Upacara HUT RI 80 di Lapangan Utama SMK Prestasi Prima",
-      title_en:
-        "Independence Day Ceremony at SMK Prestasi Prima Main Field",
+      title_id: "Upacara HUT RI 80 di Lapangan Utama SMK Prestasi Prima",
+      title_en: "Independence Day Ceremony at SMK Prestasi Prima Main Field",
       desc_id:
         "SMK Prestasi Prima hari ini menggelar upacara memperingati HUT ke-80 Kemerdekaan Republik Indonesia. Acara yang dilaksanakan dengan khidmat...",
       desc_en:
@@ -30,8 +29,7 @@ export default function Berita() {
       date_en: "September 22, 2025",
       title_id:
         "Bandtols Wakili Sekolah Prestasi Prima di Ajang Awesome Skool Fest",
-      title_en:
-        "Bandtols Represents SMK Prestasi Prima at Awesome Skool Fest",
+      title_en: "Bandtols Represents SMK Prestasi Prima at Awesome Skool Fest",
       desc_id:
         "Bandtols, grup musik kebanggaan sekolah, sukses memukau penonton dan mengharumkan nama sekolah...",
       desc_en:
@@ -43,13 +41,11 @@ export default function Berita() {
       id: 3,
       date_id: "19 Agustus 2025",
       date_en: "August 19, 2025",
-      title_id:
-        "Skrining Kesehatan Siswa Siswi Kelas 10 SMK Prestasi Prima",
+      title_id: "Skrining Kesehatan Siswa Siswi Kelas 10 SMK Prestasi Prima",
       title_en: "Health Screening for Grade 10 Students",
       desc_id:
         "Upaya memastikan peserta didik baru memiliki kondisi fisik dan mental optimal...",
-      desc_en:
-        "An effort to ensure new students are physically and mentally fit...",
+      desc_en: "An effort to ensure new students are physically and mentally fit...",
       img: "/berita/3.jpg",
       href: "#",
     },
@@ -61,8 +57,7 @@ export default function Berita() {
       title_en: "ANBK Implementation for AY 2025–2026",
       desc_id:
         "Asesmen Nasional Berbasis Komputer diselenggarakan di laboratorium sekolah...",
-      desc_en:
-        "The Computer-Based National Assessment was held in the school’s labs...",
+      desc_en: "The Computer-Based National Assessment was held in the school’s labs...",
       img: "/berita/4.jpg",
       href: "#",
     },
@@ -70,10 +65,8 @@ export default function Berita() {
       id: 5,
       date_id: "29 Juli 2025",
       date_en: "July 29, 2025",
-      title_id:
-        "Lulusan SMK Prestasi Prima Melangkah PTN Melalui Jalur Mandiri",
-      title_en:
-        "Graduates Admitted to Public Universities via Independent Track",
+      title_id: "Lulusan SMK Prestasi Prima Melangkah PTN Melalui Jalur Mandiri",
+      title_en: "Graduates Admitted to Public Universities via Independent Track",
       desc_id:
         "Banyak alumni berhasil menembus PTN melalui jalur mandiri dengan prestasi membanggakan...",
       desc_en:
@@ -95,6 +88,42 @@ export default function Berita() {
       href: "#",
     },
   ];
+
+  // 🟢 State dinamis dari backend
+  const [beritaList, setBeritaList] = useState(beritaListStatic);
+  const [isBackendActive, setIsBackendActive] = useState(false);
+
+  // 🟢 Coba ambil data dari backend Laravel
+  useEffect(() => {
+    const fetchBerita = async () => {
+      try {
+        const res = await fetch("http://127.0.0.1:8000/api/news");
+        if (!res.ok) throw new Error("API error");
+        const data = await res.json();
+
+        if (Array.isArray(data) && data.length > 0) {
+          setBeritaList(
+            data.map((b) => ({
+              id: b.id,
+              date_id: new Date(b.date).toLocaleDateString("id-ID"),
+              date_en: new Date(b.date).toLocaleDateString("en-US"),
+              title_id: b.title_id,
+              title_en: b.title_en,
+              desc_id: b.desc_id,
+              desc_en: b.desc_en,
+              img: b.image ?? "/placeholder-news.jpg",
+              href: `/informasi/berita/${b.id}`,
+            }))
+          );
+          setIsBackendActive(true);
+        }
+      } catch (error) {
+        console.warn("⚠️ Backend Laravel belum aktif, pakai data statis.");
+      }
+    };
+
+    fetchBerita();
+  }, []);
 
   return (
     <>
@@ -125,13 +154,12 @@ export default function Berita() {
 
       {/* === Konten Utama === */}
       <main className="flex-1 w-full bg-white">
-        {/* === Section Intro dengan Dekorasi Kotak (tetap) === */}
+        {/* === Section Intro === */}
         <section className="relative w-full bg-white">
-          {/* Dekorasi kotak: pertahankan posisi custom via inline style */}
-          <div className="absolute bottom-0 right-0 w-[50px] h-[50px] bg-[#FE4D01] hidden sm:block"/>
-          <div className="absolute bottom-12.5 right-12.5 w-[50px] h-[50px] bg-[#FE4D01] hidden sm:block"/>
-          <div className="absolute bottom-25 right-12.5 w-[50px] h-[50px] bg-[#243771] hidden sm:block"/>
-          <div className="absolute bottom-37.5 right-0 w-[50px] h-[50px] bg-[#243771] hidden sm:block"/>
+          <div className="absolute bottom-0 right-0 w-[50px] h-[50px] bg-[#FE4D01] hidden sm:block" />
+          <div className="absolute bottom-12.5 right-12.5 w-[50px] h-[50px] bg-[#FE4D01] hidden sm:block" />
+          <div className="absolute bottom-25 right-12.5 w-[50px] h-[50px] bg-[#243771] hidden sm:block" />
+          <div className="absolute bottom-37.5 right-0 w-[50px] h-[50px] bg-[#243771] hidden sm:block" />
 
           <div className="max-w-6xl mx-auto px-4 pt-16 pb-24">
             <h2 className="text-3xl sm:text-4xl font-semibold text-[#243771] text-center mb-12">
@@ -155,12 +183,19 @@ export default function Berita() {
                     ? "Telusuri berita terbaru untuk mendapatkan informasi terkini tentang kegiatan, prestasi, dan inovasi di SMK Prestasi Prima. Dari acara kampus hingga penghargaan nasional, semuanya kami sajikan untuk Anda."
                     : "Explore the latest news to stay updated on SMK Prestasi Prima’s activities, achievements, and innovations—from campus events to national awards."}
                 </p>
+
+                {/* 🟢 Tambahan indikator backend */}
+                <p className="text-sm text-gray-500">
+                  {isBackendActive
+                    ? "✅ Data diambil dari server Laravel."
+                    : "⚠️ Menampilkan data statis (backend belum aktif)."}
+                </p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* === Section Berita Terbaru (card mirip referensi) === */}
+        {/* === Section Berita Terbaru === */}
         <section className="w-full bg-white py-10 sm:py-16">
           <div className="container mx-auto px-6">
             <h2 className="text-3xl md:text-4xl font-bold text-center text-[#243771] mb-10">
@@ -173,7 +208,6 @@ export default function Berita() {
                   key={b.id}
                   className="bg-white rounded-2xl border border-gray-200 shadow-[0_10px_24px_rgba(17,24,32,0.06)] hover:shadow-[0_14px_32px_rgba(17,24,32,0.12)] transition-all duration-300 overflow-hidden"
                 >
-                  {/* Gambar atas */}
                   <div className="relative w-full h-48 md:h-52">
                     <Image
                       src={b.img}
@@ -184,7 +218,6 @@ export default function Berita() {
                     />
                   </div>
 
-                  {/* Isi card */}
                   <div className="p-4 md:p-5">
                     <p className="text-xs md:text-sm font-semibold text-[#FE4D01] mb-2">
                       {lang === "id" ? b.date_id : b.date_en}
@@ -199,7 +232,7 @@ export default function Berita() {
                     </p>
 
                     <Link
-                      href={b.href}
+                      href={`/informasi/berita/${b.id}`}
                       className="inline-block text-[13px] md:text-sm font-semibold text-[#FE4D01] hover:underline"
                     >
                       {lang === "id" ? "Baca Selengkapnya..." : "Read More..."}
@@ -211,7 +244,7 @@ export default function Berita() {
           </div>
         </section>
 
-        {/* === Section Gedung (warna & gaya konsisten) === */}
+        {/* === Section Gedung === */}
         <section className="relative w-full bg-white overflow-hidden">
           <img
             src="/avif/gedung.avif"
