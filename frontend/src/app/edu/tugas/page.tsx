@@ -272,8 +272,10 @@ export default function TugasSiswa() {
                             >
                                 <option value="all">Semua Mata Pelajaran</option>
                                 {getUniqueMataPelajaran().map((mataPelajaran) => (
+                                    // @ts-ignore
                                     <option key={mataPelajaran} value={mataPelajaran}>
-                                        {mataPelajaran}
+                                        {/* @ts-ignore */}
+                                        { mataPelajaran }
                                     </option>
                                 ))}
                             </select>
