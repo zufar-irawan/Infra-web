@@ -18,6 +18,7 @@ class LmsStudent extends Model
         'class_id',
         'guardian_name',
         'guardian_contact',
+        'rfid_id',
         'enrollment_date',
         'status'
     ];
@@ -35,5 +36,10 @@ class LmsStudent extends Model
     public function classStudents()
     {
         return $this->hasMany(LmsClassStudent::class, 'student_id');
+    }
+
+    public function rfid()
+    {
+        return $this->belongsTo(LmsRfid::class, 'rfid_id');
     }
 }

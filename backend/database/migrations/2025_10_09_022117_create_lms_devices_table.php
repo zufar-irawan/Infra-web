@@ -12,8 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('lms_devices', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->timestamps();
+            $table->softDeletes();
+            $table->string('name');
+            $table->string('mode');
+            $table->tinyInteger('is_active');
         });
     }
 

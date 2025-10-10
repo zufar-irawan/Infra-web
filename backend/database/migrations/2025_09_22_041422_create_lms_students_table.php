@@ -13,9 +13,12 @@ return new class extends Migration {
             $table->foreignId('class_id')->nullable()->constrained('lms_classes')->nullOnDelete();
             $table->string('guardian_name')->nullable();
             $table->string('guardian_contact')->nullable();
+            $table->uuid('rfid_id')->nullable()->unique();
             $table->date('enrollment_date');
             $table->enum('status', ['aktif', 'nonaktif'])->default('aktif');
             $table->timestamps();
+
+            $table->foreign('rfid_id')->references('id')->on('lms_rfids')->onDelete('set null');
         });
     }
 

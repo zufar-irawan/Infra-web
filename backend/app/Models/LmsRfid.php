@@ -16,8 +16,8 @@ class LmsRfid extends Model
         'status',
     ];
 
-    public function siswa()
+    public function student()
     {
-        return $this->hasMany(LmsSiswa::class);
+        return $this->hasOne(LmsStudent::class, 'rfid_id');
     }
 }
