@@ -10,29 +10,30 @@ class LmsStudentController extends Controller
 {
     public function index()
     {
-        $students = Student::with(['user', 'class'])->paginate(15);
+        $students = Student::with(['user', 'class', 'rfid'])->paginate(15);
         return response()->json($students);
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'user_id' => 'required|exists:lms_users,id|unique:lms_students,user_id', // ✅ lms_users
+            'user_id' => 'required|exists:lms_users,id|unique:lms_students,user_id',
             'nis' => 'required|string|unique:lms_students,nis',
             'class_id' => 'nullable|exists:lms_classes,id',
             'guardian_name' => 'nullable|string',
             'guardian_contact' => 'nullable|string',
             'enrollment_date' => 'required|date',
+            'rfid_id' => 'nullable|exists:lms_rfid,id|unique:lms_students,rfid_id',
             'status' => 'required|in:aktif,nonaktif',
         ]);
 
         $student = Student::create($request->all());
-        return response()->json($student, 201);
+        return response()->json($student->load(['user', 'class', 'rfid']), 201);
     }
 
     public function show(Student $student)
     {
-        return response()->json($student->load(['user', 'class']));
+        return response()->json($student->load(['user', 'class', 'rfid']));
     }
 
     public function update(Request $request, Student $student)
@@ -43,7 +44,7 @@ class LmsStudentController extends Controller
         ]);
 
         $student->update($request->all());
-        return response()->json($student);
+        return response()->json($student->load(['user', 'class', 'rfid']));
     }
 
     public function destroy(Student $student)

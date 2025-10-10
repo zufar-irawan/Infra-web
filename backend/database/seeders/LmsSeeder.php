@@ -17,6 +17,7 @@ use App\Models\LmsClassTeacher;
 use App\Models\LmsClassStudent;
 use App\Models\LmsInfal;
 use App\Models\LmsScheduleImport;
+use App\Models\LmsFile;
 use Illuminate\Support\Facades\Hash;
 
 class LmsSeeder extends Seeder
@@ -127,11 +128,35 @@ class LmsSeeder extends Seeder
             'title' => 'Modul 1 - Aljabar',
             'description' => 'Pengenalan aljabar',
             'status' => 'aktif',
-            'files' => json_encode([
-                ['type' => 'file', 'path' => 'storage/modules/mat/aljabar.pdf', 'name' => 'aljabar.pdf'],
-                ['type' => 'image', 'path' => 'storage/modules/mat/cover.png', 'name' => 'cover.png'],
-            ]),
-            'links' => json_encode(['https://drive.google.com/file/d/abc123/view']),
+        ]);
+
+        // Add files to module
+        LmsFile::create([
+            'fileable_type' => LmsModule::class,
+            'fileable_id' => $module->id,
+            'type' => 'file',
+            'path' => 'storage/modules/mat/aljabar.pdf',
+            'name' => 'aljabar.pdf',
+            'mime' => 'application/pdf',
+            'size' => 1024 // size in KB
+        ]);
+
+        LmsFile::create([
+            'fileable_type' => LmsModule::class,
+            'fileable_id' => $module->id,
+            'type' => 'image',
+            'path' => 'storage/modules/mat/cover.png',
+            'name' => 'cover.png',
+            'mime' => 'image/png',
+            'size' => 512
+        ]);
+
+        LmsFile::create([
+            'fileable_type' => LmsModule::class,
+            'fileable_id' => $module->id,
+            'type' => 'link',
+            'path' => 'https://drive.google.com/file/d/abc123/view',
+            'name' => 'Google Drive Link'
         ]);
 
         // === ASSIGNMENTS ===
@@ -141,10 +166,26 @@ class LmsSeeder extends Seeder
             'description' => 'Kerjakan soal di modul aljabar',
             'deadline' => '2025-10-01 23:59:00',
             'created_by' => $admin->id,
-            'files' => json_encode([
-                ['type' => 'file', 'path' => 'storage/assignments/tugas1.pdf', 'name' => 'tugas1.pdf'],
-            ]),
-            'links' => json_encode(['https://example.com/referensi/aljabar']),
+        ]);
+
+        // Add files to assignment
+        LmsFile::create([
+            'fileable_type' => LmsAssignment::class,
+            'fileable_id' => $assignment->id,
+            'type' => 'file',
+            'path' => 'storage/assignments/tugas1.pdf',
+            'name' => 'tugas1.pdf',
+            'mime' => 'application/pdf',
+            'size' => 1024
+        ]);
+
+        // Add link to assignment
+        LmsFile::create([
+            'fileable_type' => LmsAssignment::class,
+            'fileable_id' => $assignment->id,
+            'type' => 'link',
+            'path' => 'https://example.com/referensi/aljabar',
+            'name' => 'Referensi Aljabar'
         ]);
 
         // === ASSIGNMENT SUBMISSION ===
