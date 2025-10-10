@@ -20,7 +20,6 @@ return new class extends Migration
             $table->date('date');
             $table->time('start_time');
             $table->time('end_time');
-            $table->foreignId('room_id')->constrained('lms_rooms')->onDelete('cascade');
             $table->foreignId('created_by')->constrained('lms_users')->onDelete('cascade');
             $table->timestamps();
         });

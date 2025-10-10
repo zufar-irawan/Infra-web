@@ -10,7 +10,7 @@ class LmsExamController extends Controller
 {
     public function index()
     {
-        return response()->json(LmsExam::with(['subject','class','room','creator'])->paginate(15));
+        return response()->json(LmsExam::with(['subject','class','creator'])->paginate(15));
     }
 
     public function store(Request $request)
@@ -22,7 +22,6 @@ class LmsExamController extends Controller
             'date' => 'required|date',
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'required|date_format:H:i|after:start_time',
-            'room_id' => 'required|exists:lms_rooms,id',
             'created_by' => 'required|exists:lms_users,id',
         ]);
 

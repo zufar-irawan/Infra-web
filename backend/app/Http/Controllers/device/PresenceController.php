@@ -4,33 +4,29 @@ namespace App\Http\Controllers\Device;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\LmsDevice as Device;
-use App\Models\LmsSetting as Setting;
-use App\Models\LmsStudent as Siswa;
-use App\Models\LmsRfid as Rfid;
-use App\Models\LmsAttendance as AbsenSiswa;
+use App\Models\LmsDevice;
+use App\Models\LmsSetting;
+use App\Models\LmsStudent;
+use App\Models\LmsRfid;
+use App\Models\LmsAttendance;
 use Carbon\Carbon;
 
 class PresenceController extends Controller
 {
+    // === Ubah mode device antara reader <-> add_card ===
     public function changeMode(Request $request)
     {
-        $setting = Setting::first();
-        $deviceCount = Device::count();
-        $deviceName = 'Device_' . ($deviceCount + 1);
+        $setting = LmsSetting::first();
+        if (!$setting) return "SECRET_KEY_NOT_FOUND";
 
-        $device = Device::firstOrCreate(
+        $device = LmsDevice::firstOrCreate(
             ['id' => $request->device_id],
             [
-                'name' => $deviceName,
+                'name' => 'Device_' . (LmsDevice::count() + 1),
                 'mode' => 'reader',
                 'is_active' => 1
             ]
         );
-
-        if (!$setting) {
-            return "SECRET_KEY_NOT_FOUND";
-        }
 
         $device->update([
             'mode' => $device->mode == "add_card" ? "reader" : "add_card"
@@ -39,9 +35,10 @@ class PresenceController extends Controller
         return $device->mode == "add_card" ? "CARD_ADD_MODE" : "READER_MODE";
     }
 
-    public function getModeByTime($setting)
+    // === Tentukan mode berdasarkan jam sekarang ===
+    private function getModeByTime()
     {
-        $setting = Setting::first();
+        $setting = LmsSetting::first();
         $now = Carbon::now()->format('H:i');
 
         if ($now >= $setting->mulai_masuk_siswa && $now <= $setting->jam_masuk_siswa) {
@@ -52,165 +49,129 @@ class PresenceController extends Controller
         return null;
     }
 
+    // === Endpoint utama presensi ===
     public function presence(Request $request)
     {
-        $setting = Setting::first();
-        $mode = $this->getModeByTime($setting);
-
-        $now = Carbon::now()->format('H:i');
-        // Jika di luar jam absensi, tetap proses absen, status_masuk otomatis 'telat'
-        if ($mode == 'jam_masuk') {
-            $setting->mode = 'clock_in';
-            $status_masuk = ($now > $setting->jam_masuk_siswa) ? 'telat' : 'tepat_waktu';
-        } elseif ($mode == 'jam_pulang') {
-            $setting->mode = 'clock_out';
-            $status_masuk = null;
-        } else {
-            // Di luar jam absensi, anggap clock_in dan status_masuk telat
-            $setting->mode = 'clock_in';
-            $status_masuk = 'telat';
-        }
-
-        // Device
-        $device = Device::firstOrCreate(
+        $setting = LmsSetting::first();
+        $device = LmsDevice::firstOrCreate(
             ['id' => $request->device_id],
             [
-                'name' => 'Device_' . (Device::count() + 1),
+                'name' => 'Device_' . (LmsDevice::count() + 1),
                 'mode' => 'reader',
                 'is_active' => 1
             ]
         );
 
-        if (!$device) {
-            return "DEVICE_NOT_FOUND";
-        }
-
-        // Jika mode device add_card, tambahkan RFID baru jika belum ada
+        // === Jika device mode add_card, tambahkan kartu baru ===
         if ($device->mode == 'add_card') {
-            $rfid = Rfid::where('code', $request->rfid)->first();
-            if ($rfid) {
-                return "RFID_REGISTERED";
-            } else {
-                Rfid::create([
-                    'code' => $request->rfid
-                ]);
-                return "RFID_ADDED";
-            }
+            $rfid = LmsRfid::where('code', $request->rfid)->first();
+            if ($rfid) return "RFID_REGISTERED";
+
+            LmsRfid::create(['code' => $request->rfid]);
+            return "RFID_ADDED";
         }
 
-        // Cari RFID
-        $rfid = Rfid::where('code', $request->rfid)->first();
-        if (!$rfid) {
-            return "RFID_NOT_FOUND";
-        }
+        // === MODE READER ===
+        $rfid = LmsRfid::where('code', $request->rfid)->first();
+        if (!$rfid) return "RFID_NOT_FOUND";
 
-        // Cari siswa berdasarkan rfid_id
-        $siswa = Siswa::where('rfid_id', $rfid->id)->first();
-        if (!$siswa) {
-            return "RFID_NOT_FOUND";
-        }
+        $student = LmsStudent::where('rfid_id', $rfid->id)->first();
+        if (!$student) return "STUDENT_NOT_FOUND";
 
-        // Cek data presensi hari ini
-        $presenceData = AbsenSiswa::where([
-            'siswa_id' => $siswa->id,
-            'tanggal' => Carbon::now()->format('Y-m-d')
-        ])->first();
+        $today = Carbon::now()->format('Y-m-d');
+        $now = Carbon::now()->format('H:i:s');
+        $mode = $this->getModeByTime();
 
-        // Tentukan status presensi
-        $status = $setting->mode == 'clock_in' ? 'absen_masuk' : 'absen_pulang';
-
-        // Tentukan status_masuk
-        if ($setting->mode == 'clock_in') {
-            // Jika jam sekarang lebih dari jam_masuk_siswa, status_masuk = 'telat'
-            $status_masuk = ($now > $setting->jam_masuk_siswa) ? 'telat' : 'tepat_waktu';
+        // Tentukan mode dan status waktu
+        if ($mode == 'jam_masuk') {
+            $type = 'clock_in';
+            $statusWaktu = (Carbon::now()->format('H:i') > $setting->jam_masuk_siswa) ? 'telat' : 'tepat_waktu';
+        } elseif ($mode == 'jam_pulang') {
+            $type = 'clock_out';
+            $statusWaktu = 'tepat_waktu';
         } else {
-            // clock_out atau mode lain, ambil dari data sebelumnya
-            $status_masuk = $presenceData->status_masuk ?? 'telat';
+            $type = 'clock_in';
+            $statusWaktu = 'telat';
         }
 
-        // Siapkan data lengkap
-        $data = [
-            'device_id'     => $request->device_id,
-            'tanggal'       => Carbon::now()->format('Y-m-d'),
-            'status'        => $setting->mode == 'clock_in' ? 'absen_masuk' : 'absen_pulang',
-            'jam_masuk'     => $setting->mode == 'clock_in' ? Carbon::now()->format('H:i:s') : ($presenceData->jam_masuk ?? null),
-            'jam_pulang'    => $setting->mode == 'clock_out' ? Carbon::now()->format('H:i:s') : ($presenceData->jam_pulang ?? null),
-            'status_masuk'  => $status_masuk,
-            'keterangan'    => $presenceData->keterangan ?? null,
-        ];
+        // Cek presensi hari ini
+        $attendance = LmsAttendance::where('student_id', $student->id)
+            ->where('date', $today)
+            ->first();
 
-        // Jika mode clock_out dan sudah ada data absen masuk, update status dan jam_pulang
-        if ($setting->mode == 'clock_out' && $presenceData) {
-            $data['jam_masuk']    = $presenceData->jam_masuk; // tetap pakai jam_masuk lama
-            $data['status_masuk'] = $presenceData->status_masuk;
-            $data['status']       = 'absen_pulang';
-            $data['jam_pulang']   = Carbon::now()->format('H:i:s');
+        // === PROSES CLOCK IN ===
+        if ($type == 'clock_in') {
+            if ($attendance) return "ALREADY_CLOCKED_IN";
+
+            LmsAttendance::create([
+                'class_id' => $student->class_id,
+                'student_id' => $student->id,
+                'date' => $today,
+                'attendance_status' => 'absen_masuk', // sesuai enum migrasi
+                'time_in' => $now,
+                'status' => $statusWaktu, // telat / tepat_waktu
+            ]);
+
+            $this->sendWA($student->guardian_contact, "{$student->user->name} masuk pada $now.");
+            return "PRESENCE_CLOCK_IN_SAVED";
         }
 
-        // Simpan/update presensi
-        $presence = AbsenSiswa::updateOrCreate([
-            'siswa_id' => $siswa->id,
-            'tanggal'  => Carbon::now()->format('Y-m-d')
-        ], $data);
+        // === PROSES CLOCK OUT ===
+        if (!$attendance) {
+            // belum clock in → buat baru
+            LmsAttendance::create([
+                'class_id' => $student->class_id,
+                'student_id' => $student->id,
+                'date' => $today,
+                'attendance_status' => 'absen_pulang',
+                'time_out' => $now,
+                'status' => 'tepat_waktu',
+            ]);
+        } else {
+            $attendance->update([
+                'attendance_status' => 'absen_pulang',
+                'time_out' => $now,
+            ]);
+        }
 
-        // Kirim WhatsApp ke wali murid jika clock in atau clock out
+        $this->sendWA($student->guardian_contact, "{$student->user->name} pulang pada $now.");
+        return "PRESENCE_CLOCK_OUT_SAVED";
+    }
+
+    // === Kirim WhatsApp sederhana via Wablas ===
+    private function sendWA($phone, $message)
+    {
+        // \Log::info('ENV TEST', [
+        //     'api' => env('WABLAS_API_KEY'),
+        //     'secret' => env('WABLAS_SECRET_KEY'),
+        // ]);
+
         try {
+            if (!$phone) return;
             $apiKey = env('WABLAS_API_KEY');
-            $secretKey = env('WABLAS_SECRET_KEY');
-            $phone = $siswa->telepon_wali;
-            $nama = $siswa->nama;
-            $jam = Carbon::now()->format('H:i:s');
-            $statusText = $setting->mode == "clock_in" ? "masuk" : "pulang";
-            $message = "Informasi: *$nama* telah $statusText pada $jam. Terima kasih.";
+            $secret = env('WABLAS_SECRET_KEY');
 
-            if ($phone) {
-                // --- START: Blok baru untuk memformat nomor telepon ---
+            $phone = preg_replace('/[^0-9]/', '', $phone);
+            if (substr($phone, 0, 2) == '08') $phone = '62' . substr($phone, 1);
+            elseif (substr($phone, 0, 1) == '8') $phone = '62' . $phone;
 
-                // 1. Hapus semua karakter non-angka (spasi, tanda hubung, dll.)
-                $formattedPhone = preg_replace('/[^0-9]/', '', $phone);
-
-                // 2. Cek jika nomor diawali '08'
-                if (substr($formattedPhone, 0, 2) == '08') {
-                    // Ganti '0' di depan dengan '62'
-                    $formattedPhone = '62' . substr($formattedPhone, 1);
-                }
-                // 3. Cek jika nomor diawali '8' (tanpa '0')
-                elseif (substr($formattedPhone, 0, 1) == '8') {
-                    // Langsung tambahkan '62' di depan
-                    $formattedPhone = '62' . $formattedPhone;
-                }
-                // Jika nomor sudah diawali '62', maka tidak akan diubah.
-
-                // --- END: Blok baru untuk memformat nomor telepon ---
-
-                $curl = curl_init();
-                $token = $apiKey;
-                $secret_key = $secretKey;
-                $data = [
-                    'phone' => $formattedPhone, // Gunakan nomor yang sudah diformat
+            $curl = curl_init();
+            curl_setopt_array($curl, [
+                CURLOPT_URL => "https://tegal.wablas.com/api/send-message",
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_POST => true,
+                CURLOPT_POSTFIELDS => http_build_query([
+                    'phone' => $phone,
                     'message' => $message,
-                ];
-                curl_setopt(
-                    $curl,
-                    CURLOPT_HTTPHEADER,
-                    array(
-                        "Authorization: $token.$secret_key",
-                    )
-                );
-                curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
-                curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($data));
-                curl_setopt($curl, CURLOPT_URL,  "https://tegal.wablas.com/api/send-message");
-                curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
-                curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
-                $result = curl_exec($curl);
-                curl_close($curl);
-                // Optional: log response if needed
-            }
-        } catch (\Exception $e) {
-            // Optional: log error
+                ]),
+                CURLOPT_HTTPHEADER => ["Authorization: {$apiKey}.{$secret}"],
+                CURLOPT_SSL_VERIFYHOST => 0,
+                CURLOPT_SSL_VERIFYPEER => 0,
+            ]);
+            curl_exec($curl);
+            curl_close($curl);
+        } catch (\Throwable $e) {
+            // abaikan error kirim
         }
-
-        return $setting->mode == "clock_in" ? "PRESENCE_CLOCK_IN_SAVED" : "PRESENCE_CLOCK_OUT_SAVED";
     }
 }

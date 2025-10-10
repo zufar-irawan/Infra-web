@@ -33,6 +33,7 @@ use App\Http\Controllers\LmsReportController;
 use App\Http\Controllers\LmsDeviceController;
 use App\Http\Controllers\LmsSettingController;
 use App\Http\Controllers\LmsRfidController;
+use App\Http\Controllers\Device\PresenceController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -62,6 +63,10 @@ Route::prefix('lms')->group(function () {
     Route::post('auth/register', [LmsUserController::class, 'register']);
     Route::post('auth/login', [LmsUserController::class, 'login']);
     Route::get('auth/me', [LmsUserController::class, 'me'])->middleware('auth:lms_api');
+
+    // API Device
+    Route::get('devices/mode', [PresenceController::class, 'changeMode']);
+    Route::get('presences/store', [PresenceController::class, 'presence']);
 
     Route::middleware('auth:lms_api')->group(function () {
         // Auth
