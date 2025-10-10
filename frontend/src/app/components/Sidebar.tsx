@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from "axios";
 import {User} from "@/app/api/me/route";
-import {Bolt, BookMarked, BarChart3, LayoutDashboard, Users, LogOut, Shapes, X, Calendar, Clipboard} from "lucide-react";
+import {Bolt, BookMarked, BarChart3, LayoutDashboard, Users, LogOut, Shapes, X, Calendar, Clipboard, IdCard, Smartphone} from "lucide-react";
 import Image from "next/image";
 import Swal from "sweetalert2";
 
@@ -135,6 +135,9 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 {/* Navigation Menu */}
                 {user?.role === 'admin' &&
                     <section className="w-full px-5 pb-5">
+                        <p className='text-gray-400 text-sm my-2'>
+                            PRESMA EDU
+                        </p>
                         <nav className="flex flex-col gap-1.5">
                             <a
                                 href="/edu/dashboard"
@@ -256,6 +259,11 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                                     Laporan
                                 </span>
                             </a>
+                        </nav>
+                        <p className='text-gray-400 text-sm my-2'>
+                            PRESENSI
+                        </p>
+                        <nav className="flex flex-col gap-1.5">
                             <a
                                 href="/edu/setelan"
                                 className={
@@ -269,6 +277,36 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                                 </div>
                                 <span className={pathname === "/edu/setelan" ? "font-semibold" : "font-medium text-gray-700 group-hover:text-orange-700 transition-colors"}>
                                     Setelan
+                                </span>
+                            </a>
+                            <a
+                                href="/edu/perangkat"
+                                className={
+                                    pathname === "/edu/perangkat"
+                                        ? "group bg-gradient-to-r from-orange-600 to-orange-500 text-white rounded-xl px-4 py-3.5 flex items-center gap-3 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+                                        : "group rounded-xl px-4 py-3.5 hover:bg-gradient-to-r hover:from-orange-50 hover:to-orange-50/50 transition-all duration-300 cursor-pointer flex items-center gap-3 hover:shadow-sm hover:scale-[1.02] active:scale-[0.98] border border-transparent hover:border-orange-100"
+                                }
+                            >
+                                <div className={pathname === "/edu/perangkat" ? "p-1.5 bg-white/20 rounded-lg" : "p-1.5 rounded-lg group-hover:bg-orange-100 transition-colors"}>
+                                    <Smartphone className={pathname === "/edu/perangkat" ? "w-5 h-5" : "w-5 h-5 text-gray-600 group-hover:text-orange-600 transition-colors"} />
+                                </div>
+                                <span className={pathname === "/edu/perangkat" ? "font-semibold" : "font-medium text-gray-700 group-hover:text-orange-700 transition-colors"}>
+                                    Perangkat
+                                </span>
+                            </a>
+                            <a
+                                href="/edu/rfid"
+                                className={
+                                    pathname === "/edu/rfid"
+                                        ? "group bg-gradient-to-r from-orange-600 to-orange-500 text-white rounded-xl px-4 py-3.5 flex items-center gap-3 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+                                        : "group rounded-xl px-4 py-3.5 hover:bg-gradient-to-r hover:from-orange-50 hover:to-orange-50/50 transition-all duration-300 cursor-pointer flex items-center gap-3 hover:shadow-sm hover:scale-[1.02] active:scale-[0.98] border border-transparent hover:border-orange-100"
+                                }
+                            >
+                                <div className={pathname === "/edu/rfid" ? "p-1.5 bg-white/20 rounded-lg" : "p-1.5 rounded-lg group-hover:bg-orange-100 transition-colors"}>
+                                    <IdCard className={pathname === "/edu/rfid" ? "w-5 h-5" : "w-5 h-5 text-gray-600 group-hover:text-orange-600 transition-colors"} />
+                                </div>
+                                <span className={pathname === "/edu/rfid" ? "font-semibold" : "font-medium text-gray-700 group-hover:text-orange-700 transition-colors"}>
+                                    RFID
                                 </span>
                             </a>
                         </nav>
