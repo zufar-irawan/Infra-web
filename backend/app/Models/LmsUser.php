@@ -26,7 +26,7 @@ class LmsUser extends Authenticatable
         'password' => 'hashed',
     ];
 
-    protected $guard_name = 'lms_api';  
+    protected $guard_name = 'lms_api';
 
     public function student()
     {

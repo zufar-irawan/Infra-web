@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use App\Models\LmsUser;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -10,6 +11,12 @@ use Illuminate\Support\Facades\Auth;
 
 class LmsUserController extends Controller
 {
+    public function __construct()
+    {
+        // semua route ini hanya bisa diakses jika sudah login di guard lms_api
+        $this->middleware('auth:lms_api')->only(['me', 'logout', 'index', 'store', 'show', 'update', 'destroy']);
+    }
+
     /* ===================== AUTH ===================== */
 
     public function register(Request $request)
@@ -25,22 +32,22 @@ class LmsUserController extends Controller
 
         $data['role'] = $data['role'] ?? 'siswa';
         $data['status'] = $data['status'] ?? 'aktif';
+        $data['password'] = Hash::make($data['password']);
 
         $user = LmsUser::create($data);
-        $token = $user->createToken('api-token')->plainTextToken;
 
-        return response()->json(
-            [
-                'success' => true,
-                'message' => 'Register success',
-                'data' => [
-                    'user' => $user,
-                    'token' => $token,
-                    'token_type' => 'Bearer',
-                ],
+        // buat token untuk guard lms_api
+        $token = $user->createToken('lms_api_token', ['*'])->plainTextToken;
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Register success',
+            'data' => [
+                'user' => $user,
+                'token' => $token,
+                'token_type' => 'Bearer',
             ],
-            201,
-        );
+        ], 201);
     }
 
     public function login(Request $request)
@@ -50,21 +57,17 @@ class LmsUserController extends Controller
             'password' => 'required|string',
         ]);
 
-        // Ambil user dari tabel lms_users
         $user = LmsUser::where('email', $data['email'])->first();
 
         if (!$user || !Hash::check($data['password'], $user->password)) {
-            return response()->json(
-                [
-                    'success' => false,
-                    'message' => 'Invalid credentials',
-                ],
-                401,
-            );
+            return response()->json(['success' => false, 'message' => 'Invalid credentials'], 401);
         }
 
-        // Buat token dengan guard lms_api
-        $token = $user->createToken('lms-api-token', ['*'])->plainTextToken;
+        // hapus token lama (opsional, supaya satu device satu token)
+        $user->tokens()->delete();
+
+        // buat token baru untuk guard lms_api
+        $token = $user->createToken('lms_api_token', ['*'])->plainTextToken;
 
         return response()->json([
             'success' => true,
@@ -81,13 +84,15 @@ class LmsUserController extends Controller
     {
         return response()->json([
             'success' => true,
-            'user' => $request->user(), // otomatis dari sanctum token
+            'user' => auth('lms_api')->user(),
         ]);
     }
 
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()?->delete();
+        $user = auth('lms_api')->user();
+        $user?->currentAccessToken()?->delete();
+
         return response()->json(['success' => true, 'message' => 'Logged out']);
     }
 
@@ -95,14 +100,13 @@ class LmsUserController extends Controller
 
     public function index(Request $request)
     {
-        // hanya admin
-        if ($request->user()->role !== 'admin') {
+        $user = auth('lms_api')->user();
+        if ($user->role !== 'admin') {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
 
         $perPage = (int) $request->input('per_page', 15) ?: 15;
-
-        $users = LmsUser::query()->role($request->role)->status($request->status)->search($request->q)->orderBy('id', 'desc')->paginate($perPage)->appends($request->query());
+        $users = LmsUser::orderBy('id', 'desc')->paginate($perPage);
 
         return response()->json([
             'success' => true,
@@ -119,7 +123,8 @@ class LmsUserController extends Controller
 
     public function store(Request $request)
     {
-        if ($request->user()->role !== 'admin') {
+        $user = auth('lms_api')->user();
+        if ($user->role !== 'admin') {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
 
@@ -132,21 +137,20 @@ class LmsUserController extends Controller
             'status' => ['required', Rule::in(['aktif', 'nonaktif'])],
         ]);
 
-        $user = LmsUser::create($data);
+        $data['password'] = Hash::make($data['password']);
+        $newUser = LmsUser::create($data);
 
-        return response()->json(
-            [
-                'success' => true,
-                'message' => 'User created',
-                'data' => $user,
-            ],
-            201,
-        );
+        return response()->json([
+            'success' => true,
+            'message' => 'User created',
+            'data' => $newUser,
+        ], 201);
     }
 
     public function show(Request $request, LmsUser $user)
     {
-        if ($request->user()->role !== 'admin' && $request->user()->id !== $user->id) {
+        $auth = auth('lms_api')->user();
+        if ($auth->role !== 'admin' && $auth->id !== $user->id) {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
 
@@ -159,7 +163,8 @@ class LmsUserController extends Controller
 
     public function update(Request $request, LmsUser $user)
     {
-        if ($request->user()->role !== 'admin' && $request->user()->id !== $user->id) {
+        $auth = auth('lms_api')->user();
+        if ($auth->role !== 'admin' && $auth->id !== $user->id) {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
 
@@ -172,9 +177,12 @@ class LmsUserController extends Controller
             'status' => ['sometimes', Rule::in(['aktif', 'nonaktif'])],
         ]);
 
-        // kalau bukan admin → jangan boleh ubah role & status
-        if ($request->user()->role !== 'admin') {
+        if ($auth->role !== 'admin') {
             unset($data['role'], $data['status']);
+        }
+
+        if (isset($data['password'])) {
+            $data['password'] = Hash::make($data['password']);
         }
 
         $user->update($data);
@@ -188,7 +196,8 @@ class LmsUserController extends Controller
 
     public function destroy(Request $request, LmsUser $user)
     {
-        if ($request->user()->role !== 'admin') {
+        $auth = auth('lms_api')->user();
+        if ($auth->role !== 'admin') {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
 

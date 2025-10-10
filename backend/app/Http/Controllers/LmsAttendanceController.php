@@ -15,21 +15,21 @@ class LmsAttendanceController extends Controller
     {
         $user = auth('lms_api')->user();
 
-        // kalau bukan admin/guru → hanya tampilkan absensinya sendiri
-        if (!$user->hasRole(['admin', 'guru'])) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Access denied: only admin or guru can view all attendance records',
-            ], 403);
+        // kalau admin/guru → lihat semua
+        if (in_array($user->role, ['admin', 'guru'])) {
+            $attendances = LmsAttendance::with(['class', 'student'])->get();
+        } else {
+            // kalau siswa → hanya lihat absensi dirinya
+            $attendances = LmsAttendance::with(['class', 'student'])
+                ->where('student_id', $user->id)
+                ->get();
         }
-
-        $attendances = LmsAttendance::with(['class', 'student'])->get();
 
         return response()->json([
             'success' => true,
-            'message' => 'List of all attendance records',
-            'data'    => $attendances
-        ], 200);
+            'message' => 'List of attendance records',
+            'data'    => $attendances,
+        ]);
     }
 
     /**
@@ -39,7 +39,7 @@ class LmsAttendanceController extends Controller
     {
         $user = auth('lms_api')->user();
 
-        if (!$user->hasRole(['admin', 'guru'])) {
+        if (!in_array($user->role, ['admin', 'guru'])) {
             return response()->json([
                 'success' => false,
                 'message' => 'Access denied: only admin or guru can create attendance records',
@@ -90,7 +90,7 @@ class LmsAttendanceController extends Controller
     {
         $user = auth('lms_api')->user();
 
-        if (!$user->hasRole(['admin', 'guru'])) {
+        if (!in_array($user->role, ['admin', 'guru'])) {
             return response()->json([
                 'success' => false,
                 'message' => 'Access denied: only admin or guru can view attendance details',
@@ -120,7 +120,7 @@ class LmsAttendanceController extends Controller
     {
         $user = auth('lms_api')->user();
 
-        if (!$user->hasRole(['admin', 'guru'])) {
+        if (!in_array($user->role, ['admin', 'guru'])) {
             return response()->json([
                 'success' => false,
                 'message' => 'Access denied: only admin or guru can update attendance records',
@@ -180,7 +180,7 @@ class LmsAttendanceController extends Controller
     {
         $user = auth('lms_api')->user();
 
-        if (!$user->hasRole(['admin', 'guru'])) {
+        if (!in_array($user->role, ['admin', 'guru'])) {
             return response()->json([
                 'success' => false,
                 'message' => 'Access denied: only admin or guru can delete attendance records',

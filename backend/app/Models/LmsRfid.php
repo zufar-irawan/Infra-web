@@ -18,6 +18,6 @@ class LmsRfid extends Model
 
     public function student()
     {
-        return $this->hasOne(LmsStudent::class, 'rfid_id');
+        return $this->hasMany(LmsStudent::class);
     }
 }
