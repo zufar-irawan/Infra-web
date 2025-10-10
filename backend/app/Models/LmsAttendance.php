@@ -15,7 +15,11 @@ class LmsAttendance extends Model
         'class_id',
         'student_id',
         'date',
-        'status'
+        'attendance_status',
+        'time_in',
+        'time_out',
+        'status',
+        'description'
     ];
 
     public function class()

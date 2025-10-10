@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Device;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Device;
-use App\Models\Setting;
-use App\Models\Siswa;
-use App\Models\Rfid;
-use App\Models\AbsenSiswa;
+use App\Models\LmsDevice as Device;
+use App\Models\LmsSetting as Setting;
+use App\Models\LmsStudent as Siswa;
+use App\Models\LmsRfid as Rfid;
+use App\Models\LmsAttendance as AbsenSiswa;
 use Carbon\Carbon;
 
 class PresenceController extends Controller

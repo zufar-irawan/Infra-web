@@ -31,6 +31,7 @@ use App\Http\Controllers\LmsExamQuestionController;
 use App\Http\Controllers\LmsAttendanceController;
 use App\Http\Controllers\LmsReportController;
 use App\Http\Controllers\LmsFinanceController;
+use App\Http\Controllers\LmsDeviceController;
 
 // --- PRESENCE SYSTEM ---
 use App\Http\Controllers\PresenceApiController;
@@ -108,62 +109,13 @@ Route::prefix('lms')->group(function () {
         // Attendance
         Route::apiResource('attendance', LmsAttendanceController::class)->only(['index','store','show']);
 
+        // LMS Device Management
+        Route::apiResource('devices', LmsDeviceController::class);
+        Route::patch('devices/{id}/toggle', [LmsDeviceController::class, 'toggleActive']);
+        Route::patch('devices/{id}/mode', [LmsDeviceController::class, 'updateMode']);
+
         // Reports & Finance
         Route::apiResource('reports', LmsReportController::class)->only(['index','store','show']);
         Route::apiResource('finance', LmsFinanceController::class)->only(['index','store','show']);
-    });
-});
-
-
-Route::prefix('presence')->group(function () {
-    Route::post('/change-mode', [PresenceApiController::class, 'changeMode']);
-    Route::post('/', [PresenceApiController::class, 'presence']);
-    Route::apiResource('users', PresenceUserController::class);
-
-    // Protected routes (perlu authentication)
-    Route::middleware('auth:sanctum')->group(function () {
-    
-        // User routes
-        // Route::apiResource('users', UserController::class);
-        Route::get('roles', [PresenceUserController::class, 'roles']);
-        
-        // Setting routes
-        Route::get('settings', [SettingController::class, 'index']);
-        Route::post('settings', [SettingController::class, 'store']);
-        Route::put('settings/{id}', [SettingController::class, 'update']);
-        
-        // RFID routes
-        Route::apiResource('rfids', RfidController::class)->only(['index', 'show', 'destroy']);
-        
-        // Kelas routes
-        Route::apiResource('kelas', KelasController::class);
-        
-        // Guru routes
-        Route::apiResource('guru', GuruController::class);
-        
-        // Device routes
-        Route::apiResource('devices', DeviceController::class);
-        
-        // Siswa routes
-        Route::apiResource('siswa', SiswaController::class);
-        Route::post('siswa/daftar-rfid', [SiswaController::class, 'daftarRfid']);
-        
-        // Presence routes
-        Route::get('presences', [PresenceApiController::class, 'index']);
-        Route::get('presences/today', [PresenceApiController::class, 'today']);
-        
-        // // Dashboard routes
-        // Route::get('dashboard', [DashboardController::class, 'index']);
-        // Route::get('dashboard/statistics', [DashboardController::class, 'statistics']);
-        
-        // Report routes
-        Route::get('reports/date', [ReportController::class, 'reportDate']);
-        Route::get('reports/student', [ReportController::class, 'reportStudent']);
-        Route::get('reports/student/{id}/presence', [ReportController::class, 'studentPresence']);
-        Route::get('reports/rekap-absensi', [ReportController::class, 'rekapAbsensiSiswa']);
-        Route::get('reports/detail-absensi', [ReportController::class, 'detailAbsensiSiswa']);
-        Route::post('reports/export/date', [ReportController::class, 'reportDateExport']);
-        Route::post('reports/export/rekap', [ReportController::class, 'rekapAbsensiSiswaExport']);
-        Route::post('reports/export/detail', [ReportController::class, 'detailAbsensiSiswaExport']);
     });
 });

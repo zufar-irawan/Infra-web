@@ -14,6 +14,6 @@ class LmsDevice extends Model
         'id',
         'name',
         'mode',
-        'last_active'
+        'is_active'
     ];
 }
