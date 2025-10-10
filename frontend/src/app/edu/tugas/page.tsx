@@ -108,8 +108,6 @@ export default function TugasSiswa() {
         }
     };
 
-    const [open1, setOpen1] = useState(true);
-    const [open2, setOpen2] = useState(true);
     const [openSubjects, setOpenSubjects] = useState<{ [key: string]: boolean }>({});
 
     // Get unique mata pelajaran for filter dropdown
@@ -151,7 +149,6 @@ export default function TugasSiswa() {
         <div className="overflow-y-auto min-h-screen">
             <DashHeader user={user} student={student} />
 
-            {/* MAIN CONTENT - Flex layout responsive */}
             <div className="w-full p-4 flex flex-col lg:flex-row gap-4">
                 {/* TASK PENDING DETAILS */}
                 <div className="lg:flex-1 bg-white rounded-2xl p-4 shadow-md border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 flex flex-col gap-4 h-[200px]">
