@@ -82,10 +82,18 @@ class LmsUserController extends Controller
 
     public function me(Request $request)
     {
+        $user = auth('lms_api')->user(['id', 'name', 'email', 'role']); // ambil kolom penting saja
+
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'Unauthenticated'], 401);
+        }
+
         return response()->json([
             'success' => true,
-            'user' => auth('lms_api')->user(),
-        ]);
+            'user' => $user,
+        ], 200, [
+            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0'
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     }
 
     public function logout(Request $request)

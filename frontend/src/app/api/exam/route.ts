@@ -1,25 +1,19 @@
-import {cookies} from "next/headers";
-import {NextResponse} from "next/server";
+import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import api from "@/app/lib/api";
 
 export async function GET() {
-    const cookieStore = cookies()
-    // @ts-ignore
-    const token = cookieStore.get('token')?.value;
+  const token = (await cookies()).get("secure-auth-token")?.value;
+  if (!token)
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 
-    if(!token) return NextResponse.json({ error: "Token tidak ada!" }, { status: 401 });
-
-    try {
-        const res = await api.get("/lms/exams", {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            }
-        })
-
-        if(res.status === 200){
-            return NextResponse.json(res.data)
-        }
-    } catch (error) {
-        return NextResponse.json({ error: error }, { status: 500 });
-    }
+  try {
+    const res = await api.get("/lms/exams", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return NextResponse.json(res.data);
+  } catch (err: any) {
+    console.error("Error fetching exams:", err.message);
+    return NextResponse.json({ message: "Failed to fetch exams" }, { status: 500 });
+  }
 }
