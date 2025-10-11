@@ -34,6 +34,7 @@ use App\Http\Controllers\LmsDeviceController;
 use App\Http\Controllers\LmsSettingController;
 use App\Http\Controllers\LmsRfidController;
 use App\Http\Controllers\Device\PresenceController;
+use App\Http\Controllers\Api\PortalController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -119,4 +120,43 @@ Route::prefix('lms')->group(function () {
         // Reports & Finance
         Route::apiResource('reports', LmsReportController::class)->only(['index','store','show']);
     });
+});
+
+
+// === PORTAL ADMIN LANDING ===
+
+// Kirim kode verifikasi ke email (dibatasi 3x per menit)
+Route::post('/auth/request-code', [PortalController::class, 'requestCode'])
+    ->middleware('throttle:3,1');
+
+Route::post('/auth/verify-code', [PortalController::class, 'verifyCode']);
+Route::get('/auth/check-token', [PortalController::class, 'checkToken']);
+
+
+Route::get('/portal/dashboard', function (Request $request) {
+    $token = $request->bearerToken();
+
+    if (!$token) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Unauthorized: token kosong'
+        ], 401);
+    }
+
+    $admin = DB::table('admins')
+        ->where('api_token', $token)
+        ->first();
+
+    if (!$admin) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Unauthorized: token tidak valid'
+        ], 401);
+    }
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Selamat datang, ' . $admin->email,
+        'email'   => $admin->email,
+    ]);
 });
