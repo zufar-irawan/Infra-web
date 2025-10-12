@@ -7,7 +7,6 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from "axios";
 import {User} from "@/app/api/me/route";
-import TugasPending from "@/components/subComponents/forTugas/tugasPending";
 import UjianCard from "@/components/subComponents/forUjian/Ujiancard";
 
 export default function UjianSiswa() {
@@ -19,7 +18,7 @@ export default function UjianSiswa() {
 
     // Add new state variables for exam list functionality
     const [ujian, setUjian] = useState<any>()
-    const [subjects, setSubjects] = useState<any>()
+    // const [subjects, setSubjects] = useState<any>()
 
     // Search and filter states
     const [searchQuery, setSearchQuery] = useState("")
@@ -84,7 +83,7 @@ export default function UjianSiswa() {
                 setUncompletedExam(uncompletedExamMe);
                 setExamSelesai(examSelesaiMe);
                 setUjian(ujianWithSubjects);
-                setSubjects(subjectsList);
+                // setSubjects(subjectsList);
 
                 console.log('Ujian with subjects:', ujianWithSubjects);
             } catch (e:any) {
@@ -116,8 +115,6 @@ export default function UjianSiswa() {
             })
     };
 
-    const [open1, setOpen1] = useState(true);
-    const [open2, setOpen2] = useState(true);
     const [openSubjects, setOpenSubjects] = useState<{ [key: string]: boolean }>({});
 
     // Get unique mata pelajaran for filter dropdown
@@ -152,12 +149,6 @@ export default function UjianSiswa() {
             return matchesSearch && matchesMataPelajaran && matchesStatus;
         });
     };
-
-    // Filtered ujian for display
-    const filteredUjian = getFilteredUjian();
-
-    // Subjects for filter dropdown
-    const mataPelajaranOptions = getUniqueMataPelajaran();
 
     // Carousel functions
     const nextSlide = () => {
