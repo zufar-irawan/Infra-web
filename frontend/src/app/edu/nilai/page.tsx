@@ -11,6 +11,7 @@ export default function NilaiSiswa() {
     const [student, setStudent] = useState<any>()
     const [nilaiMapel, setNilaiMapel] = useState<any>()
     const [ringkasanNilai, setRingkasanNilai] = useState<any>()
+    const [filterMapel, setFilterMapel] = useState<string>("")
 
     const router = useRouter();
 
@@ -38,7 +39,6 @@ export default function NilaiSiswa() {
                     }
                 });
                 setNilaiMapel(resNilai.data?.nilai_mapel ?? null)
-                console.log(resNilai.data.nilai_mapel);
                 setRingkasanNilai(resNilai.data?.ringkasan ?? null)
 
             } catch (error: any) {
@@ -74,6 +74,17 @@ export default function NilaiSiswa() {
         }));
     }, [nilaiMapel]);
 
+    // Options for filter dropdown
+    const mapelOptions = React.useMemo(() => {
+        return dataNilai.map((d) => d.mapel);
+    }, [dataNilai]);
+
+    // Apply filter by selected mapel
+    const filteredDataNilai = React.useMemo(() => {
+        if (!filterMapel) return dataNilai;
+        return dataNilai.filter((d) => d.mapel === filterMapel);
+    }, [dataNilai, filterMapel]);
+
     // Derived ringkasan values with guards
     const rataKeseluruhan = (() => {
         const val = ringkasanNilai?.rata_rata_keseluruhan;
@@ -107,10 +118,23 @@ export default function NilaiSiswa() {
 
                 {/* Tabel Nilai */}
                 <div className="bg-white rounded-2xl p-4 shadow-md border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 flex flex-col gap-4">
-                    {/* <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center justify-between gap-4">
                         <h2 className="text-lg font-semibold">Daftar Nilai Mata Pelajaran</h2>
-                        <span className="text-xs text-gray-400">2025/2026</span>
-                    </div> */}
+                        <div className="flex items-center gap-2">
+                            <label htmlFor="filter-mapel" className="text-sm text-gray-600">Filter Mapel</label>
+                            <select
+                                id="filter-mapel"
+                                className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                                value={filterMapel}
+                                onChange={(e) => setFilterMapel(e.target.value)}
+                            >
+                                <option value="">Semua Mapel</option>
+                                {mapelOptions.map((m) => (
+                                    <option key={m} value={m}>{m}</option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
                     <div className="overflow-x-auto">
                         <table id="mapel-nilai" className="min-w-full text-sm">
                             <thead className="font-semibold text-lg bg-gray-100">
@@ -121,7 +145,7 @@ export default function NilaiSiswa() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {dataNilai.map((d) => (
+                                {filteredDataNilai.map((d) => (
                                     <tr key={d.mapel} className="group hover:bg-orange-50 transition">
                                         <td className="py-3 px-4 font-medium text-gray-800">{d.mapel}</td>
                                         <td className="py-3 px-4 text-end">{d.total}</td>
