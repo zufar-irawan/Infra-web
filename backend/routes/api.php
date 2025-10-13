@@ -34,7 +34,12 @@ use App\Http\Controllers\LmsDeviceController;
 use App\Http\Controllers\LmsSettingController;
 use App\Http\Controllers\LmsRfidController;
 use App\Http\Controllers\Device\PresenceController;
+
+//PORTAL
 use App\Http\Controllers\Api\PortalController;
+use App\Http\Controllers\Api\FaqController;
+use App\Http\Controllers\Api\ExtracurricularController;
+use App\Http\Controllers\Api\UploadController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -123,40 +128,32 @@ Route::prefix('lms')->group(function () {
 });
 
 
-// === PORTAL ADMIN LANDING ===
 
-// Kirim kode verifikasi ke email (dibatasi 3x per menit)
-Route::post('/auth/request-code', [PortalController::class, 'requestCode'])
-    ->middleware('throttle:3,1');
-
+// PORTAL ADMIN API 
+Route::post('/auth/request-code', [PortalController::class, 'requestCode'])->middleware('throttle:3,1');
 Route::post('/auth/verify-code', [PortalController::class, 'verifyCode']);
 Route::get('/auth/check-token', [PortalController::class, 'checkToken']);
+Route::get('/portal/dashboard', [PortalController::class, 'dashboard']);
+
+// === FAQ API ===
+// daftar FAQ untuk publik (tanpa login)
+Route::get('/faq/list', [FaqController::class, 'publicList']);
+
+// CRUD FAQ
+Route::get('/faq', [FaqController::class, 'index']);     // tampil semua
+Route::get('/faq/{id}', [FaqController::class, 'show']); // detail
+Route::post('/faq', [FaqController::class, 'store']);    // tambah
+Route::put('/faq/{id}', [FaqController::class, 'update']); // edit
+Route::delete('/faq/{id}', [FaqController::class, 'destroy']); // hapus
 
 
-Route::get('/portal/dashboard', function (Request $request) {
-    $token = $request->bearerToken();
+// CRUD EKSKUL
+Route::get('/ekskul/list', [ExtracurricularController::class, 'publicList']);
+Route::get('/ekskul', [ExtracurricularController::class, 'index']);
+Route::get('/ekskul/{ekskul}', [ExtracurricularController::class, 'show']);
+Route::post('/ekskul', [ExtracurricularController::class, 'store']);
+Route::put('/ekskul/{ekskul}', [ExtracurricularController::class, 'update']);
+Route::delete('/ekskul/{ekskul}', [ExtracurricularController::class, 'destroy']);
+Route::post('/upload/ekskul', [UploadController::class, 'uploadEkskulImage']);
+Route::apiResource('ekskul', ExtracurricularController::class);
 
-    if (!$token) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Unauthorized: token kosong'
-        ], 401);
-    }
-
-    $admin = DB::table('admins')
-        ->where('api_token', $token)
-        ->first();
-
-    if (!$admin) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Unauthorized: token tidak valid'
-        ], 401);
-    }
-
-    return response()->json([
-        'success' => true,
-        'message' => 'Selamat datang, ' . $admin->email,
-        'email'   => $admin->email,
-    ]);
-});

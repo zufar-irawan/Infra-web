@@ -55,5 +55,13 @@ class DatabaseSeeder extends Seeder
             // RolePermissionSeeder::class,
             // PresenceSeeder::class,
         ]);
+
+        $this->call([
+        FaqSeeder::class,
+        ]);
+
+        $this->call([ ExtracurricularSeeder::class ]);
     }
+
+    
 }

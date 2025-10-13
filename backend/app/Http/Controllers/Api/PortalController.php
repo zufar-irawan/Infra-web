@@ -41,15 +41,22 @@ class PortalController extends Controller
         );
 
         // Kirim email berisi kode verifikasi (gunakan view emails/portal-login.blade.php)
-        Mail::send('emails.portal-login', ['kode' => $kode], function ($msg) use ($request) {
-            $msg->to($request->email)
-                ->subject('Kode Verifikasi Portal SMK Prestasi Prima');
-        });
+        try {
+            Mail::send('emails.portal-login', ['kode' => $kode], function ($msg) use ($request) {
+                $msg->to($request->email)
+                    ->subject('Kode Verifikasi Portal SMK Prestasi Prima');
+            });
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Kode verifikasi telah dikirim ke email terdaftar.'
-        ]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Kode verifikasi telah dikirim ke email terdaftar.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengirim email: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -82,7 +89,7 @@ class PortalController extends Controller
             ], 400);
         }
 
-        // Generate token login
+        // Generate token login (32 karakter hex)
         $token = bin2hex(random_bytes(16));
 
         // Simpan token ke tabel admins
@@ -101,32 +108,63 @@ class PortalController extends Controller
         ]);
     }
 
+    /**
+     * Cek token dari FE (validasi token aktif)
+     */
     public function checkToken(Request $request)
-{
-    $token = $request->bearerToken();
+    {
+        $token = $request->bearerToken();
 
-    if (!$token) {
+        if (!$token) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Token tidak ditemukan.'
+            ], 401);
+        }
+
+        $admin = DB::table('admins')->where('api_token', $token)->first();
+
+        if (!$admin) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Token tidak valid atau sudah kedaluwarsa.'
+            ], 401);
+        }
+
         return response()->json([
-            'success' => false,
-            'message' => 'Token tidak ditemukan.'
-        ], 401);
+            'success' => true,
+            'message' => 'Token valid.',
+            'email' => $admin->email,
+        ]);
     }
 
-    $admin = DB::table('admins')->where('api_token', $token)->first();
+    /**
+     * Ambil data admin login untuk Dashboard
+     */
+    public function dashboard(Request $request)
+    {
+        $token = $request->bearerToken();
 
-    if (!$admin) {
+        if (!$token) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized: token kosong'
+            ], 401);
+        }
+
+        $admin = DB::table('admins')->where('api_token', $token)->first();
+
+        if (!$admin) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized: token tidak valid'
+            ], 401);
+        }
+
         return response()->json([
-            'success' => false,
-            'message' => 'Token tidak valid atau sudah kedaluwarsa.'
-        ], 401);
+            'success' => true,
+            'email'   => $admin->email,
+            'message' => 'Selamat datang, ' . $admin->email
+        ]);
     }
-
-    return response()->json([
-        'success' => true,
-        'message' => 'Token valid.',
-        'email' => $admin->email,
-    ]);
-}
-
-    
 }
