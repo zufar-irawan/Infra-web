@@ -40,6 +40,14 @@ use App\Http\Controllers\Api\PortalController;
 use App\Http\Controllers\Api\FaqController;
 use App\Http\Controllers\Api\ExtracurricularController;
 use App\Http\Controllers\Api\UploadController;
+use App\Http\Controllers\Api\KegiatanController;
+use App\Http\Controllers\Api\MitraController;
+// use App\Http\Controllers\Api\StaffController;
+use App\Http\Controllers\Api\ManagementController;
+use App\Http\Controllers\Api\FacilityController;
+use App\Http\Controllers\Api\AchievementController;
+
+
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -157,3 +165,37 @@ Route::delete('/ekskul/{ekskul}', [ExtracurricularController::class, 'destroy'])
 Route::post('/upload/ekskul', [UploadController::class, 'uploadEkskulImage']);
 Route::apiResource('ekskul', ExtracurricularController::class);
 
+//CRUD KEGIATAN
+Route::get('/kegiatan/public', [KegiatanController::class, 'publicList']);
+Route::apiResource('kegiatan', KegiatanController::class);
+
+//CRUD MITRA
+Route::get('/mitra/public', [MitraController::class, 'publicList']);
+Route::apiResource('mitra', MitraController::class);
+
+// //CRUD STAFF
+// Route::get('/staff/public', [StaffController::class, 'publicIndex']);
+// Route::get('/staff', [StaffController::class, 'index']);
+// Route::post('/staff', [StaffController::class, 'store']);
+// Route::post('/staff/{id}', [StaffController::class, 'update']);
+// Route::delete('/staff/{id}', [StaffController::class, 'destroy']);
+Route::prefix('management')->group(function () {
+    Route::get('/', [ManagementController::class, 'index']);
+    Route::post('/', [ManagementController::class, 'store']);
+    Route::post('/{id}', [ManagementController::class, 'update']); // pakai POST untuk FormData update
+    Route::delete('/{id}', [ManagementController::class, 'destroy']);
+    Route::get('/public', [ManagementController::class, 'public']); // endpoint untuk frontend user
+});
+
+//CRUD FASILITAS
+Route::prefix('facilities')->group(function () {
+    Route::get('/', [FacilityController::class, 'index']);
+    Route::post('/', [FacilityController::class, 'store']);
+    Route::post('/{id}', [FacilityController::class, 'update']);
+    Route::delete('/{id}', [FacilityController::class, 'destroy']);
+    Route::get('/public', [FacilityController::class, 'public']);
+});
+
+//PRESTASI
+Route::apiResource('achievements', AchievementController::class);
+Route::get('/achievements/public', [AchievementController::class, 'public']);

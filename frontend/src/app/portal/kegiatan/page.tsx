@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import Swal from "sweetalert2";
 import { Pencil, Trash2, Plus } from "lucide-react";
 
-interface Event {
+interface Kegiatan {
   id: number;
   title_id: string;
   title_en: string;
@@ -15,40 +16,36 @@ interface Event {
   place: string;
 }
 
-export default function AdminKegiatanPage() {
-  const [events, setEvents] = useState<Event[]>([
-    {
-      id: 1,
-      title_id: "EXPONER 2025",
-      title_en: "EXPONER 2025",
-      desc_id:
-        "Pameran karya inovatif dan kreatifitas siswa SMK Prestasi Prima dalam berbagai bidang.",
-      desc_en:
-        "An exhibition of innovation and creativity by Prestasi Prima students in various fields.",
-      date: "2025-10-02",
-      time: "23:00",
-      place: "Lapangan SMK Prestasi Prima",
-    },
-    {
-      id: 2,
-      title_id: "Saintek Fair 2025",
-      title_en: "Saintek Fair 2025",
-      desc_id:
-        "Ajang tahunan untuk memperkenalkan teknologi dan sains kepada siswa.",
-      desc_en:
-        "An annual event to introduce science and technology to students.",
-      date: "2025-10-03",
-      time: "23:00",
-      place: "Lapangan SMK Prestasi Prima",
-    },
-  ]);
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
-  const [form, setForm] = useState<Partial<Event>>({});
+export default function AdminKegiatanPage() {
+  const [kegiatan, setKegiatan] = useState<Kegiatan[]>([]);
+  const [form, setForm] = useState<Partial<Kegiatan>>({});
   const [editId, setEditId] = useState<number | null>(null);
   const [isModalOpen, setModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  // === Simpan Kegiatan (Dummy CRUD) ===
-  const handleSave = () => {
+  // === Ambil Data dari API ===
+  const fetchData = async () => {
+    try {
+      const res = await axios.get(`${API_BASE_URL}/kegiatan`);
+      if (res.data.success) {
+        setKegiatan(res.data.data);
+      }
+    } catch (err) {
+      console.error("Gagal mengambil data kegiatan:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  // === Simpan atau Update ===
+  const handleSave = async () => {
     if (
       !form.title_id ||
       !form.title_en ||
@@ -62,33 +59,27 @@ export default function AdminKegiatanPage() {
       return;
     }
 
-    if (editId) {
-      setEvents((prev) =>
-        prev.map((e) => (e.id === editId ? { ...e, ...form } as Event : e))
-      );
-      Swal.fire("Berhasil", "Kegiatan berhasil diperbarui.", "success");
-    } else {
-      const newItem: Event = {
-        id: Date.now(),
-        title_id: form.title_id!,
-        title_en: form.title_en!,
-        desc_id: form.desc_id!,
-        desc_en: form.desc_en!,
-        date: form.date!,
-        time: form.time!,
-        place: form.place!,
-      };
-      setEvents((prev) => [...prev, newItem]);
-      Swal.fire("Berhasil", "Kegiatan berhasil ditambahkan.", "success");
-    }
+    try {
+      if (editId) {
+        await axios.put(`${API_BASE_URL}/kegiatan/${editId}`, form);
+        Swal.fire("Berhasil", "Kegiatan berhasil diperbarui.", "success");
+      } else {
+        await axios.post(`${API_BASE_URL}/kegiatan`, form);
+        Swal.fire("Berhasil", "Kegiatan berhasil ditambahkan.", "success");
+      }
 
-    setForm({});
-    setEditId(null);
-    setModalOpen(false);
+      setModalOpen(false);
+      setForm({});
+      setEditId(null);
+      fetchData();
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Gagal", "Terjadi kesalahan saat menyimpan data.", "error");
+    }
   };
 
-  // === Hapus Kegiatan ===
-  const handleDelete = (id: number) => {
+  // === Hapus Data ===
+  const handleDelete = async (id: number) => {
     Swal.fire({
       title: "Hapus Kegiatan?",
       text: "Data yang dihapus tidak dapat dikembalikan.",
@@ -98,26 +89,31 @@ export default function AdminKegiatanPage() {
       cancelButtonColor: "#243771",
       confirmButtonText: "Ya, Hapus",
       cancelButtonText: "Batal",
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        setEvents((prev) => prev.filter((e) => e.id !== id));
-        Swal.fire("Terhapus!", "Kegiatan berhasil dihapus.", "success");
+        try {
+          await axios.delete(`${API_BASE_URL}/kegiatan/${id}`);
+          Swal.fire("Terhapus!", "Kegiatan berhasil dihapus.", "success");
+          fetchData();
+        } catch (err) {
+          Swal.fire("Gagal", "Tidak dapat menghapus kegiatan.", "error");
+        }
       }
     });
   };
 
-  // === Edit Kegiatan ===
-  const handleEdit = (e: Event) => {
-    setForm(e);
-    setEditId(e.id);
+  const handleEdit = (item: Kegiatan) => {
+    setForm(item);
+    setEditId(item.id);
     setModalOpen(true);
   };
 
   return (
     <div className="space-y-8 animate-fadeIn p-8 max-w-6xl mx-auto">
-      {/* Header */}
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-[#243771]">📅 Manajemen Kegiatan</h1>
+        <h1 className="text-3xl font-bold text-[#243771]">
+          📅 Manajemen Kegiatan
+        </h1>
         <button
           onClick={() => {
             setForm({});
@@ -130,7 +126,6 @@ export default function AdminKegiatanPage() {
         </button>
       </div>
 
-      {/* Table */}
       <div className="bg-white rounded-2xl shadow-md overflow-x-auto">
         <table className="min-w-full text-sm">
           <thead className="bg-[#243771] text-white text-left">
@@ -144,8 +139,14 @@ export default function AdminKegiatanPage() {
             </tr>
           </thead>
           <tbody>
-            {events.length > 0 ? (
-              events.map((e, i) => (
+            {loading ? (
+              <tr>
+                <td colSpan={6} className="text-center py-6">
+                  Memuat data...
+                </td>
+              </tr>
+            ) : kegiatan.length > 0 ? (
+              kegiatan.map((e, i) => (
                 <tr
                   key={e.id}
                   className="border-b border-gray-100 hover:bg-gray-50 transition"
@@ -175,10 +176,7 @@ export default function AdminKegiatanPage() {
               ))
             ) : (
               <tr>
-                <td
-                  colSpan={6}
-                  className="text-center py-6 text-gray-500 italic"
-                >
+                <td colSpan={6} className="text-center py-6 text-gray-500 italic">
                   Belum ada kegiatan.
                 </td>
               </tr>

@@ -4,9 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Prestasi;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 
 class PrestasiController extends Controller
 {
+    /**
+     * Tampilkan semua data prestasi (admin panel)
+     */
     public function index(Request $request)
     {
         $query = Prestasi::query();
@@ -23,23 +27,41 @@ class PrestasiController extends Controller
 
         $prestasi = $query->paginate(10);
 
+        // Format URL gambar ke path publik
+        $prestasi->getCollection()->transform(function ($item) {
+            $item->poster = asset('storage/' . $item->poster);
+            return $item;
+        });
+
         return response()->json([
             'success' => true,
             'data' => $prestasi
         ]);
     }
 
+    /**
+     * Simpan prestasi baru
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'poster' => 'required|image|max:2048'
+            'poster' => 'required|image|mimes:webp,jpeg,png,jpg|max:2048'
         ]);
 
-        $path = $request->file('poster')->store('prestasi', 'public');
+        // Pastikan folder tersedia
+        $path = public_path('storage/prestasi');
+        if (!File::exists($path)) {
+            File::makeDirectory($path, 0777, true, true);
+        }
+
+        // Simpan file ke storage/public/prestasi
+        $posterPath = $request->file('poster')->store('prestasi', 'public');
 
         $prestasi = Prestasi::create([
-            'poster' => $path
+            'poster' => $posterPath
         ]);
+
+        $prestasi->poster = asset('storage/' . $posterPath);
 
         return response()->json([
             'success' => true,
@@ -48,23 +70,39 @@ class PrestasiController extends Controller
         ], 201);
     }
 
+    /**
+     * Tampilkan detail prestasi
+     */
     public function show($id)
     {
         $prestasi = Prestasi::findOrFail($id);
+        $prestasi->poster = asset('storage/' . $prestasi->poster);
+
         return response()->json([
             'success' => true,
             'data' => $prestasi
         ]);
     }
 
+    /**
+     * Update prestasi
+     */
     public function update(Request $request, $id)
     {
         $prestasi = Prestasi::findOrFail($id);
 
         if ($request->hasFile('poster')) {
-            $path = $request->file('poster')->store('prestasi', 'public');
-            $prestasi->update(['poster' => $path]);
+            // Hapus file lama
+            if (File::exists(public_path('storage/' . $prestasi->poster))) {
+                File::delete(public_path('storage/' . $prestasi->poster));
+            }
+
+            // Simpan file baru
+            $posterPath = $request->file('poster')->store('prestasi', 'public');
+            $prestasi->update(['poster' => $posterPath]);
         }
+
+        $prestasi->poster = asset('storage/' . $prestasi->poster);
 
         return response()->json([
             'success' => true,
@@ -73,12 +111,42 @@ class PrestasiController extends Controller
         ]);
     }
 
+    /**
+     * Hapus prestasi
+     */
     public function destroy($id)
     {
-        Prestasi::destroy($id);
+        $prestasi = Prestasi::findOrFail($id);
+
+        // Hapus file dari storage
+        if (File::exists(public_path('storage/' . $prestasi->poster))) {
+            File::delete(public_path('storage/' . $prestasi->poster));
+        }
+
+        $prestasi->delete();
+
         return response()->json([
             'success' => true,
             'message' => 'Prestasi deleted successfully'
+        ]);
+    }
+
+    /**
+     * Endpoint publik untuk frontend (tanpa auth)
+     */
+    public function public()
+    {
+        $prestasi = Prestasi::all()->map(function ($item) {
+            return [
+                'id' => $item->id,
+                'poster' => asset('storage/' . $item->poster),
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Daftar prestasi publik',
+            'data' => $prestasi
         ]);
     }
 }

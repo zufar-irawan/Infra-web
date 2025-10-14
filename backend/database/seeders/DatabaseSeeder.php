@@ -61,6 +61,15 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $this->call([ ExtracurricularSeeder::class ]);
+        $this->call([ AchievementSeeder::class ]);
+
+        $this->call([
+        StaffSeeder::class,
+        ]);
+
+        $this->call([
+        ManagementSeeder::class,
+        ]);
     }
 
     
