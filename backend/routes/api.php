@@ -46,7 +46,8 @@ use App\Http\Controllers\Api\MitraController;
 use App\Http\Controllers\Api\ManagementController;
 use App\Http\Controllers\Api\FacilityController;
 use App\Http\Controllers\Api\AchievementController;
-
+use App\Http\Controllers\Api\NewsController;
+use App\Http\Controllers\Api\TestimoniController;
 
 
 Route::get('/user', function (Request $request) {
@@ -199,3 +200,9 @@ Route::prefix('facilities')->group(function () {
 //PRESTASI
 Route::apiResource('achievements', AchievementController::class);
 Route::get('/achievements/public', [AchievementController::class, 'public']);
+
+//BERITA
+Route::apiResource('news', NewsController::class);
+
+//TESTIMONI
+Route::apiResource('testimoni', TestimoniController::class)->only(['index', 'store', 'update', 'destroy']);
