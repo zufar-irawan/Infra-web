@@ -24,16 +24,29 @@ export default function DashHeader({student, user, teacher} : {student?: any, us
                 
                 <div>
                     <h1 className="text-xl sm:text-2xl font-bold">
-                        {pathname == '/edu/dashboard'
-                            ? `Dashboard ${isUser === 'admin' ? "Admin" : isUser === 'teacher' ? "Guru" : "Siswa"}`
-                        :pathname == '/edu/tugas'
-                            ? 'Tugas Anda'
-                        :pathname == '/edu/ujian'
-                            ? 'Ujian Anda'
-                        :pathname == '/edu/nilai'
-                            ? 'Nilai Anda'
-                        :pathname == '/edu/jadwal'
-                            ? 'Jadwal' : ''
+                        {
+                            (() => {
+                                switch (true) {
+                                    case pathname.startsWith('/edu/dashboard'):
+                                        return `Dashboard ${isUser === 'admin' ? 'Admin' : isUser === 'teacher' ? 'Guru' : 'Siswa'}`;
+                                    case pathname.startsWith('/edu/tugas'):
+                                        return 'Tugas Anda';
+                                    case pathname.startsWith('/edu/ujian'):
+                                        return 'Ujian Anda';
+                                    case pathname.startsWith('/edu/nilai'):
+                                        return 'Nilai Anda';
+                                    case pathname.startsWith('/edu/jadwal'):
+                                        return 'Jadwal';
+                                    case pathname.startsWith('/edu/setelan'):
+                                        return 'Setelan';
+                                    case pathname.startsWith('/edu/perangkat'):
+                                        return 'Perangkat';
+                                    case pathname.startsWith('/edu/rfid'):
+                                        return 'RFID Card';
+                                    default:
+                                        return '';
+                                }
+                            })()
                         }
 
                         </h1>

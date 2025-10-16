@@ -1,18 +1,29 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import DashHeader from "@/app/components/DashHeader";
+import {
+  Users,
+  BookOpen,
+  GraduationCap,
+  Info,
+  Settings,
+  Search,
+  ChevronRight,
+} from "lucide-react";
 
 export default function KelasPage() {
   const [search, setSearch] = useState("");
   const [filteredClasses, setFilteredClasses] = useState<any[]>([]);
+  const router = useRouter();
 
   // === Data dummy sementara ===
   const dummyClasses = [
     {
       id: 1,
       name: "X-PPLG-1",
-      description: "Kelas X PPLG 1",
+      description: "Kelas X PPLG 1 - Pemrograman dan Rekayasa Perangkat Lunak",
       status: "aktif",
       students: [
         { id: 1, name: "Zufar Rafid Irawan" },
@@ -26,14 +37,13 @@ export default function KelasPage() {
     {
       id: 2,
       name: "XI-TJKT-2",
-      description: "Kelas XI Teknik Jaringan Komputer",
+      description: "Kelas XI Teknik Jaringan Komputer dan Telekomunikasi",
       status: "nonaktif",
       students: [{ id: 1, name: "Fahmi" }],
       teachers: [{ id: 1, name: "Pak Hendra" }],
     },
   ];
 
-  // === Inisialisasi & filter pencarian ===
   useEffect(() => {
     let data = dummyClasses;
 
@@ -53,36 +63,25 @@ export default function KelasPage() {
         {/* === Header === */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-800">
+            <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
+              <BookOpen className="w-7 h-7 text-orange-500" />
               Daftar Kelas
             </h1>
-            <p className="text-gray-500 text-sm">
-              Lihat seluruh kelas aktif dan nonaktif di sistem LMS
+            <p className="text-gray-500 text-sm mt-1">
+              Kelola dan pantau seluruh kelas aktif maupun nonaktif dalam sistem
+              LMS.
             </p>
           </div>
 
-          <div className="relative w-full sm:w-64">
+          <div className="relative w-full sm:w-72">
             <input
               type="text"
               placeholder="Cari nama kelas..."
-              className="w-full px-4 py-2 rounded-xl border border-gray-200 focus:ring-2 focus:ring-orange-500 focus:outline-none"
+              className="w-full px-4 py-2.5 pl-10 rounded-xl border border-gray-200 focus:ring-2 focus:ring-orange-500 focus:outline-none shadow-sm bg-white"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-5 h-5 text-gray-400 absolute right-3 top-2.5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1010.5 3a7.5 7.5 0 006.15 13.65z"
-              />
-            </svg>
+            <Search className="w-5 h-5 text-gray-400 absolute left-3 top-2.5" />
           </div>
         </div>
 
@@ -92,12 +91,16 @@ export default function KelasPage() {
             filteredClasses.map((kelas, i) => (
               <div
                 key={i}
-                className="bg-white p-5 rounded-2xl shadow-md border border-gray-100 hover:shadow-lg transition-all duration-200"
+                className="group bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-lg hover:border-orange-200 transition-all duration-200"
               >
-                <div className="flex items-center justify-between mb-3">
-                  <h2 className="text-lg font-semibold text-gray-800">
-                    {kelas.name}
-                  </h2>
+                {/* Header */}
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <GraduationCap className="text-orange-500 w-6 h-6" />
+                    <h2 className="text-lg font-semibold text-gray-800">
+                      {kelas.name}
+                    </h2>
+                  </div>
                   <span
                     className={`px-3 py-1 text-xs font-semibold rounded-full ${
                       kelas.status === "aktif"
@@ -109,40 +112,33 @@ export default function KelasPage() {
                   </span>
                 </div>
 
-                <p className="text-gray-600 text-sm mb-4">
+                {/* Deskripsi */}
+                <p className="text-gray-600 text-sm leading-relaxed mb-4">
                   {kelas.description}
                 </p>
 
-                <div className="flex items-center justify-between text-sm text-gray-700">
-                  <p>
-                    👨‍🎓 <strong>{kelas.students.length}</strong> siswa
-                  </p>
-                  <p>
-                    👩‍🏫 <strong>{kelas.teachers.length}</strong> guru
-                  </p>
+                {/* Statistik */}
+                <div className="flex items-center justify-between text-sm text-gray-700 mb-4">
+                  <div className="flex items-center gap-2">
+                    <Users className="w-4 h-4 text-blue-500" />
+                    <span>{kelas.students.length} siswa</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Info className="w-4 h-4 text-purple-500" />
+                    <span>{kelas.teachers.length} guru</span>
+                  </div>
                 </div>
 
-                {/* === List Guru & Siswa (optional tampil) === */}
-                <details className="mt-3 text-sm">
-                  <summary className="cursor-pointer text-orange-600 font-medium">
+                {/* Tombol Aksi */}
+                <div className="flex justify-between gap-3">
+                  <button
+                    onClick={() => router.push(`/edu/kelas/${kelas.id}`)}
+                    className="flex items-center justify-center gap-2 w-full px-4 py-2 text-sm font-medium rounded-xl bg-orange-500 text-white hover:bg-orange-600 transition-colors"
+                  >
+                    <ChevronRight className="w-4 h-4" />
                     Lihat Detail
-                  </summary>
-                  <div className="mt-2 pl-3 text-gray-700 space-y-1">
-                    <p className="font-medium">Guru:</p>
-                    <ul className="list-disc list-inside text-gray-600 mb-2">
-                      {kelas.teachers.map((t) => (
-                        <li key={t.id}>{t.name}</li>
-                      ))}
-                    </ul>
-
-                    <p className="font-medium">Siswa:</p>
-                    <ul className="list-disc list-inside text-gray-600">
-                      {kelas.students.map((s) => (
-                        <li key={s.id}>{s.name}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </details>
+                  </button>
+                </div>
               </div>
             ))
           ) : (
