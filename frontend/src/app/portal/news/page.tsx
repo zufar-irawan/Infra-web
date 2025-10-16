@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Swal from "sweetalert2";
-import { Pencil, Trash2, Plus } from "lucide-react";
+import axios from "axios";
+import { Pencil, Trash2, Plus, X } from "lucide-react";
 
 interface News {
   id: number;
@@ -11,90 +12,97 @@ interface News {
   title_en: string;
   desc_id: string;
   desc_en: string;
-  image: string | File | null;
+  image: string;
   date: string;
 }
 
-export default function AdminNewsPage() {
-  // === Data Dummy ===
-  const [news, setNews] = useState<News[]>([
-    {
-      id: 1,
-      title_id: "Upacara HUT RI ke-80 di SMK Prestasi Prima",
-      title_en: "Independence Day Ceremony at Prestasi Prima",
-      desc_id:
-        "SMK Prestasi Prima mengadakan upacara peringatan Hari Kemerdekaan dengan khidmat dan semangat nasionalisme tinggi.",
-      desc_en:
-        "Prestasi Prima Vocational School held an Independence Day ceremony with pride and great enthusiasm.",
-      image: "/berita/1.jpg",
-      date: "2025-08-17",
-    },
-    {
-      id: 2,
-      title_id: "Bandtols Wakili Sekolah di Ajang Skool Fest",
-      title_en: "Bandtols Represents School in Skool Fest",
-      desc_id:
-        "Bandtols sukses memukau penonton dalam ajang musik antar sekolah se-Jabodetabek.",
-      desc_en:
-        "Bandtols successfully impressed the audience in the interschool music festival in Jakarta area.",
-      image: "/berita/2.jpg",
-      date: "2025-09-22",
-    },
-  ]);
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
-  const [form, setForm] = useState<Partial<News>>({});
+export default function AdminNewsPage() {
+  const [news, setNews] = useState<News[]>([]);
+  const [form, setForm] = useState<Partial<News> & { imageFile?: File | null }>({});
   const [editId, setEditId] = useState<number | null>(null);
   const [isModalOpen, setModalOpen] = useState(false);
+  const modalRef = useRef<HTMLDivElement>(null);
 
-  // === Upload Gambar ===
+  // === Ambil data dari API ===
+  const fetchNews = async () => {
+    try {
+      const res = await axios.get(`${API_BASE_URL}/news`);
+      if (res.data.success) setNews(res.data.data);
+    } catch (err) {
+      console.error("Gagal memuat berita:", err);
+      Swal.fire("Gagal", "Tidak bisa memuat berita.", "error");
+    }
+  };
+
+  useEffect(() => {
+    fetchNews();
+  }, []);
+
+  // === Upload handler ===
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!file.name.endsWith(".webp") && !file.name.endsWith(".jpg") && !file.name.endsWith(".png")) {
+    const allowed = [".webp", ".jpg", ".jpeg", ".png"];
+    if (!allowed.some((ext) => file.name.endsWith(ext))) {
       Swal.fire("Format Salah", "Gunakan gambar .webp, .jpg, atau .png", "warning");
       return;
     }
 
-    setForm({ ...form, image: file });
+    setForm((prev) => ({ ...prev, imageFile: file }));
   };
 
-  // === Simpan Berita (Dummy) ===
-  const handleSave = () => {
-    if (!form.title_id || !form.title_en || !form.desc_id || !form.desc_en || !form.date) {
+  // === Simpan data (Tambah / Edit) ===
+  const handleSave = async () => {
+    if (
+      !form.title_id ||
+      !form.title_en ||
+      !form.desc_id ||
+      !form.desc_en ||
+      !form.date
+    ) {
       Swal.fire("Lengkapi Data", "Semua field wajib diisi!", "warning");
       return;
     }
 
-    if (editId) {
-      setNews((prev) =>
-        prev.map((n) =>
-          n.id === editId ? { ...n, ...form, id: editId } as News : n
-        )
-      );
-      Swal.fire("Berhasil", "Berita berhasil diperbarui.", "success");
-    } else {
-      const newItem: News = {
-        id: Date.now(),
-        title_id: form.title_id!,
-        title_en: form.title_en!,
-        desc_id: form.desc_id!,
-        desc_en: form.desc_en!,
-        image: form.image || "/placeholder-news.jpg",
-        date: form.date!,
-      };
-      setNews((prev) => [...prev, newItem]);
-      Swal.fire("Berhasil", "Berita berhasil ditambahkan.", "success");
-    }
+    const formData = new FormData();
+    formData.append("title_id", form.title_id);
+    formData.append("title_en", form.title_en);
+    formData.append("desc_id", form.desc_id);
+    formData.append("desc_en", form.desc_en);
+    formData.append("date", form.date);
+    if (form.imageFile) formData.append("image", form.imageFile);
 
-    setForm({});
-    setEditId(null);
-    setModalOpen(false);
+    try {
+      const url = editId
+        ? `${API_BASE_URL}/news/${editId}`
+        : `${API_BASE_URL}/news`;
+
+      await axios.post(url, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      Swal.fire(
+        "Berhasil!",
+        editId ? "Berita berhasil diperbarui." : "Berita berhasil ditambahkan.",
+        "success"
+      );
+
+      setModalOpen(false);
+      setForm({});
+      setEditId(null);
+      fetchNews();
+    } catch (err: any) {
+      console.error("Gagal menyimpan berita:", err);
+      Swal.fire("Gagal", err.response?.data?.message || "Upload gagal", "error");
+    }
   };
 
-  // === Hapus Berita ===
-  const handleDelete = (id: number) => {
-    Swal.fire({
+  // === Hapus data ===
+  const handleDelete = async (id: number) => {
+    const result = await Swal.fire({
       title: "Hapus Berita?",
       text: "Data yang dihapus tidak dapat dikembalikan.",
       icon: "warning",
@@ -103,20 +111,49 @@ export default function AdminNewsPage() {
       cancelButtonColor: "#243771",
       confirmButtonText: "Ya, Hapus",
       cancelButtonText: "Batal",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        setNews((prev) => prev.filter((n) => n.id !== id));
-        Swal.fire("Terhapus!", "Berita berhasil dihapus.", "success");
-      }
     });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      await axios.delete(`${API_BASE_URL}/news/${id}`);
+      Swal.fire("Terhapus!", "Berita berhasil dihapus.", "success");
+      fetchNews();
+    } catch {
+      Swal.fire("Gagal", "Tidak dapat menghapus berita.", "error");
+    }
   };
 
-  // === Edit Berita ===
+  // === Edit data ===
   const handleEdit = (n: News) => {
-    setForm(n);
     setEditId(n.id);
+    setForm({
+      title_id: n.title_id,
+      title_en: n.title_en,
+      desc_id: n.desc_id,
+      desc_en: n.desc_en,
+      date: n.date,
+      image: n.image,
+      imageFile: null,
+    });
     setModalOpen(true);
   };
+
+  // === Tutup modal di luar atau ESC ===
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (modalRef.current && !modalRef.current.contains(e.target as Node)) setModalOpen(false);
+    };
+    const handleEsc = (e: KeyboardEvent) => e.key === "Escape" && setModalOpen(false);
+    if (isModalOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("keydown", handleEsc);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEsc);
+    };
+  }, [isModalOpen]);
 
   return (
     <div className="space-y-8 animate-fadeIn p-8 max-w-6xl mx-auto">
@@ -135,7 +172,7 @@ export default function AdminNewsPage() {
         </button>
       </div>
 
-      {/* Tabel */}
+      {/* Table */}
       <div className="bg-white rounded-2xl shadow-md overflow-x-auto">
         <table className="min-w-full text-sm">
           <thead className="bg-[#243771] text-white text-left">
@@ -143,7 +180,7 @@ export default function AdminNewsPage() {
               <th className="p-3">#</th>
               <th className="p-3">Judul (ID)</th>
               <th className="p-3">Tanggal</th>
-              <th className="p-3">Gambar</th>
+              <th className="p-3 text-center">Gambar</th>
               <th className="p-3 text-center">Aksi</th>
             </tr>
           </thead>
@@ -156,21 +193,15 @@ export default function AdminNewsPage() {
                 >
                   <td className="p-3">{i + 1}</td>
                   <td className="p-3 font-semibold">{n.title_id}</td>
-                  <td className="p-3">
-                    {new Date(n.date).toLocaleDateString("id-ID")}
-                  </td>
-                  <td className="p-3">
+                  <td className="p-3">{new Date(n.date).toLocaleDateString("id-ID")}</td>
+                  <td className="p-3 text-center">
                     {n.image ? (
                       <Image
-                        src={
-                          typeof n.image === "string"
-                            ? n.image
-                            : URL.createObjectURL(n.image)
-                        }
+                        src={n.image}
                         alt={n.title_id}
-                        width={80}
-                        height={60}
-                        className="rounded border object-cover"
+                        width={100}
+                        height={70}
+                        className="rounded border object-cover mx-auto"
                       />
                     ) : (
                       <span className="text-gray-400 italic">Tidak ada</span>
@@ -206,7 +237,17 @@ export default function AdminNewsPage() {
       {/* Modal Tambah/Edit */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-6 w-[95%] max-w-2xl shadow-xl relative">
+          <div
+            ref={modalRef}
+            className="bg-white rounded-2xl p-6 w-[95%] max-w-2xl shadow-xl relative"
+          >
+            <button
+              onClick={() => setModalOpen(false)}
+              className="absolute top-3 right-3 text-gray-400 hover:text-[#FE4D01]"
+            >
+              <X size={20} />
+            </button>
+
             <h2 className="text-xl font-bold text-[#243771] mb-4">
               {editId ? "Edit Berita" : "Tambah Berita"}
             </h2>
@@ -257,21 +298,21 @@ export default function AdminNewsPage() {
                 />
               </div>
 
-              {form.image && (
-                <div className="mt-2">
+              {form.image || form.imageFile ? (
+                <div className="mt-2 text-center">
                   <Image
                     src={
-                      typeof form.image === "string"
-                        ? form.image
-                        : URL.createObjectURL(form.image)
+                      form.imageFile
+                        ? URL.createObjectURL(form.imageFile)
+                        : (form.image as string)
                     }
                     alt="Preview"
-                    width={200}
-                    height={120}
-                    className="rounded border object-cover"
+                    width={300}
+                    height={160}
+                    className="rounded border object-cover mx-auto"
                   />
                 </div>
-              )}
+              ) : null}
             </div>
 
             <div className="mt-6 flex justify-end gap-3">

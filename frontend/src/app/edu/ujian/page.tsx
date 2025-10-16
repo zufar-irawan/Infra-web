@@ -1,135 +1,70 @@
 "use client";
 
-
 import DashHeader from "@/app/components/DashHeader";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import axios from "axios";
-import {User} from "@/app/api/me/route";
-import TugasPending from "@/components/subComponents/forTugas/tugasPending";
+import React, { useState, useEffect, useMemo } from 'react';
 import UjianCard from "@/components/subComponents/forUjian/Ujiancard";
+import { useEduData } from "@/app/edu/context";
 
 export default function UjianSiswa() {
-    const [user, setUser] = useState<User | null>(null)
-    const [student, setStudent] = useState<any>()
-    const [uncompletedExam, setUncompletedExam] = useState<any>()
-    const [examSelesai, setExamSelesai] = useState<any>()
-    const [currentIndex, setCurrentIndex] = useState(0)
+    const { user, student, exams, subjects } = useEduData();
 
-    // Add new state variables for exam list functionality
-    const [ujian, setUjian] = useState<any>()
-    const [subjects, setSubjects] = useState<any>()
+    const [uncompletedExam, setUncompletedExam] = useState<any[]>([])
+    const [examSelesai, setExamSelesai] = useState<any[]>([])
+    const [ujian, setUjian] = useState<any[]>([])
+    const [currentIndex, setCurrentIndex] = useState(0)
 
     // Search and filter states
     const [searchQuery, setSearchQuery] = useState("")
     const [filterMataPelajaran, setFilterMataPelajaran] = useState("all")
     const [filterStatus, setFilterStatus] = useState("all")
 
-    const router = useRouter();
+    const classId = useMemo(() => student?.class?.id ?? student?.class_id ?? student?.classId ?? null, [student])
 
+    // Derive exam lists from context
     useEffect(() => {
-        const fetchAll = async () => {
-            try {
-                // user
-                const meRes = await axios.get("/api/me");
-                const userData = meRes.data.user;
-                setUser(userData);
+        if (!exams || !subjects || !classId) return;
 
-                // student
-                const studentRes = await axios.get("/api/student");
-                const studentList = studentRes.data.data;
-                const studentMe = studentList.find(
-                    (s: any) => s.user_id === userData.id
-                );
-                if (!studentMe) return;
-                setStudent(studentMe);
+        const allExams = exams?.exams ?? [];
+        const uncompleted = exams?.uncompletedExams ?? [];
+        const selesai = exams?.selesaiExams ?? exams?.completedExams ?? [];
 
-                // fetch exam
-                const examRes = await axios.get("/api/exam-card");
-                const uncompletedExamList = examRes.data.uncompletedExams;
-                const examSelesaiList = examRes.data.selesaiExams;
-                const allExams = examRes.data.exams;
+        // Filter to student's class
+        const filterByClass = (arr: any[]) => arr.filter((e: any) => (e.class_id ?? e.classId ?? e.class?.id) === classId)
 
-                const uncompletedExamMe = uncompletedExamList.filter(
-                    (s: any) => s.class_id === studentMe.class_id
-                )
-                const examSelesaiMe = examSelesaiList.filter(
-                    (s: any) => s.class_id === studentMe.class_id
-                )
+        const uncompletedMe = filterByClass(Array.isArray(uncompleted) ? uncompleted : []);
+        const selesaiMe = filterByClass(Array.isArray(selesai) ? selesai : []);
+        const allMe = filterByClass(Array.isArray(allExams) ? allExams : []);
 
-                // Filter all exams for student's class
-                const ujianMe = allExams.filter(
-                    (e: any) => e.class_id === studentMe.class_id
-                );
+        // Merge subjects and completion flag
+        const ujianWithSubjects = allMe.map((exam: any) => {
+            const subject = subjects.find((s: any) => s.id === (exam.subject_id ?? exam.subjectId));
+            const isCompleted = [...selesaiMe].some((completed: any) => completed.id === exam.id);
+            return { ...exam, subject, isCompleted };
+        });
 
-                // Fetch subjects
-                const subjectsRes = await axios.get("/api/subject");
-                const subjectsList = subjectsRes.data.data;
-
-                // Merge exams with subjects and exam results
-                const ujianWithSubjects = ujianMe.map((exam: any) => {
-                    const subject = subjectsList.find((s: any) => s.id === exam.subject_id);
-                    const isCompleted = [...examSelesaiMe, ...examSelesaiList].some((completed: any) => completed.id === exam.id);
-                    return {
-                        ...exam,
-                        subject,
-                        isCompleted
-                    };
-                });
-
-                if (!uncompletedExamMe) return;
-                if (!examSelesaiMe) return;
-
-                setUncompletedExam(uncompletedExamMe);
-                setExamSelesai(examSelesaiMe);
-                setUjian(ujianWithSubjects);
-                setSubjects(subjectsList);
-
-                console.log('Ujian with subjects:', ujianWithSubjects);
-            } catch (e:any) {
-                console.error(e)
-
-                if (e.response && (e.response.status === 401 || e.response.status === 403)) {
-                    handleLogout();
-                }
-            }
-        }
-
-        fetchAll()
-    }, []);
+        setUncompletedExam(uncompletedMe)
+        setExamSelesai(selesaiMe)
+        setUjian(ujianWithSubjects)
+    }, [exams, subjects, classId])
 
     // Reset carousel index when uncompletedExam changes
     useEffect(() => {
         setCurrentIndex(0);
     }, [uncompletedExam]);
 
-    const handleLogout = async () => {
-        await axios.post("/api/logout")
-            .then((res) => {
-                if(res.status === 200) {
-                    router.push("/edu/login");
-                }
-            })
-            .catch((err) => {
-                console.error(err);
-            })
-    };
-
-    const [open1, setOpen1] = useState(true);
-    const [open2, setOpen2] = useState(true);
     const [openSubjects, setOpenSubjects] = useState<{ [key: string]: boolean }>({});
 
     // Get unique mata pelajaran for filter dropdown
     const getUniqueMataPelajaran = () => {
-        if (!ujian) return [];
+        if (!ujian) return [] as string[];
         const subjectNames = ujian.map((u: any) => u.subject?.name || 'Mata Pelajaran Lain');
         return [...new Set(subjectNames)];
     };
 
     // Filter ujian based on search query and filters
     const getFilteredUjian = () => {
-        if (!ujian) return [];
+        if (!ujian) return [] as any[];
 
         return ujian.filter((item: any) => {
             const subjectName = item.subject?.name || 'Mata Pelajaran Lain';
@@ -152,12 +87,6 @@ export default function UjianSiswa() {
             return matchesSearch && matchesMataPelajaran && matchesStatus;
         });
     };
-
-    // Filtered ujian for display
-    const filteredUjian = getFilteredUjian();
-
-    // Subjects for filter dropdown
-    const mataPelajaranOptions = getUniqueMataPelajaran();
 
     // Carousel functions
     const nextSlide = () => {
@@ -298,9 +227,7 @@ export default function UjianSiswa() {
                             >
                                 <option value="all">Semua Mata Pelajaran</option>
                                 {getUniqueMataPelajaran().map((mataPelajaran) => (
-                                    // @ts-ignore
                                     <option key={mataPelajaran} value={mataPelajaran}>
-                                        {/* @ts-ignore */}
                                         {mataPelajaran}
                                     </option>
                                 ))}
@@ -408,8 +335,7 @@ export default function UjianSiswa() {
                                                     }`}>
                                                         {item.isCompleted
                                                             ? "Selesai"
-                                                            : "Belum dikerjakan"
-                                                        }
+                                                            : "Belum dikerjakan"}
                                                     </p>
                                                 </div>
                                                 <div className="flex flex-col sm:flex-row items-center gap-2">
@@ -421,7 +347,7 @@ export default function UjianSiswa() {
                                                             </svg>
                                                         </a>
                                                     ) : (
-                                                        <a href="#" className="text-sm bg-blue-500 text-white px-3 py-2 rounded-sm flex items-center gap-1 hover:bg-blue-400 hover:shadow transition">
+                                                        <a href="#" className="text-sm bg-orange-500 text-white px-3 py-2 rounded-sm flex items-center gap-1 hover:bg-orange-400 hover:shadow transition">
                                                             Kerjakan
                                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
                                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
@@ -436,34 +362,8 @@ export default function UjianSiswa() {
                             </div>
                         ))
                     ) : (
-                        <div className="w-full flex flex-col items-center justify-center py-8 bg-gray-50 rounded-xl border border-dashed border-orange-200">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-12 h-12 text-orange-400 mb-3">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-                            </svg>
-                            <h3 className="text-lg font-semibold text-orange-600 mb-1">
-                                {(searchQuery !== "" || filterMataPelajaran !== "all" || filterStatus !== "all")
-                                    ? "Tidak ada ujian yang sesuai filter"
-                                    : "Tidak ada ujian tersedia"
-                                }
-                            </h3>
-                            <p className="text-black/60 text-sm text-center max-w-md">
-                                {(searchQuery !== "" || filterMataPelajaran !== "all" || filterStatus !== "all")
-                                    ? "Coba ubah kata kunci pencarian atau filter untuk melihat ujian lainnya"
-                                    : "Silakan cek kembali nanti untuk ujian yang baru"
-                                }
-                            </p>
-                            {(searchQuery !== "" || filterMataPelajaran !== "all" || filterStatus !== "all") && (
-                                <button
-                                    onClick={() => {
-                                        setSearchQuery("");
-                                        setFilterMataPelajaran("all");
-                                        setFilterStatus("all");
-                                    }}
-                                    className="mt-3 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors duration-200 text-sm font-medium"
-                                >
-                                    Reset Filter
-                                </button>
-                            )}
+                        <div className="text-center text-gray-400 py-8">
+                            Tidak ada ujian.
                         </div>
                     );
                 })()}
@@ -473,4 +373,3 @@ export default function UjianSiswa() {
         </>
     )
 }
-

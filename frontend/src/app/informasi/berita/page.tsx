@@ -3,122 +3,43 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useLang } from "../../components/LangContext";
-import { useEffect, useState } from "react"; // 🟢 Tambahan integrasi backend
+import { useEffect, useState } from "react";
+
+interface BeritaItem {
+  id: number;
+  title_id: string;
+  title_en: string;
+  desc_id: string;
+  desc_en: string;
+  date: string;
+  image: string;
+}
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
 export default function Berita() {
   const { lang } = useLang();
-
-  // === Data Berita (contoh lokal / fallback) ===
-  const beritaListStatic = [
-    {
-      id: 1,
-      date_id: "17 Agustus 2025",
-      date_en: "August 17, 2025",
-      title_id: "Upacara HUT RI 80 di Lapangan Utama SMK Prestasi Prima",
-      title_en: "Independence Day Ceremony at SMK Prestasi Prima Main Field",
-      desc_id:
-        "SMK Prestasi Prima hari ini menggelar upacara memperingati HUT ke-80 Kemerdekaan Republik Indonesia. Acara yang dilaksanakan dengan khidmat...",
-      desc_en:
-        "SMK Prestasi Prima held a ceremony to commemorate Indonesia’s 80th Independence Day. The event was conducted solemnly...",
-      img: "/berita/1.jpg",
-      href: "#",
-    },
-    {
-      id: 2,
-      date_id: "22 September 2025",
-      date_en: "September 22, 2025",
-      title_id:
-        "Bandtols Wakili Sekolah Prestasi Prima di Ajang Awesome Skool Fest",
-      title_en: "Bandtols Represents SMK Prestasi Prima at Awesome Skool Fest",
-      desc_id:
-        "Bandtols, grup musik kebanggaan sekolah, sukses memukau penonton dan mengharumkan nama sekolah...",
-      desc_en:
-        "Bandtols, the school’s pride, stunned the audience and brought honor to the school...",
-      img: "/berita/2.jpg",
-      href: "#",
-    },
-    {
-      id: 3,
-      date_id: "19 Agustus 2025",
-      date_en: "August 19, 2025",
-      title_id: "Skrining Kesehatan Siswa Siswi Kelas 10 SMK Prestasi Prima",
-      title_en: "Health Screening for Grade 10 Students",
-      desc_id:
-        "Upaya memastikan peserta didik baru memiliki kondisi fisik dan mental optimal...",
-      desc_en: "An effort to ensure new students are physically and mentally fit...",
-      img: "/berita/3.jpg",
-      href: "#",
-    },
-    {
-      id: 4,
-      date_id: "4 Agustus 2025",
-      date_en: "August 4, 2025",
-      title_id: "Pelaksanaan ANBK Tahun Pelajaran 2025–2026",
-      title_en: "ANBK Implementation for AY 2025–2026",
-      desc_id:
-        "Asesmen Nasional Berbasis Komputer diselenggarakan di laboratorium sekolah...",
-      desc_en: "The Computer-Based National Assessment was held in the school’s labs...",
-      img: "/berita/4.jpg",
-      href: "#",
-    },
-    {
-      id: 5,
-      date_id: "29 Juli 2025",
-      date_en: "July 29, 2025",
-      title_id: "Lulusan SMK Prestasi Prima Melangkah PTN Melalui Jalur Mandiri",
-      title_en: "Graduates Admitted to Public Universities via Independent Track",
-      desc_id:
-        "Banyak alumni berhasil menembus PTN melalui jalur mandiri dengan prestasi membanggakan...",
-      desc_en:
-        "Many alumni were accepted into public universities through the independent track...",
-      img: "/berita/5.jpg",
-      href: "#",
-    },
-    {
-      id: 6,
-      date_id: "25 Juli 2025",
-      date_en: "July 25, 2025",
-      title_id: "Sekolah Nonton Bersama Film Believe",
-      title_en: "School Movie Day: Believe",
-      desc_id:
-        "Kegiatan nobar menjadi ajang mempererat kebersamaan sekaligus sarana edukatif bagi siswa...",
-      desc_en:
-        "A movie day to strengthen togetherness while providing an educational experience...",
-      img: "/berita/6.jpg",
-      href: "#",
-    },
-  ];
-
-  // 🟢 State dinamis dari backend
-  const [beritaList, setBeritaList] = useState(beritaListStatic);
+  const [beritaList, setBeritaList] = useState<BeritaItem[]>([]);
   const [isBackendActive, setIsBackendActive] = useState(false);
 
-  // 🟢 Coba ambil data dari backend Laravel
   useEffect(() => {
     const fetchBerita = async () => {
       try {
-        const res = await fetch("http://127.0.0.1:8000/api/news");
-        if (!res.ok) throw new Error("API error");
-        const data = await res.json();
+        const res = await fetch(`${API_BASE_URL}/news`, { cache: "no-store" });
+        const json = await res.json();
+        console.log("📦 Data dari backend:", json);
 
-        if (Array.isArray(data) && data.length > 0) {
-          setBeritaList(
-            data.map((b) => ({
-              id: b.id,
-              date_id: new Date(b.date).toLocaleDateString("id-ID"),
-              date_en: new Date(b.date).toLocaleDateString("en-US"),
-              title_id: b.title_id,
-              title_en: b.title_en,
-              desc_id: b.desc_id,
-              desc_en: b.desc_en,
-              img: b.image ?? "/placeholder-news.jpg",
-              href: `/informasi/berita/${b.id}`,
-            }))
-          );
+        // ✅ gunakan json.data sesuai struktur yang kamu kirim
+        if (json.success && Array.isArray(json.data)) {
+          setBeritaList(json.data);
           setIsBackendActive(true);
+        } else {
+          console.warn("⚠️ Format tidak sesuai atau data kosong");
+          setIsBackendActive(false);
         }
       } catch (error) {
-        console.warn("⚠️ Backend Laravel belum aktif, pakai data statis.");
+        console.error("❌ Gagal ambil berita dari backend:", error);
+        setIsBackendActive(false);
       }
     };
 
@@ -127,7 +48,6 @@ export default function Berita() {
 
   return (
     <>
-      {/* Spacer agar tidak tertutup navbar */}
       <div className="h-[100px] bg-white" />
 
       {/* === Breadcrumbs === */}
@@ -138,70 +58,60 @@ export default function Berita() {
               {lang === "id" ? "Beranda" : "Home"}
             </Link>
             <span className="text-[#FE4D01]">{">"}</span>
-            <Link
-              href="/informasi/berita"
-              className="text-[#FE4D01] hover:underline"
-            >
+            <Link href="/informasi/berita" className="text-[#FE4D01] hover:underline">
               {lang === "id" ? "Informasi" : "Information"}
             </Link>
             <span className="text-[#243771]">{">"}</span>
-            <span className="text-[#243771]">
-              {lang === "id" ? "Berita" : "News"}
-            </span>
+            <span className="text-[#243771]">{lang === "id" ? "Berita" : "News"}</span>
           </nav>
         </div>
       </section>
 
-      {/* === Konten Utama === */}
-      <main className="flex-1 w-full bg-white">
-        {/* === Section Intro === */}
-        <section className="relative w-full bg-white">
-          <div className="absolute bottom-0 right-0 w-[50px] h-[50px] bg-[#FE4D01] hidden sm:block" />
-          <div className="absolute bottom-12.5 right-12.5 w-[50px] h-[50px] bg-[#FE4D01] hidden sm:block" />
-          <div className="absolute bottom-25 right-12.5 w-[50px] h-[50px] bg-[#243771] hidden sm:block" />
-          <div className="absolute bottom-37.5 right-0 w-[50px] h-[50px] bg-[#243771] hidden sm:block" />
+      {/* === Intro Section === */}
+      <section className="relative w-full bg-white">
+        <div className="max-w-6xl mx-auto px-4 pt-16 pb-24">
+          <h2 className="text-3xl sm:text-4xl font-semibold text-[#243771] text-center mb-12">
+            {lang === "id" ? "Berita" : "News"}
+          </h2>
 
-          <div className="max-w-6xl mx-auto px-4 pt-16 pb-24">
-            <h2 className="text-3xl sm:text-4xl font-semibold text-[#243771] text-center mb-12">
-              {lang === "id" ? "Berita" : "News"}
-            </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            <div>
+              <img
+                src="/avif/ppdb.avif"
+                alt="SMK Prestasi Prima"
+                className="rounded-xl w-full h-auto object-cover aspect-[4/3] hover:scale-[1.03] hover:shadow-xl transition-transform duration-500"
+              />
+            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-              {/* Gambar */}
-              <div>
-                <img
-                  src="/avif/ppdb.avif"
-                  alt="SMK Prestasi Prima"
-                  className="rounded-xl w-full h-auto object-cover aspect-[4/3] hover:scale-[1.03] hover:shadow-xl transition-transform duration-500"
-                />
-              </div>
+            <div>
+              <p className="text-gray-700 leading-relaxed text-justify text-base sm:text-lg mb-6">
+                {lang === "id"
+                  ? "Telusuri berita terbaru untuk mendapatkan informasi terkini tentang kegiatan, prestasi, dan inovasi di SMK Prestasi Prima."
+                  : "Explore the latest news to stay updated on SMK Prestasi Prima’s activities, achievements, and innovations."}
+              </p>
 
-              {/* Teks */}
-              <div>
-                <p className="text-gray-700 leading-relaxed text-justify text-base sm:text-lg mb-6">
-                  {lang === "id"
-                    ? "Telusuri berita terbaru untuk mendapatkan informasi terkini tentang kegiatan, prestasi, dan inovasi di SMK Prestasi Prima. Dari acara kampus hingga penghargaan nasional, semuanya kami sajikan untuk Anda."
-                    : "Explore the latest news to stay updated on SMK Prestasi Prima’s activities, achievements, and innovations—from campus events to national awards."}
-                </p>
-
-                {/* 🟢 Tambahan indikator backend */}
-                <p className="text-sm text-gray-500">
-                  {isBackendActive
-                    ? "✅ Data diambil dari server Laravel."
-                    : "⚠️ Menampilkan data statis (backend belum aktif)."}
-                </p>
-              </div>
+              <p className="text-sm text-gray-500">
+                {isBackendActive
+                  ? "✅ Data diambil dari server Laravel."
+                  : "⚠️ Backend belum aktif atau tidak ada data."}
+              </p>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* === Section Berita Terbaru === */}
-        <section className="w-full bg-white py-10 sm:py-16">
-          <div className="container mx-auto px-6">
-            <h2 className="text-3xl md:text-4xl font-bold text-center text-[#243771] mb-10">
-              {lang === "id" ? "Berita Terbaru" : "Latest News"}
-            </h2>
+      {/* === Section Berita === */}
+      <section className="w-full bg-white py-10 sm:py-16">
+        <div className="container mx-auto px-6">
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-[#243771] mb-10">
+            {lang === "id" ? "Berita Terbaru" : "Latest News"}
+          </h2>
 
+          {beritaList.length === 0 ? (
+            <p className="text-center text-gray-500 italic">
+              {lang === "id" ? "Belum ada berita." : "No news available."}
+            </p>
+          ) : (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {beritaList.map((b) => (
                 <article
@@ -210,17 +120,16 @@ export default function Berita() {
                 >
                   <div className="relative w-full h-48 md:h-52">
                     <Image
-                      src={b.img}
+                      src={b.image}
                       alt={lang === "id" ? b.title_id : b.title_en}
                       fill
                       className="object-cover"
-                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     />
                   </div>
 
                   <div className="p-4 md:p-5">
                     <p className="text-xs md:text-sm font-semibold text-[#FE4D01] mb-2">
-                      {lang === "id" ? b.date_id : b.date_en}
+                      {new Date(b.date).toLocaleDateString(lang === "id" ? "id-ID" : "en-US")}
                     </p>
 
                     <h3 className="text-[15px] md:text-lg font-semibold text-[#111820] leading-snug mb-2">
@@ -241,22 +150,18 @@ export default function Berita() {
                 </article>
               ))}
             </div>
-          </div>
-        </section>
+          )}
+        </div>
+      </section>
 
-        {/* === Section Gedung === */}
-        <section className="relative w-full bg-white overflow-hidden">
-          <img
-            src="/avif/gedung.avif"
-            alt={
-              lang === "id"
-                ? "Gedung SMK Prestasi Prima"
-                : "Prestasi Prima Building"
-            }
-            className="w-full h-[40vh] sm:h-[55vh] lg:h-screen object-cover object-center hover:scale-[1.02] transition-transform duration-700"
-          />
-        </section>
-      </main>
+      {/* === Section Gedung === */}
+      <section className="relative w-full bg-white overflow-hidden">
+        <img
+          src="/avif/gedung.avif"
+          alt={lang === "id" ? "Gedung SMK Prestasi Prima" : "Prestasi Prima Building"}
+          className="w-full h-[40vh] sm:h-[55vh] lg:h-screen object-cover object-center hover:scale-[1.02] transition-transform duration-700"
+        />
+      </section>
     </>
   );
 }

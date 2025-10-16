@@ -1,95 +1,94 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
+import axios from "axios";
 import Swal from "sweetalert2";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 
 interface Partner {
   id: number;
   name: string;
-  img_id: string; // gambar versi Bahasa Indonesia (webp)
-  img_en: string; // gambar versi Bahasa Inggris (webp)
+  img_id: string;
+  img_en: string;
 }
 
-export default function MitraPage() {
-  const [partners, setPartners] = useState<Partner[]>([
-    {
-      id: 1,
-      name: "Komatsu",
-      img_id: "/webp/komatsu_id.webp",
-      img_en: "/webp/komatsu_en.webp",
-    },
-    {
-      id: 2,
-      name: "Panasonic",
-      img_id: "/webp/panasonic_id.webp",
-      img_en: "/webp/panasonic_en.webp",
-    },
-  ]);
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
+export default function MitraPage() {
+  const [partners, setPartners] = useState<Partner[]>([]);
   const [form, setForm] = useState<Partial<Partner>>({});
   const [editId, setEditId] = useState<number | null>(null);
   const [isModalOpen, setModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  // === Upload Gambar ===
-  const handleImageUpload = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    type: "id" | "en"
-  ) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (!file.name.endsWith(".webp")) {
-      Swal.fire("Format Salah", "Gunakan gambar berformat .webp", "warning");
-      return;
+  // === Ambil Data dari API ===
+  const fetchData = async () => {
+    try {
+      const res = await axios.get(`${API_BASE_URL}/mitra`);
+      if (res.data.success) setPartners(res.data.data);
+    } catch (err) {
+      console.error("Gagal mengambil data mitra:", err);
+    } finally {
+      setLoading(false);
     }
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (type === "id") setForm({ ...form, img_id: reader.result as string });
-      else setForm({ ...form, img_en: reader.result as string });
-    };
-    reader.readAsDataURL(file);
   };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  // === Upload file handler ===
+  const [fileID, setFileID] = useState<File | null>(null);
+  const [fileEN, setFileEN] = useState<File | null>(null);
 
   // === Simpan (Tambah / Edit) ===
-  const handleSave = () => {
-    if (!form.name || !form.img_id || !form.img_en) {
-      Swal.fire("Lengkapi Data", "Semua field harus diisi!", "warning");
+  const handleSave = async () => {
+    if (!form.name || (!fileID && !editId) || (!fileEN && !editId)) {
+      Swal.fire("Lengkapi Data", "Semua field wajib diisi!", "warning");
       return;
     }
 
-    if (editId) {
-      setPartners((prev) =>
-        prev.map((p) => (p.id === editId ? { ...p, ...form } as Partner : p))
-      );
-      Swal.fire("Berhasil", "Data mitra diperbarui.", "success");
-    } else {
-      const newPartner: Partner = {
-        id: Date.now(),
-        name: form.name!,
-        img_id: form.img_id!,
-        img_en: form.img_en!,
-      };
-      setPartners((prev) => [...prev, newPartner]);
-      Swal.fire("Berhasil", "Data mitra ditambahkan.", "success");
-    }
+    const formData = new FormData();
+    formData.append("name", form.name || "");
+    if (fileID) formData.append("img_id", fileID);
+    if (fileEN) formData.append("img_en", fileEN);
 
-    setForm({});
-    setEditId(null);
-    setModalOpen(false);
+    try {
+      if (editId) {
+        await axios.post(`${API_BASE_URL}/mitra/${editId}?_method=PUT`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        Swal.fire("Berhasil", "Data mitra berhasil diperbarui.", "success");
+      } else {
+        await axios.post(`${API_BASE_URL}/mitra`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        Swal.fire("Berhasil", "Data mitra berhasil ditambahkan.", "success");
+      }
+
+      setForm({});
+      setFileID(null);
+      setFileEN(null);
+      setEditId(null);
+      setModalOpen(false);
+      fetchData();
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Gagal", "Terjadi kesalahan saat menyimpan data.", "error");
+    }
   };
 
-  // === Edit ===
+  // === Edit Data ===
   const handleEdit = (partner: Partner) => {
-    setForm(partner);
+    setForm({ name: partner.name });
     setEditId(partner.id);
     setModalOpen(true);
   };
 
-  // === Hapus ===
-  const handleDelete = (id: number) => {
+  // === Hapus Data ===
+  const handleDelete = async (id: number) => {
     Swal.fire({
       title: "Hapus Mitra?",
       text: "Data tidak bisa dikembalikan setelah dihapus.",
@@ -99,17 +98,22 @@ export default function MitraPage() {
       cancelButtonColor: "#243771",
       confirmButtonText: "Ya, Hapus",
       cancelButtonText: "Batal",
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        setPartners((prev) => prev.filter((p) => p.id !== id));
-        Swal.fire("Terhapus!", "Data mitra berhasil dihapus.", "success");
+        try {
+          await axios.delete(`${API_BASE_URL}/mitra/${id}`);
+          Swal.fire("Terhapus!", "Data mitra berhasil dihapus.", "success");
+          fetchData();
+        } catch {
+          Swal.fire("Gagal", "Tidak dapat menghapus mitra.", "error");
+        }
       }
     });
   };
 
   return (
-    <div className="space-y-8 animate-fadeIn">
-      {/* === Header === */}
+    <div className="space-y-8 animate-fadeIn p-8 max-w-6xl mx-auto">
+      {/* Header */}
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-[#243771]">
           🤝 Manajemen Mitra Industri
@@ -117,6 +121,8 @@ export default function MitraPage() {
         <button
           onClick={() => {
             setForm({});
+            setFileID(null);
+            setFileEN(null);
             setEditId(null);
             setModalOpen(true);
           }}
@@ -126,7 +132,7 @@ export default function MitraPage() {
         </button>
       </div>
 
-      {/* === Tabel Mitra === */}
+      {/* Table */}
       <div className="bg-white rounded-2xl shadow-md overflow-x-auto">
         <table className="min-w-full text-sm">
           <thead className="bg-[#243771] text-white text-left">
@@ -139,7 +145,13 @@ export default function MitraPage() {
             </tr>
           </thead>
           <tbody>
-            {partners.length > 0 ? (
+            {loading ? (
+              <tr>
+                <td colSpan={5} className="text-center py-6">
+                  Memuat data...
+                </td>
+              </tr>
+            ) : partners.length > 0 ? (
               partners.map((p, i) => (
                 <tr
                   key={p.id}
@@ -149,20 +161,22 @@ export default function MitraPage() {
                   <td className="p-3 font-semibold">{p.name}</td>
                   <td className="p-3">
                     <Image
-                      src={p.img_id}
+                      src={`${p.img_id}`}
                       alt="Logo ID"
                       width={80}
                       height={80}
                       className="rounded-md border border-gray-200 object-contain"
+                      unoptimized
                     />
                   </td>
                   <td className="p-3">
                     <Image
-                      src={p.img_en}
+                      src={`${p.img_en}`}
                       alt="Logo EN"
                       width={80}
                       height={80}
                       className="rounded-md border border-gray-200 object-contain"
+                      unoptimized
                     />
                   </td>
                   <td className="p-3 flex justify-center gap-2">
@@ -183,7 +197,10 @@ export default function MitraPage() {
               ))
             ) : (
               <tr>
-                <td colSpan={5} className="text-center py-6 text-gray-500 italic">
+                <td
+                  colSpan={5}
+                  className="text-center py-6 text-gray-500 italic"
+                >
                   Belum ada data mitra.
                 </td>
               </tr>
@@ -192,7 +209,7 @@ export default function MitraPage() {
         </table>
       </div>
 
-      {/* === Modal Tambah/Edit === */}
+      {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-2xl p-6 w-[95%] max-w-md shadow-xl relative">
@@ -201,66 +218,39 @@ export default function MitraPage() {
             </h2>
 
             <div className="space-y-4">
-              {/* Nama Mitra */}
-              <div>
-                <label className="text-sm font-medium text-gray-600 mb-1 block">
-                  Nama Mitra
-                </label>
-                <input
-                  type="text"
-                  value={form.name || ""}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className="w-full border rounded-lg p-2"
-                  placeholder="Contoh: Komatsu"
-                />
-              </div>
+              <input
+                type="text"
+                placeholder="Nama Mitra"
+                value={form.name || ""}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                className="w-full border rounded-lg p-2"
+              />
 
-              {/* Gambar ID */}
               <div>
-                <label className="text-sm font-medium text-gray-600 mb-1 block">
+                <label className="block text-sm text-gray-600 mb-1">
                   Logo Bahasa Indonesia (.webp)
                 </label>
                 <input
                   type="file"
                   accept=".webp"
-                  onChange={(e) => handleImageUpload(e, "id")}
+                  onChange={(e) => setFileID(e.target.files?.[0] || null)}
                   className="w-full border rounded-lg p-2"
                 />
-                {form.img_id && (
-                  <Image
-                    src={form.img_id}
-                    alt="Preview ID"
-                    width={120}
-                    height={120}
-                    className="rounded-lg mt-2 border border-gray-200"
-                  />
-                )}
               </div>
 
-              {/* Gambar EN */}
               <div>
-                <label className="text-sm font-medium text-gray-600 mb-1 block">
+                <label className="block text-sm text-gray-600 mb-1">
                   Logo Bahasa Inggris (.webp)
                 </label>
                 <input
                   type="file"
                   accept=".webp"
-                  onChange={(e) => handleImageUpload(e, "en")}
+                  onChange={(e) => setFileEN(e.target.files?.[0] || null)}
                   className="w-full border rounded-lg p-2"
                 />
-                {form.img_en && (
-                  <Image
-                    src={form.img_en}
-                    alt="Preview EN"
-                    width={120}
-                    height={120}
-                    className="rounded-lg mt-2 border border-gray-200"
-                  />
-                )}
               </div>
             </div>
 
-            {/* Tombol Aksi */}
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => setModalOpen(false)}

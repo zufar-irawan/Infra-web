@@ -9,8 +9,8 @@ import axios from "axios";
 import {User} from "@/app/api/me/route";
 
 interface LoadingContextType {
-isLoading: boolean;
-setLoading: (loading: boolean) => void;
+    isLoading: boolean;
+    setLoading: (loading: boolean) => void;
 }
 
 const LoadingContext = createContext<LoadingContextType | undefined>(undefined);
@@ -31,7 +31,7 @@ export default function LoadingProvider({ children }: LoadingProviderProps) {
     const [user, setUser] = useState<User | null>(null)
 
     const router = useRouter();
-    
+
     const [isLoading, setIsLoading] = useState(false);
     const pathname = usePathname();
 
@@ -79,9 +79,9 @@ export default function LoadingProvider({ children }: LoadingProviderProps) {
 
     return (
         <LoadingContext.Provider value={{ isLoading, setLoading }}>
-        <LoadingBar isLoading={isLoading} />
-        <Loading isLoading={isLoading} />
-        {children}
+            <LoadingBar isLoading={isLoading} />
+            <Loading isLoading={isLoading} />
+            {children}
         </LoadingContext.Provider>
     );
 }

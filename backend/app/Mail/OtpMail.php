@@ -1,4 +1,4 @@
-<?php
+<!--
 
 namespace App\Mail;
 
@@ -25,4 +25,4 @@ class OtpMail extends Mailable
                 'code' => $this->verificationCode,
             ]);
     }
-}
+} -->

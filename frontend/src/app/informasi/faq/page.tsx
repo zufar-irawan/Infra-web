@@ -5,18 +5,15 @@ import Navbar from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useLang } from "../../components/LangContext";
 import { useState, useRef, useEffect } from "react";
+import axios from "axios";
 
-/* -------------------- Halaman Tentang -------------------- */
 export default function Faq() {
   const { lang } = useLang();
 
   return (
     <>
-
-      {/* Spacer biar ga ketiban header */}
       <div className="h-[100px] bg-white" />
 
-      {/* Breadcrumbs */}
       <section className="w-full py-4 bg-white">
         <div className="container mx-auto px-4">
           <nav className="flex items-center text-sm font-medium space-x-2">
@@ -38,55 +35,44 @@ export default function Faq() {
         </div>
       </section>
 
-      {/* FAQ Section */}
       <FAQSection />
 
-      {/* === Section Gedung === */}
-        <section className="relative w-full bg-white overflow-hidden">
-          <img
-            src="/svg/gedung.svg"
-            alt={lang === "id" ? "Gedung SMK Prestasi Prima" : "Prestasi Prima Building"}
-            className="
-              w-full h-[40vh] sm:h-[50vh] lg:h-screen
-              object-cover object-center
-              hover:scale-[1.02] transition-transform duration-700
-            "
-          />
-        </section>
-
-
+      <section className="relative w-full bg-white overflow-hidden">
+        <img
+          src="/svg/gedung.svg"
+          alt={
+            lang === "id"
+              ? "Gedung SMK Prestasi Prima"
+              : "Prestasi Prima Building"
+          }
+          className="w-full h-[40vh] sm:h-[50vh] lg:h-screen object-cover object-center hover:scale-[1.02] transition-transform duration-700"
+        />
+      </section>
     </>
   );
 }
 
-/* -------------------- FAQ Section -------------------- */
 function FAQSection() {
   const { lang } = useLang();
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [faq, setFaq] = useState<any[]>([]);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const API_BASE_URL =
+    process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
-  const faq = [
-    {
-      q_id: "Dimana alamat SMK Prestasi Prima?",
-      a_id: "Alamat kami berada di Jl. Kayu Manis Timur No. 99, Jakarta Timur.",
-      q_en: "Where is SMK Prestasi Prima located?",
-      a_en: "Our address is Jl. Kayu Manis Timur No. 99, East Jakarta.",
-    },
-    {
-      q_id: "Apa saja jurusan yang tersedia?",
-      a_id: "Kami memiliki jurusan RPL, TJKT, DKV, dan lainnya.",
-      q_en: "What majors are available?",
-      a_en: "We offer majors such as Software Engineering, Network Engineering, Visual Communication Design, and more.",
-    },
-    {
-      q_id: "Apakah ada kegiatan ekstrakurikuler?",
-      a_id: "Ya, tersedia banyak ekstrakurikuler seperti futsal, basket, musik, dan robotik.",
-      q_en: "Are there extracurricular activities?",
-      a_en: "Yes, we provide many extracurriculars such as futsal, basketball, music, and robotics.",
-    },
-  ];
+  useEffect(() => {
+    const fetchFaq = async () => {
+      try {
+        const res = await axios.get(`${API_BASE_URL}/faq/list`);
+        setFaq(res.data.data);
+      } catch (err) {
+        console.error("Gagal memuat FAQ:", err);
+      }
+    };
+    fetchFaq();
+  }, []);
 
-  // close jika klik luar atau tekan Escape
+  // Tutup jika klik luar atau tekan Escape
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent | TouchEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
@@ -96,11 +82,9 @@ function FAQSection() {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpenIndex(null);
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     document.addEventListener("touchstart", handleClickOutside);
     document.addEventListener("keydown", handleEsc);
-
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
       document.removeEventListener("touchstart", handleClickOutside);
@@ -120,41 +104,44 @@ function FAQSection() {
             : "We provide a list of frequently asked questions..."}
         </p>
 
-        {/* Ref ditempel ke wrapper card FAQ */}
         <div className="space-y-4" ref={containerRef}>
-          {faq.map((item, i) => {
-            const isOpen = openIndex === i;
-            return (
-              <div key={i} className="border rounded-lg shadow-sm overflow-hidden">
-                <button
-                  aria-expanded={isOpen}
-                  aria-controls={`faq-content-${i}`}
-                  id={`faq-btn-${i}`}
-                  className="w-full flex justify-between items-center p-4 font-medium text-[#243771] focus:outline-none"
-                  onClick={() => setOpenIndex(isOpen ? null : i)}
-                >
-                  <span className="text-left">
-                    {lang === "id" ? item.q_id : item.q_en}
-                  </span>
-                  <span className="text-lg ml-4">{isOpen ? "−" : "+"}</span>
-                </button>
-
-                <div
-                  id={`faq-content-${i}`}
-                  role="region"
-                  aria-labelledby={`faq-btn-${i}`}
-                  className={`overflow-hidden transition-[max-height] duration-500 ease-in-out ${isOpen ? "max-h-40" : "max-h-0"
+          {faq.length > 0 ? (
+            faq.map((item, i) => {
+              const isOpen = openIndex === i;
+              return (
+                <div key={i} className="border rounded-lg shadow-sm overflow-hidden">
+                  <button
+                    aria-expanded={isOpen}
+                    aria-controls={`faq-content-${i}`}
+                    id={`faq-btn-${i}`}
+                    className="w-full flex justify-between items-center p-4 font-medium text-[#243771] focus:outline-none"
+                    onClick={() => setOpenIndex(isOpen ? null : i)}
+                  >
+                    <span className="text-left">
+                      {lang === "id" ? item.q_id : item.q_en}
+                    </span>
+                    <span className="text-lg ml-4">{isOpen ? "−" : "+"}</span>
+                  </button>
+                  <div
+                    id={`faq-content-${i}`}
+                    role="region"
+                    aria-labelledby={`faq-btn-${i}`}
+                    className={`overflow-hidden transition-[max-height] duration-500 ease-in-out ${
+                      isOpen ? "max-h-40" : "max-h-0"
                     }`}
-                >
-                  <div className="p-4 pt-0">
-                    <p className="text-gray-600">
-                      {lang === "id" ? item.a_id : item.a_en}
-                    </p>
+                  >
+                    <div className="p-4 pt-0">
+                      <p className="text-gray-600">
+                        {lang === "id" ? item.a_id : item.a_en}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })
+          ) : (
+            <p className="text-center text-gray-500 italic">Tidak ada FAQ.</p>
+          )}
         </div>
       </div>
     </section>
