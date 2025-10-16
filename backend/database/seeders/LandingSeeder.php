@@ -10,8 +10,18 @@ class LandingSeeder extends Seeder
     public function run(): void
     {
         DB::table('admins')->insert([
-            ['email' => 'superadmin@smkpp.sch.id'],
-            ['email' => 'admin@smkpp.sch.id'],
+            [
+                'email' => 'anandiadavv@gmail.com',
+                'api_token' => bin2hex(random_bytes(16)), // otomatis buat token unik
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'email' => 'davina4422.pplg1@smkprestasiprima.sch.id',
+                'api_token' => bin2hex(random_bytes(16)), // otomatis buat token unik
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
         ]);
     }
 }

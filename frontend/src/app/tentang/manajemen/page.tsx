@@ -3,19 +3,31 @@
 import Link from "next/link";
 import { useLang } from "../../components/LangContext";
 import { useEffect, useRef, useState } from "react";
-import Jurusan from "@/app/sections/jurusan";
+import axios from "axios";
+
+interface Staff {
+  id: number;
+  img_id: string;
+  img_en: string;
+}
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
 export default function Manajemen() {
   const { lang } = useLang();
+  const [staffList, setStaffList] = useState<Staff[]>([]);
   const [showStaff, setShowStaff] = useState(false);
   const staffRef = useRef<HTMLDivElement | null>(null);
 
-  // Data sementara: gambar placeholder sirHendry.svg
-  const staffList = Array.from({ length: 21 }, () => ({
-    img: "/svg/sirHendry.svg",
-  }));
+  useEffect(() => {
+    axios
+      .get(`${API_BASE_URL}/management/public`)
+      .then((res) => {
+        if (res.data.success) setStaffList(res.data.data);
+      })
+      .catch((err) => console.error("Gagal memuat data staff:", err));
+  }, []);
 
-  // === animasi masuk saat scroll ===
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -33,10 +45,7 @@ export default function Manajemen() {
 
   return (
     <>
-      {/* Spacer agar tidak ketiban navbar */}
       <div className="h-[100px] bg-white" />
-
-      {/* === Breadcrumbs === */}
       <section className="w-full py-4 bg-white">
         <div className="container mx-auto px-4">
           <nav className="flex items-center text-sm font-medium space-x-2">
@@ -44,10 +53,7 @@ export default function Manajemen() {
               {lang === "id" ? "Beranda" : "Home"}
             </Link>
             <span className="text-[#FE4D01]">{">"}</span>
-            <Link
-              href="/tentang/manajemen"
-              className="text-[#FE4D01] hover:underline"
-            >
+            <Link href="/tentang/manajemen" className="text-[#FE4D01] hover:underline">
               {lang === "id" ? "Tentang Kami" : "About Us"}
             </Link>
             <span className="text-[#243771]">{">"}</span>
@@ -58,10 +64,7 @@ export default function Manajemen() {
         </div>
       </section>
 
-      {/* === Konten Utama === */}
       <main className="flex-1 w-full bg-white">
-
-        {/* === Section Manajemen Staf === */}
         <section
           ref={staffRef}
           className={`relative w-full bg-white py-14 transition-all duration-1000 ease-out ${
@@ -73,33 +76,19 @@ export default function Manajemen() {
               {lang === "id" ? "Manajemen Staf" : "Management Staff"}
             </h2>
 
-            {/* Baris pertama: 3 foto di tengah */}
-            <div className="flex justify-center gap-6 flex-wrap mb-10">
-              {staffList.slice(0, 3).map((staff, idx) => (
+            <div className="flex flex-wrap justify-center gap-8">
+              {staffList.map((staff) => (
                 <img
-                  key={idx}
-                  src={staff.img}
-                  alt={`Staff ${idx + 1}`}
-                  className="w-[70%] sm:w-[180px] md:w-[200px] lg:w-[220px] object-contain transition-transform duration-500 hover:scale-[1.05]"
-                />
-              ))}
-            </div>
-
-            {/* Grid berikutnya */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 justify-items-center">
-              {staffList.slice(3).map((staff, idx) => (
-                <img
-                  key={idx}
-                  src={staff.img}
-                  alt={`Staff ${idx + 4}`}
-                  className="w-[70%] sm:w-[160px] md:w-[190px] lg:w-[210px] object-contain transition-transform duration-500 hover:scale-[1.05]"
+                  key={staff.id}
+                  src={lang === "id" ? staff.img_id : staff.img_en}
+                  alt={`Staff ${staff.id}`}
+                  className="w-[150px] sm:w-[180px] md:w-[200px] lg:w-[220px] object-contain rounded-lg shadow hover:scale-[1.05] transition-transform duration-500"
                 />
               ))}
             </div>
           </div>
         </section>
-        
-        {/* === Section Gedung === */}
+
         <section className="relative w-full bg-white overflow-hidden">
           <img
             src="/svg/gedung.svg"

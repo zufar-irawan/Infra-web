@@ -5,39 +5,20 @@ import { useLang } from "../../components/LangContext";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-interface FacilityItem {
-  id?: number;
-  img: string;
+interface Facility {
+  id: number;
+  img_id: string;
+  img_en: string;
   category: string;
 }
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+
 export default function Fasilitas() {
   const { lang } = useLang();
+  const [facilities, setFacilities] = useState<Facility[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // === Data sementara ===
-  const [facilities, setFacilities] = useState<FacilityItem[]>([
-    // LABORATORIUM & STUDIO
-    { img: "/svg/labDkv.svg", category: "Laboratorium & Studio" },
-    { img: "/svg/labRpl.svg", category: "Laboratorium & Studio" },
-    { img: "/svg/labTkj.svg", category: "Laboratorium & Studio" },
-    { img: "/svg/labBc.svg", category: "Laboratorium & Studio" },
-    { img: "/svg/studioBc.svg", category: "Laboratorium & Studio" },
-
-    // FASILITAS AKADEMIK
-    { img: "/svg/labDkv.svg", category: "Fasilitas Akademik" },
-    { img: "/svg/labDkv.svg", category: "Fasilitas Akademik" },
-
-    // FASILITAS OLAHRAGA
-    { img: "/svg/labDkv.svg", category: "Fasilitas Olahraga" },
-
-    // FASILITAS UMUM
-    { img: "/svg/labDkv.svg", category: "Fasilitas Umum" },
-    { img: "/svg/labDkv.svg", category: "Fasilitas Umum" },
-    { img: "/svg/labDkv.svg", category: "Fasilitas Umum" },
-    { img: "/svg/labDkv.svg", category: "Fasilitas Umum" },
-  ]);
-
-  // === Kelompokkan kategori ===
   const categories = [
     "Laboratorium & Studio",
     "Fasilitas Akademik",
@@ -45,6 +26,22 @@ export default function Fasilitas() {
     "Fasilitas Umum",
   ];
 
+  // === Ambil data dari API ===
+  useEffect(() => {
+    const fetchFacilities = async () => {
+      try {
+        const res = await axios.get(`${API_BASE_URL}/facilities/public`);
+        if (res.data.success) setFacilities(res.data.data);
+      } catch (err) {
+        console.error("Gagal memuat data fasilitas:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchFacilities();
+  }, []);
+
+  // === Kelompokkan berdasarkan kategori ===
   const groupedFacilities = categories.map((cat) => ({
     title: cat,
     items: facilities.filter((f) => f.category === cat),
@@ -79,7 +76,6 @@ export default function Fasilitas() {
         {/* === Section Fasilitas === */}
         <section className="w-full py-20">
           <div className="max-w-[95rem] mx-auto px-6">
-            {/* Judul */}
             <h2 className="text-3xl sm:text-4xl font-bold text-[#243771] text-center mb-4">
               {lang === "id" ? "Fasilitas" : "Facilities"}
             </h2>
@@ -89,39 +85,40 @@ export default function Fasilitas() {
                 : "We believe every student has potential and uniqueness to be developed into a whole individual with strong character, academic foundation, and skills."}
             </p>
 
-            {/* === Grid per kategori === */}
-            {groupedFacilities.map((group, idx) => (
-              <div key={idx} className="mb-24">
-                <h3 className="text-2xl sm:text-3xl font-semibold text-[#FE4D01] mb-10 text-center">
-                  {group.title}
-                </h3>
+            {/* === Loading / Error State === */}
+            {loading ? (
+              <p className="text-center text-gray-500 italic">Memuat fasilitas...</p>
+            ) : facilities.length === 0 ? (
+              <p className="text-center text-gray-500 italic">Belum ada data fasilitas.</p>
+            ) : (
+              groupedFacilities.map((group, idx) => (
+                <div key={idx} className="mb-24">
+                  <h3 className="text-2xl sm:text-3xl font-semibold text-[#FE4D01] mb-10 text-center">
+                    {group.title}
+                  </h3>
 
-                <div
-                  className="
-                    grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3
-                    gap-8 justify-items-center
-                  "
-                >
-                  {group.items.map((item, i) => (
-                    <img
-                      key={i}
-                      src={item.img}
-                      alt={`${group.title} ${i + 1}`}
-                      loading="lazy"
-                      className="
-                        w-full
-                        max-w-[420px]      /* sedikit lebih kecil */
-                        aspect-[392/362]   /* jaga rasio */
-                        object-contain
-                        transition-transform duration-500
-                        hover:scale-[1.04]
-                        cursor-pointer
-                      "
-                    />
-                  ))}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
+                    {group.items.map((item, i) => (
+                      <img
+                        key={i}
+                        src={lang === "id" ? item.img_id : item.img_en}
+                        alt={`${group.title} ${i + 1}`}
+                        loading="lazy"
+                        className="
+                          w-full
+                          max-w-[420px]
+                          aspect-[392/362]
+                          object-contain
+                          transition-transform duration-500
+                          hover:scale-[1.04]
+                          cursor-pointer
+                        "
+                      />
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </section>
 
