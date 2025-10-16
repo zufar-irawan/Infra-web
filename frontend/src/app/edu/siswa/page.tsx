@@ -12,9 +12,6 @@ export default function SiswaPage() {
   const [filteredStudents, setFilteredStudents] = useState<any[]>([]);
   const [search, setSearch] = useState("");
 
-  const API_BASE =
-    process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
-
   // === Ambil data user login + data siswa ===
   useEffect(() => {
     const fetchData = async () => {
@@ -92,6 +89,7 @@ export default function SiswaPage() {
 
   return (
     <div className="overflow-y-auto min-h-screen bg-gray-50">
+
       <DashHeader user={user} teacher={teacher} />
 
       <section className="p-6">

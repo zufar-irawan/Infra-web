@@ -7,7 +7,7 @@ import TugasPending from "@/components/subComponents/forTugas/tugasPending";
 import TugasItem from "@/components/subComponents/forTugas/TugasItem";
 import { useEduData } from "@/app/edu/context";
 
-export default function TugasSiswa() {
+export default function Tugas() {
     const { user, student, tugas, teachers } = useEduData();
 
     const [tugasPending, setTugasPending] = useState<any[]>([])
@@ -204,7 +204,7 @@ export default function TugasSiswa() {
                                         placeholder="Cari berdasarkan mata pelajaran atau judul tugas..."
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 text-sm"
+                                        className="w-full pl-10 pr-4 py-3 border border-gray-200 focus:outline-none rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 text-sm"
                                     />
                                 </div>
 
@@ -304,7 +304,7 @@ export default function TugasSiswa() {
                                                 { // @ts-ignore
                                                     tugasList.map((item) => (
                                                         <TugasItem 
-                                                        
+
                                                             key={item.id} 
                                                             tugas={item} 
                                                             isCompleted={item.submissions && item.submissions.length > 0}

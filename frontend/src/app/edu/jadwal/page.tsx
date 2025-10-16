@@ -173,7 +173,13 @@ export default function JadwalSiswa() {
 
                 const res = await axios.post('/api/jadwal', body);
                 if (res.status === 200 || res.status === 201) {
-                    Swal.fire({icon: 'success', title: 'Berhasil', text: 'Jadwal berhasil ditambahkan.', timer: 1500, showConfirmButton: false});
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil',
+                        text: 'Jadwal berhasil ditambahkan.',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
                 }
             } else if (modalMode === 'edit' && editingId) {
                 // editingId was created as `sch-${id}` earlier; try to extract numeric id if present
@@ -190,7 +196,13 @@ export default function JadwalSiswa() {
 
                 const res = await axios.put(`/api/jadwal/${id}`, body);
                 if (res.status === 200) {
-                    Swal.fire({icon: 'success', title: 'Berhasil', text: 'Jadwal berhasil diperbarui.', timer: 1500, showConfirmButton: false});
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil',
+                        text: 'Jadwal berhasil diperbarui.',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
                 }
             }
         } catch (err) {
@@ -207,12 +219,23 @@ export default function JadwalSiswa() {
     const handleDelete = async () => {
         if (!editingId) return;
         const id = editingId.startsWith('sch-') ? editingId.replace('sch-', '') : editingId;
-        const confirmed = await Swal.fire({icon: 'warning', title: 'Hapus?', text: 'Yakin ingin menghapus jadwal ini?', showCancelButton: true});
+        const confirmed = await Swal.fire({
+            icon: 'warning',
+            title: 'Hapus?',
+            text: 'Yakin ingin menghapus jadwal ini?',
+            showCancelButton: true
+        });
         if (!confirmed.isConfirmed) return;
         try {
             const res = await axios.delete(`/api/jadwal/${id}`);
             if (res.status === 200) {
-                Swal.fire({icon: 'success', title: 'Terhapus', text: 'Jadwal berhasil dihapus.', timer: 1200, showConfirmButton: false});
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Terhapus',
+                    text: 'Jadwal berhasil dihapus.',
+                    timer: 1200,
+                    showConfirmButton: false
+                });
             }
         } catch (err) {
             console.error('Gagal menghapus jadwal:', err);
@@ -247,208 +270,210 @@ export default function JadwalSiswa() {
 
     return (
         <>
-            {user?.role === 'siswa' && (
-                <div className="overflow-y-auto min-h-screen">
-                    <DashHeader student={student} user={user}/>
+            <div className="overflow-y-auto min-h-screen">
+                <DashHeader student={student} user={user}/>
 
-                    {/* Toolbar */}
-                    <section className="w-full p-4">
-                        <div className="bg-white rounded-2xl p-4 shadow-md border border-gray-100 flex flex-col gap-3">
-                            <div className="flex items-center justify-between gap-3">
-                                <div className="flex items-center gap-2">
-                                    <button onClick={goPrevWeek} className="p-2 rounded-lg hover:bg-gray-100"
-                                            aria-label="Minggu sebelumnya">
-                                        <ChevronLeft className="w-5 h-5"/>
-                                    </button>
-                                    <button onClick={goNextWeek} className="p-2 rounded-lg hover:bg-gray-100"
-                                            aria-label="Minggu berikutnya">
-                                        <ChevronRight className="w-5 h-5"/>
-                                    </button>
-                                    <button onClick={goToday}
-                                            className="px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-sm">Hari
-                                        ini
-                                    </button>
-                                    <div className="ml-2 text-sm text-gray-600 flex items-center gap-2">
-                                        <CalendarIcon className="w-4 h-4"/>
-                                        <span>
+                {/* Toolbar */}
+                <section className="w-full p-4">
+                    <div className="bg-white rounded-2xl p-4 shadow-md border border-gray-100 flex flex-col gap-3">
+                        <div className="flex items-center justify-between gap-3">
+                            <div className="flex items-center gap-2">
+                                <button onClick={goPrevWeek} className="p-2 rounded-lg hover:bg-gray-100"
+                                        aria-label="Minggu sebelumnya">
+                                    <ChevronLeft className="w-5 h-5"/>
+                                </button>
+                                <button onClick={goNextWeek} className="p-2 rounded-lg hover:bg-gray-100"
+                                        aria-label="Minggu berikutnya">
+                                    <ChevronRight className="w-5 h-5"/>
+                                </button>
+                                <button onClick={goToday}
+                                        className="px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-sm">Hari
+                                    ini
+                                </button>
+                                <div className="ml-2 text-sm text-gray-600 flex items-center gap-2">
+                                    <CalendarIcon className="w-4 h-4"/>
+                                    <span>
                       {weekDays[0].toLocaleDateString('id-ID', {
                           day: '2-digit',
                           month: 'long'
                       })} - {weekDays[4].toLocaleDateString('id-ID', {day: '2-digit', month: 'long', year: 'numeric'})}
                     </span>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-center gap-2">
-                                    <button onClick={() => openAdd(toDateKey(weekDays[0]))}
-                                            className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-orange-500 text-white hover:bg-orange-600 text-sm">
-                                        <Plus className="w-4 h-4"/> Tambah Kegiatan
-                                    </button>
                                 </div>
                             </div>
-                        </div>
-                    </section>
 
-                    {/* Week calendar grid */}
-                    <section className="w-full px-4 pb-8">
-                        <div className="bg-white rounded-2xl p-0 shadow-md border border-gray-100 overflow-hidden">
-                            {/* Header row: empty time col + days */}
-                            <div className="grid" style={{gridTemplateColumns: `80px repeat(${weekDays.length}, 1fr)`}}>
-                                <div className="border-b border-gray-200 bg-gray-50 p-3 text-xs text-gray-500">Waktu
+                            <div className="flex items-center gap-2">
+                                <button onClick={() => openAdd(toDateKey(weekDays[0]))}
+                                        className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-orange-500 text-white hover:bg-orange-600 text-sm">
+                                    <Plus className="w-4 h-4"/> Tambah Kegiatan
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Week calendar grid */}
+                <section className="w-full px-4 pb-8">
+                    <div className="bg-white rounded-2xl p-0 shadow-md border border-gray-100 overflow-hidden">
+                        {/* Header row: empty time col + days */}
+                        <div className="grid" style={{gridTemplateColumns: `80px repeat(${weekDays.length}, 1fr)`}}>
+                            <div className="border-b border-gray-200 bg-gray-50 p-3 text-xs text-gray-500">Waktu
+                            </div>
+                            {weekDays.map((d, i) => (
+                                <div key={i}
+                                     className="border-b border-gray-200 bg-gray-50 p-3 text-sm font-medium">
+                                    {indoDays[i]} <span className="text-gray-500">{d.getDate()}</span>
                                 </div>
-                                {weekDays.map((d, i) => (
-                                    <div key={i}
-                                         className="border-b border-gray-200 bg-gray-50 p-3 text-sm font-medium">
-                                        {indoDays[i]} <span className="text-gray-500">{d.getDate()}</span>
+                            ))}
+                        </div>
+
+                        {/* Body: time labels + day columns */}
+                        <div className="grid" style={{gridTemplateColumns: `80px repeat(${weekDays.length}, 1fr)`}}>
+                            {/* Time labels */}
+                            <div className="relative">
+                                {timeLabels.map((t) => (
+                                    <div key={t}
+                                         className="h-16 border-b border-gray-100 text-[11px] text-gray-500 pr-2 flex justify-end items-start pt-2">
+                                        {t}
                                     </div>
                                 ))}
                             </div>
 
-                            {/* Body: time labels + day columns */}
-                            <div className="grid" style={{gridTemplateColumns: `80px repeat(${weekDays.length}, 1fr)`}}>
-                                {/* Time labels */}
-                                <div className="relative">
-                                    {timeLabels.map((t) => (
-                                        <div key={t}
-                                             className="h-16 border-b border-gray-100 text-[11px] text-gray-500 pr-2 flex justify-end items-start pt-2">
-                                            {t}
+                            {/* Day columns */}
+                            {weekDays.map((d, idxDay) => {
+                                const dateKey = toDateKey(d);
+                                const evts = dayEvents(dateKey);
+                                return (
+                                    <div key={idxDay} className="relative border-l border-gray-100">
+                                        {/* hour grid lines */}
+                                        {timeLabels.map((t) => (
+                                            <div key={t} className="h-16 border-b border-gray-100"/>
+                                        ))}
+
+                                        {/* events */}
+                                        <div className="absolute inset-0">
+                                            {evts.map((ev) => {
+                                                const startMin = Math.max(0, parseTimeToMinutes(ev.start) - startHour * 60);
+                                                const endMin = Math.min(gridTotalMinutes, parseTimeToMinutes(ev.end) - startHour * 60);
+                                                const top = (startMin / gridTotalMinutes) * (gridTotalMinutes / 60 * hourHeight);
+                                                const height = Math.max(28, ((endMin - startMin) / gridTotalMinutes) * (gridTotalMinutes / 60 * hourHeight));
+                                                return (
+                                                    <div
+                                                        key={ev.id}
+                                                        className={`absolute left-1 right-1 rounded-md shadow-sm p-2 ${eventColor(ev.status)} cursor-pointer hover:shadow-md`}
+                                                        style={{top: `${top}px`, height: `${height}px`}}
+                                                        title={`${ev.title} • ${ev.start} - ${ev.end}`}
+                                                        onClick={() => openEdit(ev)}
+                                                        onDoubleClick={() => openAdd(dateKey, ev.start)}
+                                                    >
+                                                        <div
+                                                            className="text-xs font-semibold truncate">{ev.title}</div>
+                                                        <div
+                                                            className="text-[10px] opacity-90 truncate">{ev.start} - {ev.end}</div>
+                                                        {ev.room && (
+                                                            <div
+                                                                className="text-[10px] opacity-90 truncate flex items-center gap-1">
+                                                                <MapPin className="w-3 h-3"/>
+                                                                {rooms?.find((r: any) => r.id == ev.room)?.name || ev.room}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                )
+                                            })}
                                         </div>
-                                    ))}
+
+                                        {/* click to add quick */}
+                                        <button
+                                            className="absolute bottom-2 right-2 bg-white/80 backdrop-blur px-2 py-1 rounded-md border text-[10px] hover:bg-white"
+                                            onClick={() => openAdd(dateKey)}
+                                        >
+                                            + Kegiatan
+                                        </button>
+                                    </div>
+                                )
+                            })}
+                        </div>
+                    </div>
+                </section>
+
+                {/* Add/Edit Event Modal */}
+                {showModal && (
+                    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+                        <div className="bg-white w-full max-w-md rounded-xl shadow-xl p-4">
+                            <h3 className="text-lg font-semibold mb-3">{modalMode === 'add' ? 'Tambah Kegiatan' : 'Edit Kegiatan'}</h3>
+                            <form onSubmit={handleSubmit} className="space-y-3">
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="block text-xs text-gray-500 mb-1">Tanggal</label>
+                                        <input type="date" value={form.date}
+                                               onChange={e => setForm(f => ({...f, date: e.target.value}))}
+                                               className="w-full border rounded-lg px-3 py-2 text-sm"/>
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs text-gray-500 mb-1">Mata Pelajaran /
+                                            Kegiatan</label>
+                                        <input type="text" value={form.title}
+                                               onChange={e => setForm(f => ({...f, title: e.target.value}))}
+                                               placeholder="Contoh: Matematika"
+                                               className="w-full border rounded-lg px-3 py-2 text-sm"/>
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs text-gray-500 mb-1">Mulai</label>
+                                        <input type="time" value={form.start}
+                                               onChange={e => setForm(f => ({...f, start: e.target.value}))}
+                                               className="w-full border rounded-lg px-3 py-2 text-sm"/>
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs text-gray-500 mb-1">Selesai</label>
+                                        <input type="time" value={form.end}
+                                               onChange={e => setForm(f => ({...f, end: e.target.value}))}
+                                               className="w-full border rounded-lg px-3 py-2 text-sm"/>
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs text-gray-500 mb-1">Ruang</label>
+                                        <select value={form.room} onChange={e => setForm(f => ({
+                                            ...f,
+                                            room: e.target.value === '' ? 0 : Number(e.target.value)
+                                        }))} className="w-full border rounded-lg px-3 py-2 text-sm">
+                                            <option value="">Pilih Ruang</option>
+                                            {rooms && rooms.map((room: any) => (
+                                                <option key={room.id} value={room.id}>{room.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-xs text-gray-500 mb-1">Status</label>
+                                        <select value={form.status}
+                                                onChange={e => setForm(f => ({...f, status: e.target.value}))}
+                                                className="w-full border rounded-lg px-3 py-2 text-sm">
+                                            <option value="akan_datang">Akan Datang</option>
+                                            <option value="berlangsung">Sedang Berlangsung</option>
+                                            <option value="selesai">Selesai</option>
+                                        </select>
+                                    </div>
                                 </div>
 
-                                {/* Day columns */}
-                                {weekDays.map((d, idxDay) => {
-                                    const dateKey = toDateKey(d);
-                                    const evts = dayEvents(dateKey);
-                                    return (
-                                        <div key={idxDay} className="relative border-l border-gray-100">
-                                            {/* hour grid lines */}
-                                            {timeLabels.map((t) => (
-                                                <div key={t} className="h-16 border-b border-gray-100"/>
-                                            ))}
-
-                                            {/* events */}
-                                            <div className="absolute inset-0">
-                                                {evts.map((ev) => {
-                                                    const startMin = Math.max(0, parseTimeToMinutes(ev.start) - startHour * 60);
-                                                    const endMin = Math.min(gridTotalMinutes, parseTimeToMinutes(ev.end) - startHour * 60);
-                                                    const top = (startMin / gridTotalMinutes) * (gridTotalMinutes / 60 * hourHeight);
-                                                    const height = Math.max(28, ((endMin - startMin) / gridTotalMinutes) * (gridTotalMinutes / 60 * hourHeight));
-                                                    return (
-                                                        <div
-                                                            key={ev.id}
-                                                            className={`absolute left-1 right-1 rounded-md shadow-sm p-2 ${eventColor(ev.status)} cursor-pointer hover:shadow-md`}
-                                                            style={{top: `${top}px`, height: `${height}px`}}
-                                                            title={`${ev.title} • ${ev.start} - ${ev.end}`}
-                                                            onClick={() => openEdit(ev)}
-                                                            onDoubleClick={() => openAdd(dateKey, ev.start)}
-                                                        >
-                                                            <div
-                                                                className="text-xs font-semibold truncate">{ev.title}</div>
-                                                            <div
-                                                                className="text-[10px] opacity-90 truncate">{ev.start} - {ev.end}</div>
-                                                            {ev.room && (
-                                                                <div className="text-[10px] opacity-90 truncate flex items-center gap-1">
-                                                                    <MapPin className="w-3 h-3"/>
-                                                                    {rooms?.find((r: any) => r.id == ev.room)?.name || ev.room}
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    )
-                                                })}
-                                            </div>
-
-                                            {/* click to add quick */}
-                                            <button
-                                                className="absolute bottom-2 right-2 bg-white/80 backdrop-blur px-2 py-1 rounded-md border text-[10px] hover:bg-white"
-                                                onClick={() => openAdd(dateKey)}
-                                            >
-                                                + Kegiatan
-                                            </button>
-                                        </div>
-                                    )
-                                })}
-                            </div>
-                        </div>
-                    </section>
-
-                    {/* Add/Edit Event Modal */}
-                    {showModal && (
-                        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-                            <div className="bg-white w-full max-w-md rounded-xl shadow-xl p-4">
-                                <h3 className="text-lg font-semibold mb-3">{modalMode === 'add' ? 'Tambah Kegiatan' : 'Edit Kegiatan'}</h3>
-                                <form onSubmit={handleSubmit} className="space-y-3">
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <div>
-                                            <label className="block text-xs text-gray-500 mb-1">Tanggal</label>
-                                            <input type="date" value={form.date}
-                                                   onChange={e => setForm(f => ({...f, date: e.target.value}))}
-                                                   className="w-full border rounded-lg px-3 py-2 text-sm"/>
-                                        </div>
-                                        <div>
-                                            <label className="block text-xs text-gray-500 mb-1">Mata Pelajaran /
-                                                Kegiatan</label>
-                                            <input type="text" value={form.title}
-                                                   onChange={e => setForm(f => ({...f, title: e.target.value}))}
-                                                   placeholder="Contoh: Matematika"
-                                                   className="w-full border rounded-lg px-3 py-2 text-sm"/>
-                                        </div>
-                                        <div>
-                                            <label className="block text-xs text-gray-500 mb-1">Mulai</label>
-                                            <input type="time" value={form.start}
-                                                   onChange={e => setForm(f => ({...f, start: e.target.value}))}
-                                                   className="w-full border rounded-lg px-3 py-2 text-sm"/>
-                                        </div>
-                                        <div>
-                                            <label className="block text-xs text-gray-500 mb-1">Selesai</label>
-                                            <input type="time" value={form.end}
-                                                   onChange={e => setForm(f => ({...f, end: e.target.value}))}
-                                                   className="w-full border rounded-lg px-3 py-2 text-sm"/>
-                                        </div>
-                                        <div>
-                                            <label className="block text-xs text-gray-500 mb-1">Ruang</label>
-                                            <select value={form.room} onChange={e => setForm(f => ({...f, room: e.target.value === '' ? 0 : Number(e.target.value)}))} className="w-full border rounded-lg px-3 py-2 text-sm">
-                                                <option value="">Pilih Ruang</option>
-                                                {rooms && rooms.map((room: any) => (
-                                                    <option key={room.id} value={room.id}>{room.name}</option>
-                                                ))}
-                                            </select>
-                                        </div>
-
-                                        <div>
-                                            <label className="block text-xs text-gray-500 mb-1">Status</label>
-                                            <select value={form.status}
-                                                    onChange={e => setForm(f => ({...f, status: e.target.value}))}
-                                                    className="w-full border rounded-lg px-3 py-2 text-sm">
-                                                <option value="akan_datang">Akan Datang</option>
-                                                <option value="berlangsung">Sedang Berlangsung</option>
-                                                <option value="selesai">Selesai</option>
-                                            </select>
-                                        </div>
+                                <div className="flex items-center justify-between gap-2 pt-2">
+                                    {modalMode === 'edit' ? (
+                                        <button type="button" onClick={handleDelete}
+                                                className="px-3 py-2 rounded-lg border border-red-200 text-red-700 text-sm hover:bg-red-50">Hapus</button>
+                                    ) : <span/>}
+                                    <div className="flex items-center gap-2">
+                                        <button type="button" onClick={() => {
+                                            setShowModal(false);
+                                            resetModal();
+                                        }} className="px-3 py-2 rounded-lg border text-sm hover:bg-gray-50">Batal
+                                        </button>
+                                        <button type="submit"
+                                                className="px-3 py-2 rounded-lg bg-orange-500 text-white text-sm hover:bg-orange-600">Simpan
+                                        </button>
                                     </div>
-
-                                    <div className="flex items-center justify-between gap-2 pt-2">
-                                        {modalMode === 'edit' ? (
-                                            <button type="button" onClick={handleDelete}
-                                                    className="px-3 py-2 rounded-lg border border-red-200 text-red-700 text-sm hover:bg-red-50">Hapus</button>
-                                        ) : <span/>}
-                                        <div className="flex items-center gap-2">
-                                            <button type="button" onClick={() => {
-                                                setShowModal(false);
-                                                resetModal();
-                                            }} className="px-3 py-2 rounded-lg border text-sm hover:bg-gray-50">Batal
-                                            </button>
-                                            <button type="submit"
-                                                    className="px-3 py-2 rounded-lg bg-orange-500 text-white text-sm hover:bg-orange-600">Simpan
-                                            </button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
+                                </div>
+                            </form>
                         </div>
-                    )}
-                </div>
-            )}
+                    </div>
+                )}
+            </div>
         </>
     )
 }
