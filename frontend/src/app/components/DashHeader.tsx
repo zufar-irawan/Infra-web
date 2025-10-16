@@ -28,6 +28,8 @@ export default function DashHeader({student, user} : {student: any, user: any}) 
                             ? `Dashboard ${isUser === 'admin' ? "Admin" : isUser === 'teacher' ? "Guru" : "Siswa"}`
                         :pathname == '/edu/tugas'
                             ? 'Tugas Anda'
+                        :pathname == '/edu/tugas/tugas_siswa_example'
+                            ? 'Tugas Anda'
                         :pathname == '/edu/ujian'
                             ? 'Ujian Anda'
                         :pathname == '/edu/nilai'
