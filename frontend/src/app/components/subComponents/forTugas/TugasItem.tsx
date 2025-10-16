@@ -3,14 +3,17 @@
 import React, { useState } from 'react';
 import { Upload, CheckCircle, Clock, User, Calendar } from 'lucide-react';
 import TugasUploadModal from './TugasUploadModal';
+import {useEduData} from "@/app/edu/context";
 
 interface TugasItemProps {
     tugas: any;
     isCompleted?: boolean;
+    student?: any;
 }
 
-export default function TugasItem({ tugas, isCompleted = false }: TugasItemProps) {
+export default function TugasItem({ student, tugas, isCompleted = false }: TugasItemProps) {
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const formatDeadline = (dateString: string) => {
         const date = new Date(dateString);
@@ -29,14 +32,96 @@ export default function TugasItem({ tugas, isCompleted = false }: TugasItemProps
         return now > deadline;
     };
 
-    const handleUploadComplete = (files: any[]) => {
-        console.log('Upload completed:', files);
-        // TODO: Implementasi API call untuk submit tugas
-        setIsUploadModalOpen(false);
+    const handleUploadComplete = async (files: any[]) => {
+        if (isSubmitting) return;
+
+        // Basic validation
+        const studentId = String(student?.id ?? "");
+        const assignId = String(tugas?.id ?? "");
+        if (!assignId) {
+            alert("ID tugas tidak tersedia.");
+            return;
+        }
+        if (!studentId) {
+            alert("ID siswa tidak tersedia.");
+            return;
+        }
+
+        // Normalize files (FileWithPreview[] | File[])
+        const blobs: File[] = (files || [])
+            .map((f: any) => (f?.file instanceof File ? f.file : f))
+            .filter((f: any) => f instanceof File);
+        if (blobs.length === 0) {
+            alert("Pilih minimal satu file untuk diunggah.");
+            return;
+        }
+
+        // Format submitted_at: YYYY-MM-DD HH:mm:ss
+        const pad = (n: number) => String(n).padStart(2, '0');
+        const now = new Date();
+        const submittedAt = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+
+        setIsSubmitting(true);
+        try {
+            const fd = new FormData();
+            // As requested, use the alias field name assignmet_id; the API route normalizes it.
+            fd.append("assignmet_id", assignId);
+            fd.append("student_id", studentId);
+            fd.append("grade", "0");
+            fd.append("feedback", "");
+            fd.append("submitted_at", submittedAt);
+            for (const file of blobs) fd.append("files[]", file);
+
+            const res = await fetch("/api/tugas/submit", { method: "POST", body: fd });
+            if (!res.ok) {
+                const ct = res.headers.get('content-type') || '';
+                let errPayload: any = {};
+                if (ct.includes('application/json')) errPayload = await res.json().catch(() => ({}));
+                else {
+                    const text = await res.text().catch(() => '');
+                    errPayload = { message: text };
+                }
+
+                // Laravel validation error formatting
+                const messages: string[] = [];
+                if (errPayload?.errors && typeof errPayload.errors === 'object') {
+                    for (const key of Object.keys(errPayload.errors)) {
+                        const arr = errPayload.errors[key];
+                        if (Array.isArray(arr)) messages.push(...arr);
+                    }
+                }
+                const msg = messages.length ? messages.join('\n') : (errPayload?.message || 'Gagal mengirim tugas. Coba lagi nanti.');
+                alert(msg);
+                return;
+            }
+
+            // Success
+            await res.json().catch(() => ({}));
+            alert("Tugas berhasil dikumpulkan!");
+            setIsUploadModalOpen(false);
+        } catch (e) {
+            console.error("Upload error:", e);
+            alert("Terjadi kesalahan saat upload tugas.");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
         <>
+            {/* Uploading overlay */}
+            {isSubmitting && (
+                <div className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex items-center justify-center">
+                    <div className="bg-white rounded-2xl p-6 shadow-2xl flex flex-col items-center gap-3">
+                        <div className="relative">
+                            <div className="h-12 w-12 rounded-full border-4 border-gray-200"></div>
+                            <div className="h-12 w-12 rounded-full border-4 border-t-orange-500 border-r-orange-400 border-b-transparent border-l-transparent animate-spin absolute top-0 left-0"></div>
+                        </div>
+                        <p className="text-sm text-gray-700">Mengunggah tugas...</p>
+                    </div>
+                </div>
+            )}
+
             <div className="flex items-start sm:items-center justify-between py-4 gap-2">
                 <div className="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1">
                     <div className="flex-1">
@@ -116,7 +201,7 @@ export default function TugasItem({ tugas, isCompleted = false }: TugasItemProps
                 tugasId={tugas.id}
                 tugasTitle={tugas.title}
                 deadline={tugas.deadline}
-                onUploadComplete={handleUploadComplete}
+                onUploadComplete={(files) => { void handleUploadComplete(files as any[]); }}
             />
         </>
     );

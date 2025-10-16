@@ -76,10 +76,9 @@ export default function Jurusan() {
                 <div
                     className="flex flex-col sm:flex-row items-stretch gap-3 sm:gap-4 h-[400px] w-full max-w-6xl mx-auto">
                     {items.map((item, i) => (
-                        <>
+                        <div key={i}>
                             {/* @ts-ignore */}
                             <motion.div variants={cardVariants}
-                                        key={i}
                                         className="relative group flex-grow transition-all duration-500 ease-in-out rounded-xl overflow-hidden hover:flex-[3] flex-[1] cursor-pointer shadow-lg hover:shadow-2xl"
                                         initial="hidden"
                                         whileInView="visible"
@@ -103,8 +102,7 @@ export default function Jurusan() {
                                     </h3>
                                 </motion.div>
                             </motion.div>
-                        </>
-
+                        </div>
                     ))}
                 </div>
             </div>

@@ -26,7 +26,7 @@ interface TugasUploadModalProps {
 export default function TugasUploadModal({
     isOpen,
     onClose,
-    tugasId,
+    tugasId: _tugasId,
     tugasTitle,
     deadline,
     onUploadComplete
@@ -213,25 +213,18 @@ export default function TugasUploadModal({
             alert('Pilih file terlebih dahulu');
             return;
         }
-
         setIsUploading(true);
-        
         try {
-            // Simulate upload for each file
+            // Simulate upload for each file with progress bar
             for (const fileItem of files) {
                 await simulateUpload(fileItem);
             }
-            
-            // Call completion callback
+            // Notify parent component with the selected files (including their original File)
             onUploadComplete?.(files);
-            
-            // Reset form
+            // Reset and close
             setFiles([]);
             setComment('');
-            
-            // Close modal
             onClose();
-            
         } catch (error) {
             console.error('Upload error:', error);
             alert('Terjadi kesalahan saat upload');

@@ -7,6 +7,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Upload, FileText, Clock, CheckCircle } from "lucide-react";
 import DashHeader from "@/app/components/DashHeader";
 import { Plus, Pencil, Trash2, Calendar, Save, X } from "lucide-react";
+import axios from "axios";
 
 interface GuruTugasItem {
 	id: string;
@@ -29,10 +30,32 @@ export default function TugasSiswa() {
         console.log('Files selected:', files);
     };
 
-    const handleUpload = () => {
-        // Implementasi upload logic di sini
-        console.log('Uploading files:', uploadedFiles);
-        // TODO: Implementasi API call untuk upload
+    const handleUpload = async () => {
+        const formData = new FormData();
+        formData.append("assignment_id", "1");
+        formData.append("student_id", String(student?.id || 1));
+        formData.append("grade", "0");
+        formData.append("feedback", "");
+        formData.append("submitted_at", new Date().toISOString());
+
+        uploadedFiles.forEach((file) => {
+            formData.append("files[]", file);
+        });
+
+        try {
+            const res = await axios.post("/api/tugas/submit", formData, {
+                // Let axios set the multipart boundary automatically
+                onUploadProgress: (progressEvent) => {
+                    // @ts-ignore
+                    const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                    console.log("Progress:", percent, "%");
+                },
+            });
+
+            console.log("Upload sukses:", res.data);
+        } catch (err) {
+            console.error("Upload gagal:", err);
+        }
     };
 
     const handleModalUploadComplete = (files: any[]) => {
@@ -40,7 +63,6 @@ export default function TugasSiswa() {
         setIsModalOpen(false);
     };
 
-    // teacher
 
 	const [tasks, setTasks] = useState<GuruTugasItem[]>([
 		{
