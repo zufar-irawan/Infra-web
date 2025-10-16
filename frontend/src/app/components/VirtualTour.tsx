@@ -36,53 +36,97 @@ export default function VirtualTour360() {
     {
       id: 'scene1',
       panorama: '/360/v360-1.jpg',
-      name: 'Lapangan',
-      description: 'Area lapangan yang luas dan asri',
+      name: 'Field',
+      description: 'Field of Prestasi Prima School',
       markers: [
         {
-          id: 'toIndoor',
-          position: { yaw: 0, pitch: 0 },
-          html: '<div class="custom-marker">→</div>',
-          tooltip: 'Ke Indoor',
+          id: 'toCooperative',
+          position: { yaw: 0.43, pitch: -0.01 },
+          html: '<div class="select-none custom-marker">→</div>',
+          tooltip: 'To Cooperative',
           data: { targetScene: 'scene2' },
         },
       ],
     },
     {
       id: 'scene2',
-      panorama: '/360/v360-2.jpg',
-      name: 'Indoor',
-      description: 'Ruang indoor yang nyaman',
+      panorama: '/360/v360-3.jpg',
+      name: 'Cooperative',
+      description: 'Cooperative of Prestasi Prima School',
       markers: [
         {
-          id: 'backLapangan',
-          position: { yaw: 3.14, pitch: 0 },
-          html: '<div class="custom-marker">←</div>',
-          tooltip: 'Kembali ke Lapangan',
+          id: 'toField',
+          position: { yaw: 0.83, pitch: -0.05 },
+          html: '<div class="select-none custom-marker">←</div>',
+          tooltip: 'To Field',
           data: { targetScene: 'scene1' },
         },
         {
-          id: 'toKelas',
-          position: { yaw: 1.0, pitch: 0 },
-          html: '<div class="custom-marker">→</div>',
-          tooltip: 'Ke Kelas',
+          id: 'toCafeteria',
+          position: { yaw: 1.01, pitch: -0.05 },
+          html: '<div class="select-none custom-marker">→</div>',
+          tooltip: 'To Cafeteria',
           data: { targetScene: 'scene3' },
         },
       ],
     },
     {
       id: 'scene3',
-      panorama: '/360/v360-3.jpg',
-      name: 'Kelas',
-      description: 'Ruang kelas dengan fasilitas lengkap',
+      panorama: '/360/v360-4.jpg',
+      name: 'Cafeteria',
+      description: 'Cafeteria of Prestasi Prima School',
       markers: [
         {
-          id: 'backIndoor',
-          position: { yaw: 3.14, pitch: 0 },
-          html: '<div class="custom-marker">←</div>',
-          tooltip: 'Kembali ke Indoor',
+          id: 'toCooperative',
+          position: { yaw: -0.77, pitch: -0.07 },
+          html: '<div class="select-none custom-marker">←</div>',
+          tooltip: 'To Cooperative',
           data: { targetScene: 'scene2' },
         },
+      ],
+    },
+    {
+      id: 'scene4',
+      panorama: '/360/v360-2.jpg',
+      name: 'Corridor',
+      description: 'Corridor of Prestasi Prima School',
+      markers: [
+        {
+          id: 'toField',
+          position: { yaw: 2.84, pitch: -0.3 },
+          html: '<div class="select-none custom-marker">→</div>',
+          tooltip: 'To Field',
+          data: { targetScene: 'scene1' },
+        },
+        {
+          id: 'toExc',
+          position: { yaw: 4.14, pitch: -0.02 },
+          html: '<div class="select-none custom-marker">←</div>',
+          tooltip: 'To Excecutive',
+          data: { targetScene: 'scene5' },
+        },
+      ],
+    },
+    {
+      id: 'scene5',
+      panorama: '/360/v360-10.jpg',
+      name: 'Executive',
+      description: 'Corridor of Prestasi Prima School',
+      markers: [
+        // {
+        //   id: 'toField',
+        //   position: { yaw: 2.84, pitch: -0.3 },
+        //   html: '<div class="select-none custom-marker">→</div>',
+        //   tooltip: 'To Field',
+        //   data: { targetScene: 'scene1' },
+        // },
+        // {
+        //   id: 'toExc',
+        //   position: { yaw: 4.14, pitch: -0.02 },
+        //   html: '<div class="select-none custom-marker">←</div>',
+        //   tooltip: 'To Excecutive',
+        //   data: { targetScene: 'scene1' },
+        // },
       ],
     },
   ];
@@ -197,7 +241,7 @@ export default function VirtualTour360() {
 
   return (
     <>
-      <div className="relative w-full h-screen bg-neutral-900 overflow-hidden">
+      <div className="relative w-full h-screen bg-neutral-900 overflow-hidden select-none">
         <div ref={viewerContainer} className="w-full h-full" />
 
         {/* Custom Loading */}
@@ -281,10 +325,10 @@ export default function VirtualTour360() {
                     key={scene.id}
                     onClick={() => changeScene(scene.id)}
                     disabled={isTransitioning}
-                    className={`relative px-5 py-3 rounded-xl text-sm font-semibold transition-all duration-300 overflow-hidden ${
+                    className={`relative px-5 py-3 w-50 rounded-xl text-sm font-semibold transition-all duration-300 overflow-hidden cursor-pointer ${
                       currentScene === scene.id
                         ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg scale-105'
-                        : 'bg-white/5 text-orange-200 hover:bg-orange-500/10 hover:text-orange-100'
+                        : 'bg-white/5 text-orange-200 hover:bg-orange-500/20 hover:text-orange-100'
                     }`}
                   >
                     <span className="flex items-center justify-between">
