@@ -12,15 +12,15 @@ export type EduTeachers = any[] | null;
 export type EduStudents = any[] | null;
 export type EduSubjects = any[] | null;
 export type EduExamsPayload = {
-  totalExams?: number | null;
-  completedExams?: number | null;
-  uncompletedExams?: any[] | null;
-  selesaiExams?: any[] | null;
-  exams?: any[] | null;
+    totalExams?: number | null;
+    completedExams?: number | null;
+    uncompletedExams?: any[] | null;
+    selesaiExams?: any[] | null;
+    exams?: any[] | null;
 } | null;
 export type EduNilaiPayload = {
-  nilaiMapel: any | null;
-  ringkasanNilai: any | null;
+    nilaiMapel: any | null;
+    ringkasanNilai: any | null;
 } | null;
 
 export type EduData = {

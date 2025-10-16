@@ -4,6 +4,7 @@ import DashHeader from "@/app/components/DashHeader";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import React, { useState, useEffect, useMemo } from 'react';
 import TugasPending from "@/components/subComponents/forTugas/tugasPending";
+import TugasItem from "@/components/subComponents/forTugas/TugasItem";
 import { useEduData } from "@/app/edu/context";
 
 export default function TugasSiswa() {
@@ -302,47 +303,12 @@ export default function TugasSiswa() {
                                             <div className="divide-y divide-black/10 transition-all duration-300">
                                                 { // @ts-ignore
                                                     tugasList.map((item) => (
-                                                        <div key={item.id} className="flex items-start sm:items-center justify-between py-4 gap-2">
-                                                            <div className="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1">
-                                                                <div>
-                                                                    <h3 className="font-medium">{item.title}</h3>
-                                                                    <p className="text-black/60 text-sm">
-                                                                        Deadline: {new Date(item.deadline).toLocaleDateString('id-ID', {
-                                                                        day: '2-digit',
-                                                                        month: 'long',
-                                                                        year: 'numeric'
-                                                                    })}
-                                                                    </p>
-                                                                </div>
-                                                                <p className={`text-xs ${
-                                                                    item.submissions && item.submissions.length > 0
-                                                                        ? "text-emerald-600"
-                                                                        : "text-orange-700"
-                                                                }`}>
-                                                                    {item.submissions && item.submissions.length > 0
-                                                                        ? "Selesai"
-                                                                        : "Belum dikerjakan"
-                                                                    }
-                                                                </p>
-                                                            </div>
-                                                            <div className="flex flex-col sm:flex-row items-center gap-2">
-                                                                {item.submissions && item.submissions.length > 0 ? (
-                                                                    <a href="#" className="text-sm bg-emerald-400 text-white px-3 py-2 rounded-sm flex items-center gap-1 hover:bg-emerald-300 hover:shadow transition">
-                                                                        Selesai
-                                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3 h-3">
-                                                                            <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                                                                        </svg>
-                                                                    </a>
-                                                                ) : (
-                                                                    <a href="#" className="text-sm bg-orange-500 text-white px-3 py-2 rounded-sm flex items-center gap-1 hover:bg-orange-400 hover:shadow transition">
-                                                                        Kerjakan
-                                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
-                                                                        </svg>
-                                                                    </a>
-                                                                )}
-                                                            </div>
-                                                        </div>
+                                                        <TugasItem 
+                                                        
+                                                            key={item.id} 
+                                                            tugas={item} 
+                                                            isCompleted={item.submissions && item.submissions.length > 0}
+                                                        />
                                                     ))}
                                             </div>
                                         )}
