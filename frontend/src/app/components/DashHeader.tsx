@@ -3,7 +3,7 @@
 import { Menu } from "lucide-react"
 import React from 'react';
 
-export default function DashHeader({student, user} : {student: any, user: any}) {
+export default function DashHeader({student, user, teacher} : {student?: any, user: any, teacher?: any}) {
     const pathname = typeof window !== "undefined" ? window.location.pathname : "";
     const classStudent = student?.class.name || "Tidak ada kelas";
     const isUser = user?.role || "guest";
