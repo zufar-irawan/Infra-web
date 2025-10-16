@@ -31,7 +31,9 @@ export default function DashHeader({student, user} : {student: any, user: any}) 
                         :pathname == '/edu/ujian'
                             ? 'Ujian Anda'
                         :pathname == '/edu/nilai'
-                            ? 'Nilai Anda' : ''
+                            ? 'Nilai Anda'
+                        :pathname == '/edu/jadwal'
+                            ? 'Jadwal' : ''
                         }
 
                         </h1>

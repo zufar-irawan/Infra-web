@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import {useRouter} from "next/navigation";
 import {showLoginSuccessAlert} from "@/components/LoginSuccess";
@@ -13,7 +13,7 @@ export default function LoginRegisterPage() {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
-    const [activeTab, setActiveTab] = useState("masuk");
+    const [activeTab] = useState("masuk");
 
     // Animation states for interactive experience
     const [isEmailFocused, setIsEmailFocused] = useState(false);
@@ -33,6 +33,18 @@ export default function LoginRegisterPage() {
                 if(res.data.login) {
                     showLoginSuccessAlert()
 
+                    // Notify layout to re-fetch auth-dependent data
+                    try {
+                        if (typeof window !== 'undefined') {
+                            // Cross-tab: toggle a storage key so other tabs/layouts can react
+                            try { localStorage.setItem('edu:login', Date.now().toString()) } catch (e) { /* ignore */ }
+                            // Same-tab: dispatch a custom event
+                            window.dispatchEvent(new Event('edu:login'))
+                        }
+                    } catch (e) {
+                        console.warn('Could not emit edu:login event', e)
+                    }
+
                     router.push("/edu/dashboard")
                 } else {
                     setError(res.data.message)
@@ -40,10 +52,10 @@ export default function LoginRegisterPage() {
             }
 
         } catch (error: any) {
-            if(error.response.status === 401 || error.response.status === 400) {
+            if(error.response?.status === 401 || error.response?.status === 400) {
                 setError(error.response.data.message)
             } else {
-                console.error(error.response.data.message)
+                console.error(error.response?.data?.message || error)
                 alert(error.response?.data?.message || "Login gagal, coba lagi.")
             }
         } finally {
