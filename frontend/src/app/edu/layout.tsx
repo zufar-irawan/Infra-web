@@ -168,6 +168,7 @@ function EduLayoutContent({children}: {children?: React.ReactNode}) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
+    // @ts-ignore
     const contextValue: EduData = useMemo(() => ({
         user,
         student,

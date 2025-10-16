@@ -3,9 +3,9 @@ import api from "@/app/lib/api";
 import {cookies} from "next/headers";
 
 export async function DELETE(
-    req: NextRequest, {params}: {params: {id: string}}
+    req: NextRequest, context: {params: Promise<{ id: string }>}
 ){
-    const { id } = params
+    const { id } = await context.params
     const cookieStore = cookies()
     // @ts-ignore
     const token = cookieStore.get('secure-auth-token')?.value
