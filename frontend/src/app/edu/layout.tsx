@@ -31,6 +31,7 @@ function EduLayoutContent({children}: {children?: React.ReactNode}) {
         try {
             const res = await axios.get('/api/me')
             setUser(res.data.user)
+            console.log("Fetched user:", res.data.user)
         } catch (err) {
             console.error(err)
             setUser(null)

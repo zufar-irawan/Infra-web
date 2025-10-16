@@ -17,7 +17,7 @@ class LmsScheduleController extends Controller
     {
         $request->validate([
             'title' => 'required|string|max:255',
-            'day' => 'required|string',
+            'day' => 'required|date_format:Y-m-d',
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'required|date_format:H:i|after:start_time',
             'room_id' => 'nullable|exists:lms_rooms,id',
@@ -37,7 +37,7 @@ class LmsScheduleController extends Controller
     {
         $request->validate([
             'title' => 'sometimes|string|max:255',
-            'day' => 'sometimes|string',
+            'day' => 'sometimes|date_format:Y-m-d',
             'start_time' => 'sometimes|date_format:H:i',
             'end_time' => 'sometimes|date_format:H:i|after:start_time',
             'room_id' => 'nullable|exists:lms_rooms,id',
