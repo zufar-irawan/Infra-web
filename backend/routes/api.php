@@ -57,6 +57,12 @@ Route::get('/user', function (Request $request) {
 // AUTH
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::prefix('ai')->group(function () {
+    Route::get('/prestasi', [PrestasiController::class, 'index']);
+    Route::get('/partners', [PartnerController::class, 'index']);
+    Route::get('/events', [EventController::class, 'index']);
+    Route::get('/blogs', [BlogController::class, 'index']);
+});
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -124,7 +130,7 @@ Route::prefix('lms')->group(function () {
         Route::apiResource('rfid', LmsRfidController::class)->only(['index','destroy']);
 
         // LMS Device Management
-        Route::apiResource('devices', LmsDeviceController::class);
+        Route::apiResource('devices', LmsDeviceController::class)->only(['index','store','show','update','destroy']);
         Route::patch('devices/{id}/toggle', [LmsDeviceController::class, 'toggleActive']);
         Route::patch('devices/{id}/mode', [LmsDeviceController::class, 'updateMode']);
 

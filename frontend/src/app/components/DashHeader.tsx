@@ -3,7 +3,7 @@
 import { Menu } from "lucide-react"
 import React from 'react';
 
-export default function DashHeader({student, user} : {student: any, user: any}) {
+export default function DashHeader({student, user, teacher} : {student?: any, user?: any, teacher?: any}) {
     const pathname = typeof window !== "undefined" ? window.location.pathname : "";
     const classStudent = student?.class.name || "Tidak ada kelas";
     const isUser = user?.role || "guest";
@@ -24,14 +24,29 @@ export default function DashHeader({student, user} : {student: any, user: any}) 
                 
                 <div>
                     <h1 className="text-xl sm:text-2xl font-bold">
-                        {pathname == '/edu/dashboard'
-                            ? `Dashboard ${isUser === 'admin' ? "Admin" : isUser === 'teacher' ? "Guru" : "Siswa"}`
-                        :pathname == '/edu/tugas'
-                            ? 'Tugas Anda'
-                        :pathname == '/edu/ujian'
-                            ? 'Ujian Anda'
-                        :pathname == '/edu/nilai'
-                            ? 'Nilai Anda' : ''
+                        {
+                            (() => {
+                                switch (true) {
+                                    case pathname.startsWith('/edu/dashboard'):
+                                        return `Dashboard ${isUser === 'admin' ? 'Admin' : isUser === 'teacher' ? 'Guru' : 'Siswa'}`;
+                                    case pathname.startsWith('/edu/tugas'):
+                                        return 'Tugas Anda';
+                                    case pathname.startsWith('/edu/ujian'):
+                                        return 'Ujian Anda';
+                                    case pathname.startsWith('/edu/nilai'):
+                                        return 'Nilai Anda';
+                                    case pathname.startsWith('/edu/jadwal'):
+                                        return 'Jadwal';
+                                    case pathname.startsWith('/edu/setelan'):
+                                        return 'Setelan';
+                                    case pathname.startsWith('/edu/perangkat'):
+                                        return 'Perangkat';
+                                    case pathname.startsWith('/edu/rfid'):
+                                        return 'RFID Card';
+                                    default:
+                                        return '';
+                                }
+                            })()
                         }
 
                         </h1>

@@ -10,24 +10,18 @@ class LmsScheduleController extends Controller
 {
     public function index()
     {
-        return response()->json(
-            LmsSchedule::with(['room','creator','infals'])->paginate(15)
-        );
+        return response()->json(LmsSchedule::with(['room', 'creator'])->paginate(10));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'title' => 'required|string',
-            'type' => 'required|in:admin,personal',
-            'target_type' => 'required|in:class,student,teacher',
-            'target_id' => 'required|integer',
-            'room_id' => 'nullable|exists:lms_rooms,id',
-            'day' => 'required|string',
+            'title' => 'required|string|max:255',
+            'day' => 'required|date_format:Y-m-d',
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'required|date_format:H:i|after:start_time',
+            'room_id' => 'nullable|exists:lms_rooms,id',
             'created_by' => 'required|exists:lms_users,id',
-            'is_practice_week' => 'boolean',
         ]);
 
         $schedule = LmsSchedule::create($request->all());
@@ -36,14 +30,17 @@ class LmsScheduleController extends Controller
 
     public function show(LmsSchedule $schedule)
     {
-        return response()->json($schedule->load(['room','creator','infals']));
+        return response()->json($schedule->load(['room', 'creator']));
     }
 
     public function update(Request $request, LmsSchedule $schedule)
     {
         $request->validate([
-            'room_id' => 'nullable|exists:lms_rooms,id',
+            'title' => 'sometimes|string|max:255',
+            'day' => 'sometimes|date_format:Y-m-d',
+            'start_time' => 'sometimes|date_format:H:i',
             'end_time' => 'sometimes|date_format:H:i|after:start_time',
+            'room_id' => 'nullable|exists:lms_rooms,id',
         ]);
 
         $schedule->update($request->all());
@@ -53,6 +50,6 @@ class LmsScheduleController extends Controller
     public function destroy(LmsSchedule $schedule)
     {
         $schedule->delete();
-        return response()->json(null, 204);
+        return response()->json(['message' => 'Schedule deleted'], 200);
     }
 }

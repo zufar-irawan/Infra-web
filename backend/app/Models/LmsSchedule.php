@@ -13,16 +13,11 @@ class LmsSchedule extends Model
 
     protected $fillable = [
         'title',
-        'description',
-        'type',
-        'target_type',
-        'target_id',
-        'room_id',
         'day',
         'start_time',
         'end_time',
+        'room_id',
         'created_by',
-        'is_practice_week'
     ];
 
     public function room()
@@ -33,10 +28,5 @@ class LmsSchedule extends Model
     public function creator()
     {
         return $this->belongsTo(LmsUser::class, 'created_by');
-    }
-
-    public function infals()
-    {
-        return $this->hasMany(LmsInfal::class, 'schedule_id');
     }
 }

@@ -1,68 +1,14 @@
 "use client";
 
 import DashHeader from "@/app/components/DashHeader"
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import axios from "axios";
-import {User} from "@/app/api/me/route";
+import React from 'react';
+import { useEduData } from "@/app/edu/context";
 
 export default function NilaiSiswa() {
-    const [user, setUser] = useState<User | null>(null)
-    const [student, setStudent] = useState<any>()
-    const [nilaiMapel, setNilaiMapel] = useState<any>()
-    const [ringkasanNilai, setRingkasanNilai] = useState<any>()
-    const [filterMapel, setFilterMapel] = useState<string>("")
+    const { user, student, nilai } = useEduData();
 
-    const router = useRouter();
-
-    useEffect(() => {
-        const fetchAll = async() => {
-            try {
-                const resMe = await axios.get('/api/me');
-                const me = resMe.data.user;
-                setUser(me);
-
-                const resStudent = await axios.get('/api/student');
-                const studentPayload = resStudent.data?.data ?? resStudent.data;
-                const studentList = Array.isArray(studentPayload) ? studentPayload : (studentPayload?.data ?? []);
-                const studentMe = studentList.find(
-                    (s:any) => (s.userId ?? s.user_id) === me?.id
-                );
-                setStudent(studentMe);
-
-                const sid = studentMe?.id ?? studentMe?.student_id;
-                if (!sid) return; // stop if can't resolve student id
-
-                const resNilai = await axios.get('/api/nilai', {
-                    params: {
-                        student_id: sid
-                    }
-                });
-                setNilaiMapel(resNilai.data?.nilai_mapel ?? null)
-                setRingkasanNilai(resNilai.data?.ringkasan ?? null)
-
-            } catch (error: any) {
-                console.error("Error fetching data:", error);
-                if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-                    handleLogout();
-                }
-            }
-        }
-
-        fetchAll();
-    }, [])
-
-    const handleLogout = async () => {
-        await axios.post('/api/logout')
-            .then((res) => {
-                if(res.status === 200){
-                    router.push('/edu/login');
-                }
-            })
-            .catch((error) => {
-                console.error("Logout failed:", error);
-            })
-    }
+    const nilaiMapel = nilai?.nilaiMapel ?? null;
+    const ringkasanNilai = nilai?.ringkasanNilai ?? null;
 
     // Transform API nilai_mapel object into array for table
     const dataNilai = React.useMemo(() => {
@@ -75,6 +21,7 @@ export default function NilaiSiswa() {
     }, [nilaiMapel]);
 
     // Options for filter dropdown
+    const [filterMapel, setFilterMapel] = React.useState<string>("")
     const mapelOptions = React.useMemo(() => {
         return dataNilai.map((d) => d.mapel);
     }, [dataNilai]);

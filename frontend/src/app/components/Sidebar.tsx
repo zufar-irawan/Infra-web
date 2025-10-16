@@ -19,17 +19,17 @@ import {
   IdCard,
   Smartphone,
 } from "lucide-react";
-import { User } from "@/app/api/me/route";
 
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
+  user: any;
+  student?: any;
 }
 
-export default function Sidebar({ isOpen, onClose }: SidebarProps) {
+export default function Sidebar({ isOpen, onClose, user }: SidebarProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const [user, setUser] = useState<User | null>(null);
 
   /** === Logout Handler === **/
   const handleLogout = async () => {
@@ -61,22 +61,6 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       router.push("/edu/login");
     }
   };
-
-  /** === Fetch User Data === **/
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await axios.get("/api/me", { withCredentials: true });
-        setUser(res.data.user);
-      } catch (e: any) {
-        console.error(e);
-        if (e.response && (e.response.status === 401 || e.response.status === 403)) {
-          await handleLogout();
-        }
-      }
-    };
-    fetchUser();
-  }, []);
 
   /** === Menu Item Generator === **/
   const MenuItem = ({
@@ -209,7 +193,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 text-white font-bold text-xl flex items-center justify-center shadow-lg ring-4 ring-orange-100">
                   {user?.name
                     ?.split(" ")
-                    .map((n) => n[0]?.toUpperCase())
+                    .map((n: string[]) => n[0]?.toUpperCase())
                     .join("") || "..."}
                 </div>
                 <div className="flex flex-col flex-1 min-w-0">

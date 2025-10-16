@@ -11,8 +11,10 @@ export default function PPDB() {
   const [activeIndex, setActiveIndex] = useState(null);
   const [activeIndex2, setActiveIndex2] = useState(null);
 
+  // @ts-ignore
   const toggleAccordion = (index, setActive) => {
-    setActive((prev) => (prev === index ? null : index));
+      // @ts-ignore
+      setActive((prev) => (prev === index ? null : index));
   };
 
   // === ANIMASI FADE-IN ===
