@@ -9,7 +9,7 @@ export default function Sekilas() {
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement | null>(null);
 
-  // Observer untuk trigger animasi saat masuk viewport
+  // Observer hanya untuk animasi konten (bukan kotak)
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -31,7 +31,7 @@ export default function Sekilas() {
     >
       <div className="w-full max-w-7xl sm:max-w-4/5 mx-auto px-6 md:px-12 lg:px-20 relative z-10">
         <div className="flex flex-col md:flex-row items-center gap-10">
-          {/* Kiri: Foto Kepala Sekolah */}
+          {/* === Kiri: Foto Kepala Sekolah === */}
           <div
             className={`relative w-full md:w-1/2 flex justify-start md:justify-center transform transition-all duration-1000 ${
               isVisible
@@ -40,8 +40,12 @@ export default function Sekilas() {
             }`}
           >
             <Image
-              src="/svg/sirHendryGaris.svg"
-              alt="Kepala Sekolah"
+              src={
+                lang === "id"
+                  ? "/webp/sirHendry.webp"
+                  : "/webp/sirHendry-eng.webp"
+              }
+              alt={lang === "id" ? "Kepala Sekolah" : "Principal"}
               width={500}
               height={650}
               className="relative z-10 w-auto h-auto max-w-full"
@@ -49,7 +53,7 @@ export default function Sekilas() {
             />
           </div>
 
-          {/* Kanan: Teks Penjelasan */}
+          {/* === Kanan: Teks Penjelasan === */}
           <div
             className={`md:w-1/2 text-left space-y-6 transform transition-all duration-1000 delay-300 ${
               isVisible
@@ -87,7 +91,7 @@ export default function Sekilas() {
             )}
 
             <a
-              href="#"
+              href="/tentang/visi-misi"
               className="inline-block bg-[#FE4D01] hover:bg-orange-600 text-white px-6 py-3 rounded-md font-semibold transition"
             >
               {lang === "id" ? "Selengkapnya" : "Read More"}
@@ -96,9 +100,10 @@ export default function Sekilas() {
         </div>
       </div>
 
-      <div className="absolute bottom-25 right-12 w-[50px] h-[50px] bg-[#243771]" />
-      <div className="absolute bottom-12.5 right-0 w-[50px] h-[50px] bg-[#243771]" />
-      <div className="absolute bottom-0 right-0 w-[50px] h-[50px] bg-[#FE4D01]" />
+      {/* === Dekorasi Kotak (statis, tanpa animasi) === */}
+      <div className="absolute bottom-[100px] right-12 w-[50px] h-[50px] bg-[#243771] z-0" />
+      <div className="absolute bottom-[50px] right-0 w-[50px] h-[50px] bg-[#243771] z-0" />
+      <div className="absolute bottom-0 right-0 w-[50px] h-[50px] bg-[#FE4D01] z-0" />
     </section>
   );
 }

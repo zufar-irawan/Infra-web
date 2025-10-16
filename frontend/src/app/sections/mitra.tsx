@@ -1,71 +1,57 @@
 "use client";
 
 import { useLang } from "../components/LangContext";
+import { useEffect, useState } from "react";
+import axios from "axios";
+
+interface Mitra {
+  id: number;
+  name: string;
+  img_id: string;
+  img_en: string;
+}
+
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+const BASE_URL = API_BASE_URL.replace("/api", "");
 
 export default function Mitra() {
   const { lang } = useLang();
+  const [partners, setPartners] = useState<Mitra[]>([]);
 
-  // === LOGO PARTNERS ===
-  const companyLogos = [
-    "/svg/antam.svg",
-    "/svg/jatelindo.svg",
-    "/svg/kemenkop.svg",
-    "/svg/kemhan.svg",
-    "/svg/komatsu.svg",
-    "/svg/panasonic.svg",
-    "/svg/starvision.svg",
-    "/svg/telkom.svg",
-    "/svg/wika.svg",
-  ];
-
-  // buat 30 kotak dengan spacing 6.4rem antar kotak
-  const boxes = Array.from({ length: 30 }, (_, i) => i * 6.4);
+  // Ambil data mitra dari API Laravel
+  useEffect(() => {
+    axios
+      .get(`${API_BASE_URL}/mitra/public`)
+      .then((res) => {
+        if (res.data.success) setPartners(res.data.data);
+      })
+      .catch((err) => console.error("❌ Gagal memuat data mitra:", err));
+  }, []);
 
   return (
     <section
       id="mitra"
-      className="relative bg-white overflow-hidden py-32 md:py-40" // ➡️ tambah padding section
+      className="relative bg-white overflow-hidden py-32 md:py-40"
     >
-      {/* === Dekorasi Kotak Baris 1 (atas) === */}
+      {/* === Dekorasi Kotak Baris 1 === */}
       <div className="absolute top-0 left-0 w-full z-0">
-        {boxes.map((pos, idx) => (
+        {Array.from({ length: 30 }, (_, i) => i * 6.4).map((pos, idx) => (
           <div
-            key={`top1-${idx}`}
+            key={`top-${idx}`}
             className="absolute w-[50px] h-[50px] bg-[#FE4D01]"
             style={{ left: `${pos}rem`, top: "0px" }}
           />
         ))}
       </div>
 
-      {/* === Dekorasi Kotak Baris 2 (atas geser) === */}
-      <div className="absolute top-0 left-[53px] w-full z-0">
-        {boxes.map((pos, idx) => (
+      {/* === Dekorasi Kotak Baris 2 === */}
+      <div className="absolute bottom-0 left-0 w-full z-0">
+        {Array.from({ length: 30 }, (_, i) => i * 6.4).map((pos, idx) => (
           <div
-            key={`top2-${idx}`}
-            className="absolute w-[50px] h-[50px] bg-[#FE4D01]"
-            style={{ left: `${pos}rem`, top: "50px" }}
-          />
-        ))}
-      </div>
-
-      {/* === Dekorasi Kotak Baris 3 (bawah) === */}
-      <div className="absolute bottom-0 left-12 w-full z-0">
-        {boxes.map((pos, idx) => (
-          <div
-            key={`bottom1-${idx}`}
+            key={`bottom-${idx}`}
             className="absolute w-[50px] h-[50px] bg-[#FE4D01]"
             style={{ left: `${pos}rem`, bottom: "0px" }}
-          />
-        ))}
-      </div>
-
-      {/* === Dekorasi Kotak Baris 4 (bawah geser) === */}
-      <div className="absolute bottom-0 left-0 w-full z-0">
-        {boxes.map((pos, idx) => (
-          <div
-            key={`bottom2-${idx}`}
-            className="absolute w-[50px] h-[50px] bg-[#FE4D01]"
-            style={{ left: `${pos}rem`, bottom: "50px" }}
           />
         ))}
       </div>
@@ -79,26 +65,27 @@ export default function Mitra() {
           </span>
         </h2>
 
-        {/* === Marquee Logo === */}
-        <div className="overflow-hidden w-full relative max-w-6xl mx-auto select-none">
-          {/* Fade gradient kiri */}
+        {/* === Carousel Mitra (auto scroll) === */}
+        <div className="overflow-hidden w-full relative max-w-7xl mx-auto select-none">
+          {/* Gradient kiri */}
           <div className="absolute left-0 top-0 h-full w-20 z-20 pointer-events-none bg-gradient-to-r from-white to-transparent" />
 
           {/* Isi marquee */}
           <div
             className="marquee-inner flex will-change-transform min-w-[200%]"
-            style={{ animationDuration: "18s" }}
+            style={{ animationDuration: "25s" }}
           >
             <div className="flex items-center">
-              {[...companyLogos, ...companyLogos].map((logo, index) => (
+              {[...partners, ...partners].map((p, index) => (
                 <div
-                  key={index}
+                  key={`${p.id}-${index}`}
                   className="flex items-center justify-center mx-10"
                   style={{ minWidth: "160px" }}
                 >
                   <img
-                    src={logo}
-                    alt={`Logo ${index + 1}`}
+                    src={`${BASE_URL}${lang === "id" ? p.img_id : p.img_en}`}
+                    alt={p.name}
+                    loading="lazy"
                     className="h-28 w-auto object-contain"
                     draggable={false}
                   />
@@ -107,7 +94,7 @@ export default function Mitra() {
             </div>
           </div>
 
-          {/* Fade gradient kanan */}
+          {/* Gradient kanan */}
           <div className="absolute right-0 top-0 h-full w-20 md:w-40 z-20 pointer-events-none bg-gradient-to-l from-white to-transparent" />
         </div>
       </div>
@@ -117,7 +104,6 @@ export default function Mitra() {
         .marquee-inner {
           animation: marqueeScroll linear infinite;
         }
-
         @keyframes marqueeScroll {
           0% {
             transform: translateX(0%);

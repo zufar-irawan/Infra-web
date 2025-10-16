@@ -21,11 +21,11 @@ class MitraController extends Controller
     {
         $validated = $request->validate([
             'name'   => 'required|string|max:255',
-            'img_id' => 'required|image|mimes:webp|max:2048',
-            'img_en' => 'required|image|mimes:webp|max:2048',
+            'img_id' => 'required|file|max:5120', // ✅ file bebas, max 5MB
+            'img_en' => 'required|file|max:5120',
         ]);
 
-        // simpan file ke storage/app/public/mitra
+        // Simpan file ke storage/app/public/mitra
         $path_id = $request->file('img_id')->store('mitra', 'public');
         $path_en = $request->file('img_en')->store('mitra', 'public');
 
@@ -62,8 +62,8 @@ class MitraController extends Controller
 
         $validated = $request->validate([
             'name'   => 'required|string|max:255',
-            'img_id' => 'nullable|image|mimes:webp|max:2048',
-            'img_en' => 'nullable|image|mimes:webp|max:2048',
+            'img_id' => 'nullable|file|max:5120',
+            'img_en' => 'nullable|file|max:5120',
         ]);
 
         // hapus file lama kalau upload baru

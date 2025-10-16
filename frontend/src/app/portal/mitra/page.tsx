@@ -229,11 +229,10 @@ export default function MitraPage() {
 
               <div>
                 <label className="block text-sm text-gray-600 mb-1">
-                  Logo Bahasa Indonesia (.webp)
+                  Logo Bahasa Indonesia 
                 </label>
                 <input
                   type="file"
-                  accept=".webp"
                   onChange={(e) => setFileID(e.target.files?.[0] || null)}
                   className="w-full border rounded-lg p-2"
                 />
@@ -241,11 +240,10 @@ export default function MitraPage() {
 
               <div>
                 <label className="block text-sm text-gray-600 mb-1">
-                  Logo Bahasa Inggris (.webp)
+                  Logo Bahasa Inggris
                 </label>
                 <input
                   type="file"
-                  accept=".webp"
                   onChange={(e) => setFileEN(e.target.files?.[0] || null)}
                   className="w-full border rounded-lg p-2"
                 />
