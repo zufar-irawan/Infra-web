@@ -203,7 +203,7 @@ class LmsSeeder extends Seeder
         // === SCHEDULE IMPORTS (opsional, jika tabel masih ada) ===
         if (class_exists(LmsScheduleImport::class)) {
             LmsScheduleImport::create([
-                'file_path' => 'storage/imports/jadwal_2025.xlsx',
+                'file_path' => 'stor    age/imports/jadwal_2025.xlsx',
                 'imported_by' => $admin->id,
                 'imported_at' => '2025-09-01 07:00:00',
                 'status' => 'success',
