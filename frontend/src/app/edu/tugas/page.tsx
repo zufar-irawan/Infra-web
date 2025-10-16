@@ -2,18 +2,16 @@
 
 import DashHeader from "@/app/components/DashHeader";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import axios from "axios";
-import {User} from "@/app/api/me/route";
+import React, { useState, useEffect, useMemo } from 'react';
 import TugasPending from "@/components/subComponents/forTugas/tugasPending";
+import { useEduData } from "@/app/edu/context";
 
 export default function TugasSiswa() {
-    const [user, setUser] = useState<User | null>(null)
-    const [student, setStudent] = useState<any>()
-    const [tugasPending, setTugasPending] = useState<any>()
-    const [tugasSelesai, setTugasSelesai] = useState<any>()
-    const [tugas, setTugas] = useState<any>()
+    const { user, student, tugas, teachers } = useEduData();
+
+    const [tugasPending, setTugasPending] = useState<any[]>([])
+    const [tugasSelesai, setTugasSelesai] = useState<any[]>([])
+    const [tugasWithTeacher, setTugasWithTeacher] = useState<any[]>([])
     const [currentIndex, setCurrentIndex] = useState(0)
 
     // Search and filter states
@@ -21,79 +19,28 @@ export default function TugasSiswa() {
     const [filterMataPelajaran, setFilterMataPelajaran] = useState("all")
     const [filterStatus, setFilterStatus] = useState("all")
 
-    const router = useRouter();
+    const classId = useMemo(() => student?.class?.id ?? student?.class_id ?? student?.classId ?? null, [student])
 
     useEffect(() => {
-        const fetchAll = async () => {
-            try {
-                // Fetch current user
-                const meRes = await axios.get("/api/me");
-                const userData = meRes.data.user;
-                setUser(userData);
+        if (!tugas || !classId) return
+        const tugasList = tugas.filter((t: any) => t.class_id === classId || t.class?.id === classId)
+        const merged = tugasList.map((t: any) => {
+            const guru = teachers?.find((g: any) => g.id === (t.created_by ?? t.teacher_id));
+            return { ...t, teacher: guru }
+        })
 
-                // Fetch student data
-                const studentRes = await axios.get("/api/student");
-                const studentList = studentRes.data.data;
-                const studentMe = studentList.find(
-                    (s: any) => s.user_id === userData.id
-                );
-                if (!studentMe) return;
-                setStudent(studentMe);
+        const belumSelesai = merged.filter((t: any) => !t.submissions || t.submissions.length === 0)
+        const sudahSelesai = merged.filter((t: any) => t.submissions && t.submissions.length > 0)
 
-                // Fetch tugas for student's class
-                const tugasRes = await axios.get("/api/tugas");
-                const tugasList = tugasRes.data.data.filter(
-                    (t: any) => t.class_id === studentMe.class.id
-                );
-
-                // Fetch teachers and merge with tugas
-                const teacherRes = await axios.get("/api/teachers");
-                const teachers = teacherRes.data.data;
-                const tugasWithTeacher = tugasList.map((t: any) => {
-                    const teacher = teachers.find((g: any) => g.id === t.created_by);
-                    return { ...t, teacher };
-                });
-
-                // Separate pending and completed
-                const belumSelesai = tugasWithTeacher.filter(
-                    (t: any) => !t.submissions || t.submissions.length === 0
-                );
-                const sudahSelesai = tugasWithTeacher.filter(
-                    (t: any) => t.submissions && t.submissions.length > 0
-                );
-
-                // Set states once after all data fetched
-                console.log(tugasWithTeacher);
-                setTugas(tugasWithTeacher);
-                setTugasPending(belumSelesai);
-                setTugasSelesai(sudahSelesai);
-            } catch (e: any) {
-                console.error(e);
-                if (e.response && (e.response.status === 401 || e.response.status === 403)) {
-                    handleLogout();
-                }
-            }
-        };
-
-        fetchAll();
-    }, []);
+        setTugasWithTeacher(merged)
+        setTugasPending(belumSelesai)
+        setTugasSelesai(sudahSelesai)
+    }, [tugas, teachers, classId])
 
     // Reset carousel index when tugasPending changes
     useEffect(() => {
         setCurrentIndex(0);
     }, [tugasPending]);
-
-    const handleLogout = async () => {
-        await axios.post("/api/logout")
-            .then(res => {
-                if (res.status === 200) {
-                    router.push("/edu/login");
-                }
-            })
-            .catch(err => {
-                console.error(err);
-            })
-    };
 
     // Carousel functions
     const nextSlide = () => {
@@ -112,16 +59,16 @@ export default function TugasSiswa() {
 
     // Get unique mata pelajaran for filter dropdown
     const getUniqueMataPelajaran = () => {
-        if (!tugas) return [];
-        const specializations = tugas.map((t: any) => t.teacher?.specialization || 'Mata Pelajaran Lain');
+        if (!tugasWithTeacher) return [] as string[];
+        const specializations = tugasWithTeacher.map((t: any) => t.teacher?.specialization || 'Mata Pelajaran Lain');
         return [...new Set(specializations)];
     };
 
     // Filter tugas based on search query and filters
     const getFilteredTugas = () => {
-        if (!tugas) return [];
+        if (!tugasWithTeacher) return [] as any[];
 
-        return tugas.filter((item: any) => {
+        return tugasWithTeacher.filter((item: any) => {
             const specialization = item.teacher?.specialization || 'Mata Pelajaran Lain';
             const isCompleted = item.submissions && item.submissions.length > 0;
 
@@ -269,9 +216,7 @@ export default function TugasSiswa() {
                                     >
                                         <option value="all">Semua Mata Pelajaran</option>
                                         {getUniqueMataPelajaran().map((mataPelajaran) => (
-                                            // @ts-ignore
                                             <option key={mataPelajaran} value={mataPelajaran}>
-                                                {/* @ts-ignore */}
                                                 { mataPelajaran }
                                             </option>
                                         ))}
@@ -404,34 +349,8 @@ export default function TugasSiswa() {
                                     </div>
                                 ))
                             ) : (
-                                <div className="w-full flex flex-col items-center justify-center py-8 bg-gray-50 rounded-xl border border-dashed border-orange-200">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-12 h-12 text-orange-400 mb-3">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-                                    </svg>
-                                    <h3 className="text-lg font-semibold text-orange-600 mb-1">
-                                        {(searchQuery !== "" || filterMataPelajaran !== "all" || filterStatus !== "all")
-                                            ? "Tidak ada tugas yang sesuai filter"
-                                            : "Tidak ada tugas tersedia"
-                                        }
-                                    </h3>
-                                    <p className="text-black/60 text-sm text-center max-w-md">
-                                        {(searchQuery !== "" || filterMataPelajaran !== "all" || filterStatus !== "all")
-                                            ? "Coba ubah kata kunci pencarian atau filter untuk melihat tugas lainnya"
-                                            : "Silakan cek kembali nanti untuk tugas yang baru"
-                                        }
-                                    </p>
-                                    {(searchQuery !== "" || filterMataPelajaran !== "all" || filterStatus !== "all") && (
-                                        <button
-                                            onClick={() => {
-                                                setSearchQuery("");
-                                                setFilterMataPelajaran("all");
-                                                setFilterStatus("all");
-                                            }}
-                                            className="mt-3 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors duration-200 text-sm font-medium"
-                                        >
-                                            Reset Filter
-                                        </button>
-                                    )}
+                                <div className="text-center text-gray-400 py-8">
+                                    Tidak ada tugas.
                                 </div>
                             );
                         })()}
@@ -441,3 +360,4 @@ export default function TugasSiswa() {
         </>
     )
 }
+

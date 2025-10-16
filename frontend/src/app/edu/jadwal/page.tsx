@@ -1,49 +1,12 @@
 "use client";
 
-import { Clock, MapPin, ChevronLeft, ChevronRight } from "lucide-react";
+import { Clock, MapPin } from "lucide-react";
 import DashHeader from "@/app/components/DashHeader"
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import axios from "axios";
-import {User} from "@/app/api/me/route";
+import React, { useState } from 'react';
+import { useEduData } from "@/app/edu/context";
 
 export default function JadwalSiswa() {
-    const [user, setUser] = useState<User | null>(null)
-
-    const router = useRouter();
-
-    useEffect(() => {
-        const fetchUser = async () => {
-            try {
-                const res = await axios.get("/api/me");
-                setUser(res.data.user);
-            } catch (e: any){
-                console.error(e);
-                // Jika error 401/403 atau user tidak ditemukan, logout otomatis
-                if (e.response && (e.response.status === 401 || e.response.status === 403)) {
-                    handleLogout();
-                }
-            }
-        }
-        fetchUser();
-    }, [])
-
-    const handleLogout = () => {
-        if (typeof window !== 'undefined') {
-            // Hapus token/cookie autentikasi jika ada
-            localStorage.removeItem('token'); // jika pakai token di localStorage
-            sessionStorage.removeItem('token'); // jika pakai sessionStorage
-            // Jika pakai cookie, bisa tambahkan kode hapus cookie di sini
-            // document.cookie = 'token=; Max-Age=0; path=/;';
-            router.push('/edu/login');
-        }
-    };
-
-    useEffect(() => {
-        if(user) {
-            console.log(user)
-        }
-    }, [user]);
+    const { user, student } = useEduData();
 
     const [hariAktif, setHariAktif] = useState("Senin");
 
@@ -74,49 +37,23 @@ export default function JadwalSiswa() {
             { mapel: "DKV", jam: "07:00 - 08:30", ruang: "Lab. Komputer", guru: "Reine Smith, S.Kom.", status: "akan_datang" },
             { mapel: "Bahasa Indonesia", jam: "08:45 - 10:15", ruang: "R. 202", guru: "Jane Smith, S.Pd.", status: "akan_datang" },
         ]
-    };
+    } as Record<string, Array<{ mapel: string; jam: string; ruang: string; guru: string; status: string }>>;
 
     const hariList = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat"];
-    const jadwalHariIni = jadwalData[hariAktif as keyof typeof jadwalData] || [];
-
-    const getStatusColor = (status: string) => {
-        switch (status) {
-            case "berlangsung":
-                return "bg-orange-100 text-orange-700 border-orange-200";
-            case "selesai":
-                return "bg-gray-100 text-gray-600 border-gray-200";
-            case "akan_datang":
-                return "bg-emerald-100 text-emerald-700 border-emerald-200";
-            default:
-                return "bg-gray-100 text-gray-600 border-gray-200";
-        }
-    };
-
-    const getStatusText = (status: string) => {
-        switch (status) {
-            case "berlangsung":
-                return "Sedang Berlangsung";
-            case "selesai":
-                return "Selesai";
-            case "akan_datang":
-                return "Akan Datang";
-            default:
-                return "Tidak Diketahui";
-        }
-    };
+    const jadwalHariIni = jadwalData[hariAktif] || [];
 
     return (
         <>
         {user?.role === 'siswa' && (
         <div className="overflow-y-auto min-h-screen">
-            <DashHeader/>
-            
+            <DashHeader student={student} user={user} />
+
             {/* Filter Hari */}
             <section className="w-full p-4">
                 <div className="bg-white rounded-2xl p-4 shadow-md border border-gray-100">
                     <div className="flex items-center justify-between mb-4">
                         <h2 className="text-lg font-semibold">Jadwal Mata Pelajaran</h2>
-                        <span className="text-sm text-gray-500">XII DKV 1</span>
+                        <span className="text-sm text-gray-500">{student?.class?.name || student?.class_name || 'Kelas'}</span>
                     </div>
                     
                     <div className="flex gap-2 overflow-x-auto pb-2">
