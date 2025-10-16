@@ -110,7 +110,7 @@ class LmsSeeder extends Seeder
         // === SCHEDULES === (Versi sederhana)
         $schedule = LmsSchedule::create([
             'title' => 'Matematika X',
-            'day' => 'Senin',
+            'day' => '2025-10-18',
             'start_time' => '08:00',
             'end_time' => '10:00',
             'room_id' => $room->id,
