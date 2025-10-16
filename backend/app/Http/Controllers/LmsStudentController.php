@@ -10,7 +10,7 @@ class LmsStudentController extends Controller
 {
     public function index()
     {
-        $students = Student::with(['user', 'class', 'rfid'])->paginate(15);
+        $students = Student::with(['user', 'class', 'rfid'])->get();
         return response()->json($students);
     }
 

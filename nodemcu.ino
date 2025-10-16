@@ -3,24 +3,29 @@
 #include <MFRC522.h>
 #include <WiFiManager.h>
 #include <ESP8266HTTPClient.h>
-#include <ESP8266WebServer.h>
 #include <WiFiClientSecure.h>
+#include <SPI.h>
 
-const char *host = "localhost:8000";
+// ==========================
+// Konfigurasi utama
+// ==========================
+const char *host = "presensismk.prestasiprima.sch.id"; // domain baru
 const int httpsPort = 443;
 
-LiquidCrystal_I2C lcd(0x27, 16, 2);
+LiquidCrystal_I2C lcd = LiquidCrystal_I2C(0x27, 16, 2);
 MFRC522 rfid(2, 0);
 WiFiClientSecure clientSecure;
 HTTPClient http;
 
-const unsigned int buzzer = 15;
-const int pushButton = 16;
-
+const unsigned int buzzer = 15; // D8
+const int pushButton = 16;      // D0 (sesuaikan wiring alatmu)
 const String secretKey = "09KOb6arkLbPBihp";
-const String deviceId = "98a6ab06-c118-488d-8674-0bdea4e4ccce";
+const String deviceId = "cc8b6c8a-3960-47df-a4a3-f0167b01c8df"; // device kamu
 
-// ====== SETUP WIFI MANAGER ======
+
+// ==========================
+// WiFi Setup
+// ==========================
 void wifiConnection() {
   Serial.begin(9600);
   WiFiManager wifiManager;
@@ -38,10 +43,15 @@ void wifiConnection() {
   lcd.print("WiFi Terhubung!");
   lcd.setCursor(0, 1);
   lcd.print(WiFi.localIP());
+
+  Serial.println("Connected to WiFi");
+  Serial.println(WiFi.localIP());
   delay(2000);
 }
 
-// ====== SETUP LCD ======
+// ==========================
+// LCD Setup
+// ==========================
 void setLcd() {
   lcd.begin(16, 2);
   lcd.init();
@@ -58,19 +68,24 @@ void setLcd() {
   lcd.print("KARTU RFID ANDA.");
 }
 
-// ====== SETUP ======
+// ==========================
+// Setup Utama
+// ==========================
 void setup() {
   wifiConnection();
   setLcd();
   SPI.begin();
   rfid.PCD_Init();
-  pinMode(pushButton, INPUT_PULLUP);
+  pinMode(pushButton, OUTPUT);
   pinMode(buzzer, OUTPUT);
 
-  clientSecure.setInsecure(); // ⚠️ skip sertifikat SSL (cukup untuk testing)
+  clientSecure.setInsecure(); // skip SSL cert (aman untuk testing)
 }
 
-// ====== LOOP ======
+
+// ==========================
+// Loop Utama
+// ==========================
 void loop() {
   deviceMode();
 
@@ -79,10 +94,10 @@ void loop() {
 
   String idTag = "";
   for (byte i = 0; i < rfid.uid.size; i++) {
-    idTag += String(rfid.uid.uidByte[i]);
+    idTag += rfid.uid.uidByte[i];
   }
 
-  Serial.println(idTag);
+  Serial.println("RFID: " + idTag);
   storePresence(idTag);
 
   delay(1000);
@@ -93,10 +108,13 @@ void loop() {
   lcd.print("KARTU RFID ANDA.");
 }
 
-// ====== SUARA ======
+
+// ==========================
+// Bunyi
+// ==========================
 void toneSuccess() {
   tone(buzzer, 2000);
-  delay(200);
+  delay(500);
   noTone(buzzer);
 }
 
@@ -107,121 +125,159 @@ void toneFailed() {
   noTone(buzzer);
 }
 
-// ====== GANTI MODE DEVICE ======
+
+// ==========================
+// Ganti Mode Device
+// ==========================
 void deviceMode() {
-  if (digitalRead(pushButton) == LOW) return; // tombol tidak ditekan
-  while (digitalRead(pushButton) == HIGH); // debounce
+  if (digitalRead(pushButton) == 1) {
+    while (digitalRead(pushButton) == 1); // tunggu sampai dilepas
 
-  String url = "https://" + String(host) + "/api/devices/mode?secret_key=" + secretKey + "&device_id=" + deviceId;
-  http.begin(clientSecure, url);
+    String url = "https://" + String(host) + "/api/lms/devices/mode?device_id=" + deviceId;
+    http.begin(clientSecure, url);
 
-  int httpCode = http.GET();
-  if (httpCode > 0) {
-    String payload = http.getString();
-    Serial.println(payload);
+    int httpResponseCode = http.GET();
+    if (httpResponseCode > 0) {
+      String payload = http.getString();
 
-    if (payload == "SECRET_KEY_NOT_FOUND") {
+      Serial.printf("[HTTP] code: %d\n", httpResponseCode);
+      Serial.println("MODE RESPONSE: " + payload);
+
+      if (payload == "DEVICE_NOT_FOUND") {
+        toneFailed();
+        lcd.clear();
+        lcd.setCursor(3, 0);
+        lcd.print("DEVICE-ID");
+        lcd.setCursor(2, 1);
+        lcd.print("TIDAK DITEMUKAN");
+      } 
+      else if (payload == "READER_MODE") {
+        toneSuccess();
+        lcd.clear();
+        lcd.setCursor(1, 0);
+        lcd.print("DEVICE CHANGED");
+        lcd.setCursor(2, 1);
+        lcd.print("READER MODE.");
+      } 
+      else if (payload == "CARD_ADD_MODE") {
+        toneSuccess();
+        lcd.clear();
+        lcd.setCursor(1, 0);
+        lcd.print("DEVICE CHANGED");
+        lcd.setCursor(2, 1);
+        lcd.print("ADD CARD MODE.");
+      } 
+      else {
+        toneFailed();
+        lcd.clear();
+        lcd.setCursor(2, 0);
+        lcd.print("RESP UNKNOWN");
+        lcd.setCursor(1, 1);
+        lcd.print(payload);
+      }
+    } 
+    else {
       toneFailed();
+      Serial.printf("[HTTP] failed, error: %s\n", http.errorToString(httpResponseCode).c_str());
       lcd.clear();
-      lcd.print("SECRET KEY ERR");
-    } else if (payload == "DEVICE_NOT_FOUND") {
-      toneFailed();
-      lcd.clear();
-      lcd.print("DEVICE NOT FOUND");
-    } else if (payload == "CARD_ADD_MODE") {
-      toneSuccess();
-      lcd.clear();
-      lcd.setCursor(2, 0);
-      lcd.print("ADD CARD MODE");
-    } else if (payload == "READER_MODE") {
-      toneSuccess();
-      lcd.clear();
-      lcd.setCursor(2, 0);
-      lcd.print("READER MODE");
-    } else {
-      toneFailed();
-      lcd.clear();
-      lcd.print("UNKNOWN RESP");
+      lcd.setCursor(3, 0);
+      lcd.print("NETWORK ERR");
+      lcd.setCursor(2, 1);
+      lcd.print("MODE FAILED");
     }
-  } else {
-    Serial.printf("Mode Change Error: %s\n", http.errorToString(httpCode).c_str());
-    toneFailed();
-    lcd.clear();
-    lcd.print("NETWORK ERROR");
+
+    http.end();
   }
-  http.end();
-  delay(500);
 }
 
-// ====== PROSES PRESENSI ======
+
+// ==========================
+// Proses Presensi
+// ==========================
 void storePresence(String rfid) {
-  String url = "https://" + String(host) + "/api/devices/presence?secret_key=" + secretKey + "&device_id=" + deviceId + "&rfid=" + rfid;
+  String url = "https://" + String(host) + "/api/lms/presences/store?rfid=" + rfid + "&device_id=" + deviceId;
   http.begin(clientSecure, url);
 
-  int httpCode = http.GET();
-  if (httpCode > 0) {
+  int httpResponseCode = http.GET();
+  if (httpResponseCode > 0) {
     String payload = http.getString();
-    Serial.printf("[HTTP] code: %d\n", httpCode);
+    Serial.printf("[HTTP] code: %d\n", httpResponseCode);
     Serial.println(payload);
 
     if (payload == "RFID_ADDED") {
       lcd.clear();
-      lcd.print("KARTU DITAMBAH!");
+      lcd.setCursor(0, 0);
+      lcd.print("KARTU BARU SUKSES");
+      lcd.setCursor(2, 1);
+      lcd.print("DIDAFTARKAN");
       toneSuccess();
     } 
     else if (payload == "RFID_REGISTERED") {
       lcd.clear();
-      lcd.print("SUDAH TERDAFTAR");
+      lcd.setCursor(0, 0);
+      lcd.print("KARTU SUDAH");
+      lcd.setCursor(3, 1);
+      lcd.print("TERDAFTAR");
       toneFailed();
-    } 
-    else if (payload == "RFID_NOT_FOUND") {
-      lcd.clear();
-      lcd.print("RFID TDK DITEMU");
-      toneFailed();
-    } 
-    else if (payload == "STUDENT_NOT_FOUND") {
-      lcd.clear();
-      lcd.print("SISWA TDK ADA");
-      toneFailed();
-    } 
+    }
     else if (payload == "PRESENCE_CLOCK_IN_SAVED") {
       lcd.clear();
-      lcd.print("CLOCK IN OK");
+      lcd.setCursor(0, 0);
+      lcd.print("ABSEN MASUK OK");
+      lcd.setCursor(2, 1);
+      lcd.print("SELAMAT BELAJAR");
       toneSuccess();
     } 
     else if (payload == "PRESENCE_CLOCK_OUT_SAVED") {
       lcd.clear();
-      lcd.print("CLOCK OUT OK");
+      lcd.setCursor(0, 0);
+      lcd.print("ABSEN PULANG OK");
+      lcd.setCursor(1, 1);
+      lcd.print("HATI-HATI DI JLN");
       toneSuccess();
+    } 
+    else if (payload == "STUDENT_NOT_FOUND") {
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("SISWA TDK ADA");
+      lcd.setCursor(2, 1);
+      lcd.print("DI DATABASE");
+      toneFailed();
+    } 
+    else if (payload == "RFID_NOT_FOUND") {
+      lcd.clear();
+      lcd.setCursor(3, 0);
+      lcd.print("RFID TIDAK");
+      lcd.setCursor(2, 1);
+      lcd.print("TERDAFTAR");
+      toneFailed();
     } 
     else if (payload == "ALREADY_CLOCKED_IN") {
       lcd.clear();
+      lcd.setCursor(0, 0);
       lcd.print("SUDAH ABSEN");
-      toneFailed();
-    } 
-    else if (payload == "SECRET_KEY_NOT_FOUND") {
-      lcd.clear();
-      lcd.print("KEY INVALID");
-      toneFailed();
-    } 
-    else if (payload == "DEVICE_NOT_FOUND") {
-      lcd.clear();
-      lcd.print("DEVICE INVALID");
+      lcd.setCursor(2, 1);
+      lcd.print("SEBELUMNYA");
       toneFailed();
     } 
     else {
       lcd.clear();
+      lcd.setCursor(0, 0);
       lcd.print("RESP UNKNOWN");
+      lcd.setCursor(2, 1);
+      lcd.print(payload);
       toneFailed();
     }
   } 
   else {
-    Serial.printf("[HTTP] failed: %s\n", http.errorToString(httpCode).c_str());
-    lcd.clear();
-    lcd.print("NETWORK FAIL");
     toneFailed();
+    Serial.printf("[HTTP] failed: %s\n", http.errorToString(httpResponseCode).c_str());
+    lcd.clear();
+    lcd.setCursor(3, 0);
+    lcd.print("NETWORK ERR");
+    lcd.setCursor(2, 1);
+    lcd.print("PRES FAIL");
   }
 
   http.end();
-  delay(500);
 }

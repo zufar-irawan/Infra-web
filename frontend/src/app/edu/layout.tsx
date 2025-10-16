@@ -23,6 +23,8 @@ function EduLayoutContent({children}: {children?: React.ReactNode}) {
     const [subjects, setSubjects] = useState<any[] | null>(null)
     const [exams, setExams] = useState<any | null>(null)
     const [nilai, setNilai] = useState<{ nilaiMapel: any | null; ringkasanNilai: any | null } | null>(null)
+    const [schedules, setSchedules] = useState<any[] | null>(null)
+    const [rooms, setRooms] = useState<any[] | null>(null)
 
     const [bootstrapped, setBootstrapped] = useState(false)
 
@@ -63,6 +65,8 @@ function EduLayoutContent({children}: {children?: React.ReactNode}) {
                 axios.get('/api/teachers').catch(() => ({ data: { data: [] }})),
                 axios.get('/api/exam-card').catch(() => ({ data: {} })),
                 axios.get('/api/subject').catch(() => ({ data: { data: [] }})),
+                axios.get('/api/jadwal').catch(() => ({ data: { data: [] }})),
+                axios.get('/api/rooms').catch(() => ({ data: { data: [] }})),
             ]
 
             // Fetch nilai only if student id exists
@@ -76,11 +80,13 @@ function EduLayoutContent({children}: {children?: React.ReactNode}) {
             const results = await Promise.all(promises)
 
             // Map results
-            const [tugasRes, teachersRes, examsRes, subjectsRes, nilaiRes] = results
+            const [tugasRes, teachersRes, examsRes, subjectsRes, scheduleRes, roomRes, nilaiRes] = results
             setTugas(tugasRes?.data?.data ?? null)
             setTeachers(teachersRes?.data?.data ?? null)
             setExams(examsRes?.data ?? null)
             setSubjects(subjectsRes?.data?.data ?? null)
+            setSchedules(scheduleRes.data.data ?? null)
+            setRooms(roomRes.data.data ?? null)
 
             if (sid) {
                 setNilai({
@@ -123,6 +129,7 @@ function EduLayoutContent({children}: {children?: React.ReactNode}) {
             const stu = await fetchStudent(user)
             await fetchCoreData(stu)
         })()
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user, isLogin])
 
@@ -169,7 +176,9 @@ function EduLayoutContent({children}: {children?: React.ReactNode}) {
         subjects,
         exams,
         nilai,
-    }), [user, student, tugas, teachers, subjects, exams, nilai])
+        schedules,
+        rooms,
+    }), [user, student, tugas, teachers, subjects, exams, nilai, schedules, rooms])
 
     return (
         <div className="flex flex-row min-h-screen bg-gray-100">
