@@ -107,19 +107,14 @@ class LmsSeeder extends Seeder
             'subject_id' => $subject->id,
         ]);
 
-        // === SCHEDULES ===
+        // === SCHEDULES === (Versi sederhana)
         $schedule = LmsSchedule::create([
             'title' => 'Matematika X',
-            'description' => 'Pertemuan rutin',
-            'type' => 'admin',
-            'target_type' => 'class',
-            'target_id' => $class->id,
-            'room_id' => $room->id,
             'day' => 'Senin',
             'start_time' => '08:00',
             'end_time' => '10:00',
+            'room_id' => $room->id,
             'created_by' => $admin->id,
-            'is_practice_week' => false,
         ]);
 
         // === MODULES ===
@@ -130,7 +125,7 @@ class LmsSeeder extends Seeder
             'status' => 'aktif',
         ]);
 
-        // Add files to module
+        // === FILES (Module) ===
         LmsFile::create([
             'fileable_type' => LmsModule::class,
             'fileable_id' => $module->id,
@@ -138,7 +133,7 @@ class LmsSeeder extends Seeder
             'path' => 'storage/modules/mat/aljabar.pdf',
             'name' => 'aljabar.pdf',
             'mime' => 'application/pdf',
-            'size' => 1024 // size in KB
+            'size' => 1024, // KB
         ]);
 
         LmsFile::create([
@@ -148,7 +143,7 @@ class LmsSeeder extends Seeder
             'path' => 'storage/modules/mat/cover.png',
             'name' => 'cover.png',
             'mime' => 'image/png',
-            'size' => 512
+            'size' => 512,
         ]);
 
         LmsFile::create([
@@ -156,7 +151,7 @@ class LmsSeeder extends Seeder
             'fileable_id' => $module->id,
             'type' => 'link',
             'path' => 'https://drive.google.com/file/d/abc123/view',
-            'name' => 'Google Drive Link'
+            'name' => 'Google Drive Link',
         ]);
 
         // === ASSIGNMENTS ===
@@ -168,7 +163,7 @@ class LmsSeeder extends Seeder
             'created_by' => $admin->id,
         ]);
 
-        // Add files to assignment
+        // === FILES (Assignment) ===
         LmsFile::create([
             'fileable_type' => LmsAssignment::class,
             'fileable_id' => $assignment->id,
@@ -176,16 +171,15 @@ class LmsSeeder extends Seeder
             'path' => 'storage/assignments/tugas1.pdf',
             'name' => 'tugas1.pdf',
             'mime' => 'application/pdf',
-            'size' => 1024
+            'size' => 1024,
         ]);
 
-        // Add link to assignment
         LmsFile::create([
             'fileable_type' => LmsAssignment::class,
             'fileable_id' => $assignment->id,
             'type' => 'link',
             'path' => 'https://example.com/referensi/aljabar',
-            'name' => 'Referensi Aljabar'
+            'name' => 'Referensi Aljabar',
         ]);
 
         // === ASSIGNMENT SUBMISSION ===
@@ -195,22 +189,26 @@ class LmsSeeder extends Seeder
             'grade' => 90,
         ]);
 
-        // === INFAL ===
-        LmsInfal::create([
-            'schedule_id' => $schedule->id,
-            'teacher_original_id' => $teacher->id,
-            'teacher_replacement_id' => $teacher->id,
-            'reason' => 'Sakit',
-            'assigned_by' => $admin->id,
-        ]);
+        // === INFAL (opsional, jika tabel masih ada) ===
+        if (class_exists(LmsInfal::class)) {
+            LmsInfal::create([
+                'schedule_id' => $schedule->id,
+                'teacher_original_id' => $teacher->id,
+                'teacher_replacement_id' => $teacher->id,
+                'reason' => 'Sakit',
+                'assigned_by' => $admin->id,
+            ]);
+        }
 
-        // === SCHEDULE IMPORTS ===
-        LmsScheduleImport::create([
-            'file_path' => 'storage/imports/jadwal_2025.xlsx',
-            'imported_by' => $admin->id,
-            'imported_at' => '2025-09-01 07:00:00',
-            'status' => 'success',
-            'notes' => 'Batch awal semester ganjil',
-        ]);
+        // === SCHEDULE IMPORTS (opsional, jika tabel masih ada) ===
+        if (class_exists(LmsScheduleImport::class)) {
+            LmsScheduleImport::create([
+                'file_path' => 'storage/imports/jadwal_2025.xlsx',
+                'imported_by' => $admin->id,
+                'imported_at' => '2025-09-01 07:00:00',
+                'status' => 'success',
+                'notes' => 'Batch awal semester ganjil',
+            ]);
+        }
     }
 }
