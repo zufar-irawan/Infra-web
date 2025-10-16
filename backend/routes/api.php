@@ -130,7 +130,7 @@ Route::prefix('lms')->group(function () {
         Route::apiResource('rfid', LmsRfidController::class)->only(['index','destroy']);
 
         // LMS Device Management
-        Route::apiResource('devices', LmsDeviceController::class);
+        Route::apiResource('devices', LmsDeviceController::class)->only(['index','store','show','update','destroy']);
         Route::patch('devices/{id}/toggle', [LmsDeviceController::class, 'toggleActive']);
         Route::patch('devices/{id}/mode', [LmsDeviceController::class, 'updateMode']);
 
