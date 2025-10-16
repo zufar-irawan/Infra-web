@@ -1,53 +1,63 @@
 "use client";
 
 import Link from "next/link";
-import Navbar from "@/components/Header";
-import Footer from "@/components/Footer";
 import { useLang } from "../../components/LangContext";
 import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 
-export default function Faq() {
+interface FaqProps {
+  hideBreadcrumb?: boolean; // ✅ Tambahan props untuk sembunyikan breadcrumb
+}
+
+export default function Faq({ hideBreadcrumb = false }: FaqProps) {
   const { lang } = useLang();
 
   return (
     <>
-      <div className="h-[100px] bg-white" />
+      {/* Spacer header */}
+      {!hideBreadcrumb && <div className="h-[100px] bg-white" />}
 
-      <section className="w-full py-4 bg-white">
-        <div className="container mx-auto px-4">
-          <nav className="flex items-center text-sm font-medium space-x-2">
-            <Link href="/" className="text-[#FE4D01] hover:underline">
-              {lang === "id" ? "Beranda" : "Home"}
-            </Link>
-            <span className="text-[#FE4D01]">{">"}</span>
-            <Link
-              href="/informasi-sekolah/tentang-kami"
-              className="text-[#FE4D01] hover:underline"
-            >
-              {lang === "id" ? "Informasi" : "Information"}
-            </Link>
-            <span className="text-[#243771]">{">"}</span>
-            <span className="text-[#243771]">
-              {lang === "id" ? "FAQ" : "FAQ"}
-            </span>
-          </nav>
-        </div>
-      </section>
+      {/* === Breadcrumbs (hilang jika hideBreadcrumb true) === */}
+      {!hideBreadcrumb && (
+        <section className="w-full py-4 bg-white">
+          <div className="container mx-auto px-4">
+            <nav className="flex items-center text-sm font-medium flex-wrap gap-1">
+              <Link href="/" className="text-[#FE4D01] hover:underline">
+                {lang === "id" ? "Beranda" : "Home"}
+              </Link>
+              <span className="text-[#FE4D01]">{">"}</span>
+              <Link
+                href="/informasi-sekolah/tentang-kami"
+                className="text-[#FE4D01] hover:underline"
+              >
+                {lang === "id" ? "Informasi" : "Information"}
+              </Link>
+              <span className="text-[#243771]">{">"}</span>
+              <span className="text-[#243771]">
+                {lang === "id" ? "FAQ" : "FAQ"}
+              </span>
+            </nav>
+          </div>
+        </section>
+      )}
 
+      {/* === Section FAQ === */}
       <FAQSection />
 
-      <section className="relative w-full bg-white overflow-hidden">
-        <img
-          src="/svg/gedung.svg"
-          alt={
-            lang === "id"
-              ? "Gedung SMK Prestasi Prima"
-              : "Prestasi Prima Building"
-          }
-          className="w-full h-[40vh] sm:h-[50vh] lg:h-screen object-cover object-center hover:scale-[1.02] transition-transform duration-700"
-        />
-      </section>
+      {/* === Gambar Gedung (juga bisa di-hide kalau mau nanti) === */}
+      {!hideBreadcrumb && (
+        <section className="relative w-full bg-white overflow-hidden">
+          <img
+            src="/svg/gedung.svg"
+            alt={
+              lang === "id"
+                ? "Gedung SMK Prestasi Prima"
+                : "Prestasi Prima Building"
+            }
+            className="w-full h-[40vh] sm:h-[50vh] lg:h-screen object-cover object-center hover:scale-[1.02] transition-transform duration-700"
+          />
+        </section>
+      )}
     </>
   );
 }
@@ -75,7 +85,10 @@ function FAQSection() {
   // Tutup jika klik luar atau tekan Escape
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent | TouchEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
         setOpenIndex(null);
       }
     };
@@ -100,8 +113,8 @@ function FAQSection() {
         </h2>
         <p className="text-gray-600 text-center mb-10">
           {lang === "id"
-            ? "Kami menyiapkan daftar pertanyaan yang sering diajukan..."
-            : "We provide a list of frequently asked questions..."}
+            ? "Kami menyiapkan daftar pertanyaan yang sering diajukan oleh calon siswa dan orang tua."
+            : "We’ve prepared a list of frequently asked questions for prospective students and parents."}
         </p>
 
         <div className="space-y-4" ref={containerRef}>
@@ -109,18 +122,25 @@ function FAQSection() {
             faq.map((item, i) => {
               const isOpen = openIndex === i;
               return (
-                <div key={i} className="border rounded-lg shadow-sm overflow-hidden">
+                <div
+                  key={i}
+                  className="border rounded-lg shadow-sm overflow-hidden transition-all duration-500 ease-in-out"
+                >
                   <button
                     aria-expanded={isOpen}
                     aria-controls={`faq-content-${i}`}
                     id={`faq-btn-${i}`}
-                    className="w-full flex justify-between items-center p-4 font-medium text-[#243771] focus:outline-none"
+                    className="w-full flex justify-between items-center p-4 font-medium text-[#243771] hover:text-[#FE4D01] transition-colors"
                     onClick={() => setOpenIndex(isOpen ? null : i)}
                   >
-                    <span className="text-left">
-                      {lang === "id" ? item.q_id : item.q_en}
+                    <span>{lang === "id" ? item.q_id : item.q_en}</span>
+                    <span
+                      className={`text-lg ml-4 transform transition-transform duration-300 ${
+                        isOpen ? "rotate-45 text-[#FE4D01]" : ""
+                      }`}
+                    >
+                      +
                     </span>
-                    <span className="text-lg ml-4">{isOpen ? "−" : "+"}</span>
                   </button>
                   <div
                     id={`faq-content-${i}`}
@@ -130,10 +150,8 @@ function FAQSection() {
                       isOpen ? "max-h-40" : "max-h-0"
                     }`}
                   >
-                    <div className="p-4 pt-0">
-                      <p className="text-gray-600">
-                        {lang === "id" ? item.a_id : item.a_en}
-                      </p>
+                    <div className="p-4 pt-0 text-gray-600">
+                      {lang === "id" ? item.a_id : item.a_en}
                     </div>
                   </div>
                 </div>

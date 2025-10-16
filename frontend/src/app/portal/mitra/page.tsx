@@ -15,6 +15,7 @@ interface Partner {
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+const BASE_URL = API_BASE_URL.replace("/api", ""); // 👉 base Laravel tanpa /api
 
 export default function MitraPage() {
   const [partners, setPartners] = useState<Partner[]>([]);
@@ -161,7 +162,7 @@ export default function MitraPage() {
                   <td className="p-3 font-semibold">{p.name}</td>
                   <td className="p-3">
                     <Image
-                      src={`${p.img_id}`}
+                      src={`${BASE_URL}${p.img_id}`}
                       alt="Logo ID"
                       width={80}
                       height={80}
@@ -171,7 +172,7 @@ export default function MitraPage() {
                   </td>
                   <td className="p-3">
                     <Image
-                      src={`${p.img_en}`}
+                      src={`${BASE_URL}${p.img_en}`}
                       alt="Logo EN"
                       width={80}
                       height={80}

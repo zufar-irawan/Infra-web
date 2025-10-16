@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Swal from "sweetalert2";
+import Cookies from "js-cookie";
 import { Loader2, Lock, ChevronLeft } from "lucide-react";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
@@ -55,7 +56,19 @@ export default function VerifyCodePage() {
           showConfirmButton: false,
           timer: 2000,
         });
+
+        // Simpan token ke sessionStorage (opsional)
         sessionStorage.setItem("token", data.token);
+
+        // Simpan token ke cookie (🔥 agar bisa dibaca middleware)
+        Cookies.set("portal-auth-token", data.token, {
+          expires: 1, // 1 hari
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+
+        // Redirect ke dashboard
         router.push("/portal/dashboard");
       }
     } catch (err: any) {
