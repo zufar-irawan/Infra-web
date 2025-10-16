@@ -31,9 +31,11 @@ function EduLayoutContent({children}: {children?: React.ReactNode}) {
         try {
             const res = await axios.get('/api/me')
             setUser(res.data.user)
+            return res.data.user ?? null
         } catch (err) {
             console.error(err)
             setUser(null)
+            return null
         }
     }
 
@@ -57,17 +59,17 @@ function EduLayoutContent({children}: {children?: React.ReactNode}) {
         try {
             // Parallel fetches that don't depend on each other
             const promises: Promise<any>[] = [
-                axios.get('/api/tugas').catch(e => ({ data: { data: [] }})),
-                axios.get('/api/teachers').catch(e => ({ data: { data: [] }})),
-                axios.get('/api/exam-card').catch(e => ({ data: {} })),
-                axios.get('/api/subject').catch(e => ({ data: { data: [] }})),
+                axios.get('/api/tugas').catch(() => ({ data: { data: [] }})),
+                axios.get('/api/teachers').catch(() => ({ data: { data: [] }})),
+                axios.get('/api/exam-card').catch(() => ({ data: {} })),
+                axios.get('/api/subject').catch(() => ({ data: { data: [] }})),
             ]
 
             // Fetch nilai only if student id exists
             const sid = studentMe?.id ?? studentMe?.student_id
             if (sid) {
                 promises.push(
-                    axios.get('/api/nilai', { params: { student_id: sid } }).catch(e => ({ data: {} }))
+                    axios.get('/api/nilai', { params: { student_id: sid } }).catch(() => ({ data: {} }))
                 )
             }
 
@@ -123,6 +125,41 @@ function EduLayoutContent({children}: {children?: React.ReactNode}) {
         })()
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user, isLogin])
+
+    // Listen for login events (same-tab via CustomEvent and cross-tab via storage)
+    useEffect(() => {
+        const handleAuthEvent = async () => {
+            try {
+                // Re-fetch user and downstream data right away
+                const me = await fetchUser()
+                if (me) {
+                    const stu = await fetchStudent(me)
+                    await fetchCoreData(stu)
+                }
+            } catch (err) {
+                console.error('Error refetching after auth event', err)
+            }
+        }
+
+        const onCustomLogin = () => {
+            handleAuthEvent()
+        }
+
+        const onStorage = (ev: StorageEvent) => {
+            if (ev.key === 'edu:login') {
+                handleAuthEvent()
+            }
+        }
+
+        window.addEventListener('edu:login', onCustomLogin)
+        window.addEventListener('storage', onStorage)
+
+        return () => {
+            window.removeEventListener('edu:login', onCustomLogin)
+            window.removeEventListener('storage', onStorage)
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
     const contextValue: EduData = useMemo(() => ({
         user,
