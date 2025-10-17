@@ -135,6 +135,7 @@ export default function Sidebar({ isOpen, onClose, user }: SidebarProps) {
     { href: "/edu/ujian", icon: BookMarked, label: "Ujian" },
     { href: "/edu/jadwal", icon: Calendar, label: "Jadwal" },
     { href: "/edu/laporan", icon: Clipboard, label: "Laporan" },
+    { href: "/edu/presensi", icon: Clipboard, label: "Absensi" },
   ];
 
   const siswaMenu = [
