@@ -161,6 +161,29 @@ function EduLayoutContent({children}: {children?: React.ReactNode}) {
     }, [isLogin, bootstrapped])
 
     useEffect(() => {
+        if (isLogin) return
+        if (typeof window === 'undefined') return
+
+        const ensureTokenSynced = async () => {
+            const existing = sessionStorage.getItem('token')
+            if (existing) return
+
+            try {
+                const res = await fetch('/api/auth/token', { cache: 'no-store' })
+                if (!res.ok) return
+                const data = await res.json()
+                if (data?.token) {
+                    sessionStorage.setItem('token', data.token)
+                }
+            } catch (err) {
+                console.error('Gagal sinkron token dari cookie', err)
+            }
+        }
+
+        ensureTokenSynced()
+    }, [isLogin])
+
+    useEffect(() => {
         // After user fetched, fetch student, then other data
         if (!user || isLogin) return
         (async () => {
