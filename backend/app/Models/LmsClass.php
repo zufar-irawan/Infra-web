@@ -13,7 +13,9 @@ class LmsClass extends Model
 
     public function students()
     {
-        return $this->belongsToMany(LmsStudent::class, 'lms_class_students', 'class_id', 'student_id')->withTimestamps();
+        return $this->belongsToMany(LmsStudent::class, 'lms_class_students', 'class_id', 'student_id')
+            ->withTimestamps()
+            ->withPivot('id');
     }
 
     public function classStudents()
@@ -21,8 +23,15 @@ class LmsClass extends Model
         return $this->hasMany(LmsClassStudent::class, 'class_id');
     }
 
+    public function classTeachers()
+    {
+        return $this->hasMany(LmsClassTeacher::class, 'class_id');
+    }
+
     public function teachers()
     {
-        return $this->belongsToMany(LmsTeacher::class, 'lms_class_teachers', 'class_id', 'teacher_id')->withPivot('subject_id')->withTimestamps();
+        return $this->belongsToMany(LmsTeacher::class, 'lms_class_teachers', 'class_id', 'teacher_id')
+            ->withPivot('id', 'subject_id')
+            ->withTimestamps();
     }
 }

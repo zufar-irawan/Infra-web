@@ -241,6 +241,17 @@ export default function PresensiPage() {
         return sorted;
     }, [attendances, statusFilter, isStaff, student?.id]);
 
+    const studentsLookup = useMemo(() => {
+        if (!studentsList || !studentsList.length) return new Map<number, any>();
+        return studentsList.reduce((map, item) => {
+            const id = Number(item.id ?? item.student_id);
+            if (!Number.isNaN(id)) {
+                map.set(id, item);
+            }
+            return map;
+        }, new Map<number, any>());
+    }, [studentsList]);
+
     const stats = useMemo(() => {
         const total = attendances.length;
         const hadir = attendances.filter((item) =>
@@ -762,7 +773,13 @@ export default function PresensiPage() {
                                     </tr>
                                 ) : (
                                     visibleAttendances.map((item) => {
-                                        const studentName = item.student?.user?.name ?? item.student?.user?.username ?? "-";
+                                        const fallbackStudent = studentsLookup.get(Number(item.student_id));
+                                        const studentName = item.student?.user?.name
+                                            ?? item.student?.user?.username
+                                            ?? fallbackStudent?.user?.name
+                                            ?? fallbackStudent?.user?.username
+                                            ?? fallbackStudent?.name
+                                            ?? "-";
                                         const className = item.class?.name ?? "-";
                                         const timeIn = item.time_in ? item.time_in.slice(0, 5) : "-";
                                         const timeOut = item.time_out ? item.time_out.slice(0, 5) : "-";

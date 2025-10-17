@@ -5,14 +5,14 @@ import api from "@/app/lib/api";
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await context.params;
+
   const cookieStore = await cookies();
   const token = cookieStore.get("secure-auth-token")?.value;
 
   if (!token) return NextResponse.json({ error: "Token tidak ada!" }, { status: 401 });
-
-  const id = params?.id;
   if (!id) return NextResponse.json({ error: "ID tugas tidak valid" }, { status: 400 });
 
   try {
