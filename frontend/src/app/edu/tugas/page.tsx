@@ -22,23 +22,46 @@ export default function Tugas() {
     const [filterMataPelajaran, setFilterMataPelajaran] = useState("all")
     const [filterStatus, setFilterStatus] = useState("all")
 
-    const classId = useMemo(() => student?.class?.id ?? student?.class_id ?? student?.classId ?? null, [student])
+    const classId = useMemo(() => student?.class?.id ?? student?.class_id ?? student?.classId ?? teacher?.class_id ??    null, [student])
 
     useEffect(() => {
-        if (!tugas || !classId) return
-        const tugasList = tugas.filter((t: any) => t.class_id === classId || t.class?.id === classId)
-        const merged = tugasList.map((t: any) => {
-            const guru = teacher?.find((g: any) => g.id === (t.created_by ?? t.teacher_id));
-            return { ...t, teacher: guru }
-        })
+        if (!tugas) return;
 
-        const belumSelesai = merged.filter((t: any) => !t.submissions || t.submissions.length === 0)
-        const sudahSelesai = merged.filter((t: any) => t.submissions && t.submissions.length > 0)
+        let tugasList: any[] = [];
+        if (user?.role === 'guru') {
+            // Untuk guru, filter tugas yang dibuat olehnya (tanpa memfilter teacher)
+            const creatorId = teacher?.user_id ?? user.id;
+            tugasList = tugas.filter((t: any) => (t.created_by ?? t.teacher_id) === creatorId);
+        } else if (user?.role === 'siswa' && classId) {
+            // Untuk siswa, filter tugas berdasarkan classId
+            tugasList = tugas.filter((t: any) => t.class_id === classId);
+        } else {
+            setTugasWithTeacher([]); // Kosongkan jika tidak ada data
+            return;
+        }
 
-        setTugasWithTeacher(merged)
-        setTugasPending(belumSelesai)
-        setTugasSelesai(sudahSelesai)
-    }, [tugas, teacher, classId])
+        // Jangan gunakan teacher.find karena teacher sudah objek tunggal
+        const tugasWithAssignedTeacher = tugasList.map((t: any) => {
+            if (user?.role === 'guru') {
+                // Untuk guru, lampirkan objek teacher yang sudah tersedia
+                return { ...t, teacher };
+            }
+            // Untuk siswa, biarkan tugas apa adanya (asumsikan API sudah menyertakan info guru jika perlu)
+            return t;
+        });
+
+        setTugasWithTeacher(tugasWithAssignedTeacher);
+    }, [tugas, teacher, classId, user]);
+
+    useEffect(() => {
+        if (!tugasWithTeacher) return;
+
+        const belumSelesai = tugasWithTeacher.filter((t: any) => !t.submissions || t.submissions.length === 0);
+        const sudahSelesai = tugasWithTeacher.filter((t: any) => t.submissions && t.submissions.length > 0);
+
+        setTugasPending(belumSelesai);
+        setTugasSelesai(sudahSelesai);
+    }, [tugasWithTeacher]);
 
     // Reset carousel index when tugasPending changes
     useEffect(() => {
@@ -523,4 +546,3 @@ export default function Tugas() {
         </>
     )
 }
-
