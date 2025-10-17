@@ -3,13 +3,14 @@ import {NextResponse} from "next/server";
 import api from "@/app/lib/api";
 
 export async function GET() {
-    const cookieStore = await cookies();
+    const cookieStore = cookies()
+    // @ts-ignore
     const token = cookieStore.get('secure-auth-token')?.value;
 
     if (!token) return NextResponse.json({ error: "Token tidak ada!" }, { status: 401 });
 
     try {
-        const res = await api.get("/lms/subjects", {
+        const res = await api.get("/edu/rooms", {
             headers: {
                 Authorization: `Bearer ${token}`,
             }
@@ -18,7 +19,7 @@ export async function GET() {
         if(res.status === 200){
             return NextResponse.json(res.data);
         }
-        return NextResponse.json({ error: "Gagal mengambil data mata pelajaran" }, { status: res.status });
+        return NextResponse.json({ error: "Gagal mengambil data ruangan" }, { status: res.status });
     } catch (error: any) {
         const status = error?.response?.status ?? 500;
         const data = error?.response?.data ?? { error: "Terjadi kesalahan pada server" };

@@ -144,7 +144,7 @@ Route::prefix('lms')->group(function () {
 
 
 
-// PORTAL ADMIN API 
+// PORTAL ADMIN API
 Route::post('/auth/request-code', [PortalController::class, 'requestCode'])->middleware('throttle:3,1');
 Route::post('/auth/verify-code', [PortalController::class, 'verifyCode']);
 Route::get('/auth/check-token', [PortalController::class, 'checkToken']);
