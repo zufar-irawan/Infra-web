@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
 import { Loader2, AlertCircle, Clock, FileText, BookOpen } from "lucide-react";
@@ -149,8 +149,34 @@ function useExamResults(examId?: number, studentId?: number) {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const fetchResults = useCallback(async () => {
     if (!examId || !studentId) return;
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await axios.get("/api/exam-results", {
+        params: { exam_id: examId, student_id: studentId },
+      });
+      const items = Array.isArray(res.data?.data) ? res.data.data : [];
+      setResults(items);
+    } catch (err: any) {
+      const message =
+        err?.response?.data?.message ??
+        err?.message ??
+        "Gagal memuat hasil ujian.";
+      setError(typeof message === "string" ? message : "Gagal memuat hasil ujian.");
+    } finally {
+      setLoading(false);
+    }
+  }, [examId, studentId]);
+
+  useEffect(() => {
+    if (!examId || !studentId) {
+      setResults([]);
+      return;
+    }
+
     let cancelled = false;
     setLoading(true);
     setError(null);
@@ -181,7 +207,7 @@ function useExamResults(examId?: number, studentId?: number) {
     };
   }, [examId, studentId]);
 
-  return { results, loading, error };
+  return { results, loading, error, refresh: fetchResults };
 }
 
 function ExamMeta({ exam }: { exam: ExamDetail }) {
@@ -330,6 +356,154 @@ function ResultSummary({ result }: { result: ExamResult }) {
   );
 }
 
+function CompletionBanner({
+  onViewResult,
+  hasResult,
+}: {
+  onViewResult: () => void;
+  hasResult: boolean;
+}) {
+  return (
+    <div className="flex flex-col gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-5 text-emerald-700">
+      <div>
+        <h3 className="text-base font-semibold">Ujian sudah dikumpulkan</h3>
+        <p className="text-sm text-emerald-800">
+          {hasResult
+            ? "Nilai sudah tersedia. Kamu bisa membuka ringkasan nilai dan kunci jawaban."
+            : "Jawabanmu tersimpan. Nilai sedang diproses oleh sistem."}
+        </p>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        <button
+          onClick={onViewResult}
+          className="inline-flex items-center gap-2 rounded-lg bg-emerald-500 px-4 py-2 text-sm font-medium text-white shadow hover:bg-emerald-400"
+        >
+          Cek Nilai & Jawaban
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            className="h-4 w-4"
+          >
+            <path
+              fillRule="evenodd"
+              d="M3 10a.75.75 0 0 1 .75-.75h9.19l-3.47-3.47a.75.75 0 1 1 1.06-1.06l4.75 4.75a.75.75 0 0 1 0 1.06l-4.75 4.75a.75.75 0 0 1-1.06-1.06l3.47-3.47H3.75A.75.75 0 0 1 3 10Z"
+              clipRule="evenodd"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function ReviewQuestionCard({
+  question,
+  studentAnswer,
+}: {
+  question: ExamQuestion;
+  studentAnswer?: string;
+}) {
+  const correctOption = question.options?.find((opt) => opt.is_correct) ?? null;
+  const hasAnswer = typeof studentAnswer === "string" && studentAnswer.length > 0;
+
+  let selectedOption: ExamQuestionOption | null = null;
+  let essayAnswer: string | null = null;
+  let isCorrect: boolean | null = null;
+
+  if (question.type === "pg") {
+    const [, optionIdRaw] = hasAnswer ? studentAnswer!.split("-") : [];
+    const optionId = optionIdRaw ? Number(optionIdRaw) : null;
+    if (optionId) {
+      selectedOption = question.options?.find((opt) => opt.id === optionId) ?? null;
+    }
+    if (selectedOption && correctOption) {
+      isCorrect = selectedOption.id === correctOption.id;
+    } else if (selectedOption && !correctOption) {
+      isCorrect = null;
+    }
+  } else {
+    essayAnswer = hasAnswer ? studentAnswer ?? "" : null;
+  }
+
+  return (
+    <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+      <div className="space-y-3">
+        <div className="flex items-start gap-3">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-100 text-sm font-semibold text-indigo-600">
+            {question.points}
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-medium text-gray-800">{question.question_text}</p>
+            <p className="text-xs uppercase tracking-wide text-gray-400">
+              {question.type === "pg" ? "Pilihan Ganda" : "Essay"}
+            </p>
+          </div>
+        </div>
+
+        {question.type === "pg" ? (
+          <div className="space-y-2">
+            <div
+              className={`flex flex-wrap items-center gap-2 text-xs font-medium ${
+                isCorrect === null
+                  ? "text-gray-500"
+                  : isCorrect
+                  ? "text-emerald-600"
+                  : "text-red-600"
+              }`}
+            >
+              <span>Jawaban kamu:</span>
+              <span className="rounded bg-gray-100 px-2 py-0.5 text-sm text-gray-700">
+                {selectedOption?.option_text ?? "Belum tersedia"}
+              </span>
+              {isCorrect === true && <span className="rounded bg-emerald-100 px-2 py-0.5 text-emerald-700">Benar</span>}
+              {isCorrect === false && <span className="rounded bg-red-100 px-2 py-0.5 text-red-700">Kurang Tepat</span>}
+            </div>
+
+            <div className="text-xs text-gray-500">
+              Kunci jawaban:
+              <span className="ml-1 font-semibold text-emerald-600">
+                {correctOption?.option_text ?? "Belum ditentukan"}
+              </span>
+            </div>
+
+            <div className="space-y-1">
+              {question.options?.map((opt) => {
+                const isSelected = selectedOption?.id === opt.id;
+                const isKey = opt.is_correct;
+                return (
+                  <div
+                    key={`${question.id}-${opt.id}`}
+                    className={`flex items-center justify-between rounded-lg border px-3 py-2 text-sm ${
+                      isKey
+                        ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                        : isSelected
+                        ? "border-orange-200 bg-orange-50 text-orange-700"
+                        : "border-gray-200 text-gray-600"
+                    }`}
+                  >
+                    <span>{opt.option_text}</span>
+                    <div className="flex items-center gap-2 text-xs">
+                      {isKey && <span className="font-semibold">Kunci</span>}
+                      {isSelected && !isKey && <span className="font-medium">Jawabanmu</span>}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ) : (
+          <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm text-gray-700">
+            {essayAnswer && essayAnswer.trim().length > 0
+              ? essayAnswer
+              : "Jawaban essay belum tersedia."}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function useAttemptState(initial: AttemptState = initialAttempt) {
   const [state, setState] = useState<AttemptState>(initial);
 
@@ -402,7 +576,16 @@ export default function ExamDetailPage() {
   );
 
   const studentId = useMemo(() => student?.id ?? student?.student_id ?? null, [student]);
-  const { results, loading: loadingResults } = useExamResults(exam?.id, studentId ?? undefined);
+  const { results, loading: loadingResults, refresh: refreshResults } = useExamResults(
+    exam?.id,
+    studentId ?? undefined
+  );
+
+  const [storedAnswers, setStoredAnswers] = useState<Record<number, string>>({});
+  const storageKey = useMemo(() => {
+    if (!studentId || !exam?.id) return null;
+    return `exam-answers-${studentId}-${exam.id}`;
+  }, [studentId, exam?.id]);
 
   const attempt = useAttemptState(initialAttempt);
 
@@ -412,6 +595,32 @@ export default function ExamDetailPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [exam?.id]);
+
+  useEffect(() => {
+    if (!storageKey) {
+      setStoredAnswers({});
+      return;
+    }
+    if (typeof window === "undefined") return;
+
+    try {
+      const raw = window.localStorage.getItem(storageKey);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === "object") {
+          setStoredAnswers(parsed);
+        }
+      }
+    } catch (err) {
+      console.warn("Gagal memuat jawaban ujian dari penyimpanan lokal", err);
+    }
+  }, [storageKey]);
+
+  const reviewAnswers = useMemo(() => {
+    return Object.keys(storedAnswers).length > 0 ? storedAnswers : attempt.answers;
+  }, [storedAnswers, attempt.answers]);
+
+  const showResultMode = mode === "hasil";
 
   const isStudent = user?.role === "siswa";
   const isStaff = user && ["teacher", "admin"].includes(user.role);
@@ -432,7 +641,16 @@ export default function ExamDetailPage() {
         score,
         feedback: "Jawaban kamu sudah direkam.",
       });
+      if (storageKey && typeof window !== "undefined") {
+        try {
+          window.localStorage.setItem(storageKey, JSON.stringify(attempt.answers));
+          setStoredAnswers(attempt.answers);
+        } catch (err) {
+          console.warn("Tidak dapat menyimpan jawaban ujian secara lokal", err);
+        }
+      }
 
+      await refreshResults();
       attempt.setSubmitSuccess(true);
     } catch (err: any) {
       const message =
@@ -449,7 +667,15 @@ export default function ExamDetailPage() {
     router.push("/edu/ujian");
   };
 
-  const canAttempt = isStudent && !existingResult;
+  const handleViewResults = useCallback(() => {
+    router.push(`/edu/ujian/${params?.id}?mode=hasil`);
+  }, [params?.id, router]);
+
+  const handleViewAttemptMode = useCallback(() => {
+    router.push(`/edu/ujian/${params?.id}`);
+  }, [params?.id, router]);
+
+  const canAttempt = isStudent && !existingResult && !showResultMode;
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -512,10 +738,19 @@ export default function ExamDetailPage() {
             <ExamMeta exam={{ ...exam, questions }} />
 
             {isStudent && existingResult && (
-              <ResultSummary result={existingResult} />
+              <div className="space-y-4">
+                <ResultSummary result={existingResult} />
+                {!showResultMode && (
+                  <CompletionBanner onViewResult={handleViewResults} hasResult={true} />
+                )}
+              </div>
             )}
 
-            {isStudent && !existingResult && (
+            {isStudent && !existingResult && attempt.submitSuccess && !showResultMode && (
+              <CompletionBanner onViewResult={handleViewResults} hasResult={false} />
+            )}
+
+            {isStudent && !existingResult && !attempt.submitSuccess && !showResultMode && (
               <div className="rounded-2xl border border-sky-200 bg-sky-50 p-4 text-sky-700">
                 <p className="text-sm font-medium">Petunjuk pengerjaan</p>
                 <ul className="mt-2 list-disc pl-5 text-xs text-sky-800 space-y-1">
@@ -550,31 +785,62 @@ export default function ExamDetailPage() {
             </div>
           )}
 
-          {questions.map((question) => (
-            <QuestionBlock
-              key={question.id}
-              question={question}
-              value={attempt.answers[question.id]}
-              onChange={(value) => attempt.setAnswer(question.id, value)}
-              disabled={!canAttempt}
-            />
-          ))}
+          {showResultMode && (
+            <div className="flex flex-col gap-3 rounded-2xl border border-emerald-100 bg-emerald-50 p-4 text-sm text-emerald-700">
+              <div>
+                <p className="font-medium">Ringkasan hasil</p>
+                <p className="text-xs text-emerald-800">
+                  Berikut kunci jawaban untuk soal pilihan ganda dan jawaban yang kamu isi.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={handleViewAttemptMode}
+                  className="inline-flex items-center gap-2 rounded-lg border border-emerald-200 px-3 py-2 text-xs font-medium text-emerald-700 hover:bg-emerald-100"
+                >
+                  Kembali ke ringkasan ujian
+                </button>
+                {loadingResults && (
+                  <span className="inline-flex items-center gap-2 rounded-lg bg-emerald-100 px-3 py-1 text-xs text-emerald-700">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Memuat nilai terbaru...
+                  </span>
+                )}
+                {isStudent && !existingResult && (
+                  <span className="text-xs text-emerald-800">
+                    Nilai belum tersedia. Coba periksa kembali beberapa saat lagi.
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+
+          {questions.map((question) =>
+            showResultMode ? (
+              <ReviewQuestionCard
+                key={question.id}
+                question={question}
+                studentAnswer={reviewAnswers[question.id]}
+              />
+            ) : (
+              <QuestionBlock
+                key={question.id}
+                question={question}
+                value={attempt.answers[question.id]}
+                onChange={(value) => attempt.setAnswer(question.id, value)}
+                disabled={!canAttempt}
+              />
+            )
+          )}
         </section>
 
-        {isStudent && (
+        {isStudent && !showResultMode && (
           <footer className="sticky bottom-0 left-0 right-0 border-t border-gray-200 bg-white/90 backdrop-blur py-4">
             <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 sm:flex-row sm:items-center sm:justify-between">
               {attempt.submitError && (
                 <div className="flex items-center gap-2 rounded-lg bg-red-100 px-3 py-2 text-xs text-red-600">
                   <AlertCircle className="h-4 w-4" />
                   {attempt.submitError}
-                </div>
-              )}
-
-              {attempt.submitSuccess && (
-                <div className="flex items-center gap-2 rounded-lg bg-emerald-100 px-3 py-2 text-xs text-emerald-600">
-                  <AlertCircle className="h-4 w-4" />
-                  Jawabanmu terkirim! Kamu dapat kembali ke halaman ujian.
                 </div>
               )}
 

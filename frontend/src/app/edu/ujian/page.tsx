@@ -275,14 +275,35 @@ export default function UjianSiswa() {
             const matchesMataPelajaran =
                 filterMataPelajaran === "all" || subjectName === filterMataPelajaran;
 
-            const matchesStatus =
-                filterStatus === "all" ||
-                (filterStatus === "selesai" && item.isCompleted) ||
-                (filterStatus === "belum" && !item.isCompleted);
+            let matchesStatus = true;
+
+            if (filterStatus !== "all") {
+                if (isStaff) {
+                    const startTs = new Date(`${item.date}T${item.start_time}`);
+                    const endTs = new Date(`${item.date}T${item.end_time}`);
+                    const now = new Date();
+
+                    const isUpcoming = now < startTs;
+                    const isCompletedTime = now > endTs;
+                    const isOngoing = !isUpcoming && !isCompletedTime;
+
+                    if (filterStatus === "upcoming") {
+                        matchesStatus = isUpcoming;
+                    } else if (filterStatus === "ongoing") {
+                        matchesStatus = isOngoing;
+                    } else if (filterStatus === "completed") {
+                        matchesStatus = isCompletedTime;
+                    }
+                } else {
+                    matchesStatus =
+                        (filterStatus === "selesai" && item.isCompleted) ||
+                        (filterStatus === "belum" && !item.isCompleted);
+                }
+            }
 
             return matchesSearch && matchesMataPelajaran && matchesStatus;
         });
-    }, [ujian, searchQuery, filterMataPelajaran, filterStatus]);
+    }, [ujian, searchQuery, filterMataPelajaran, filterStatus, isStaff]);
 
     const groupedUjian = useMemo(() => {
         return filteredUjian.reduce((acc: Record<string, any[]>, item: any) => {
@@ -294,6 +315,36 @@ export default function UjianSiswa() {
             return acc;
         }, {} as Record<string, any[]>);
     }, [filteredUjian]);
+
+    const staffSummary = useMemo(() => {
+        if (!isStaff) {
+            return { total: ujian.length, upcoming: 0, ongoing: 0, completed: 0 };
+        }
+
+        const now = new Date();
+        let upcoming = 0;
+        let ongoing = 0;
+        let completed = 0;
+
+        ujian.forEach((item: any) => {
+            const startTs = new Date(`${item.date}T${item.start_time}`);
+            const endTs = new Date(`${item.date}T${item.end_time}`);
+
+            if (Number.isNaN(startTs.getTime()) || Number.isNaN(endTs.getTime())) {
+                return;
+            }
+
+            if (now < startTs) {
+                upcoming += 1;
+            } else if (now > endTs) {
+                completed += 1;
+            } else {
+                ongoing += 1;
+            }
+        });
+
+        return { total: ujian.length, upcoming, ongoing, completed };
+    }, [isStaff, ujian]);
 
     const nextSlide = () => {
         if (!uncompletedExam?.length) return;
@@ -757,11 +808,138 @@ export default function UjianSiswa() {
                 </>
             )}
 
-            {isStaff && !isStudent && (
-                <div className="p-6">
-                    <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-8 text-center text-gray-500">
-                        Area manajemen ujian untuk guru & admin akan tampil di sini.
-                    </div>
+            {isStaff && (
+                <div className="w-full flex flex-col gap-6 p-4">
+                    <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                        <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5">
+                            <p className="text-xs uppercase tracking-wide text-gray-500">Total Ujian</p>
+                            <p className="mt-2 text-3xl font-semibold text-gray-900">{staffSummary.total}</p>
+                            <p className="text-xs text-gray-500 mt-1">Semua ujian aktif di sekolah</p>
+                        </div>
+                        <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5">
+                            <p className="text-xs uppercase tracking-wide text-gray-500">Akan Berlangsung</p>
+                            <p className="mt-2 text-3xl font-semibold text-orange-500">{staffSummary.upcoming}</p>
+                            <p className="text-xs text-gray-500 mt-1">Jadwal yang dimulai setelah hari ini</p>
+                        </div>
+                        <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5">
+                            <p className="text-xs uppercase tracking-wide text-gray-500">Selesai</p>
+                            <p className="mt-2 text-3xl font-semibold text-emerald-600">{staffSummary.completed}</p>
+                            <p className="text-xs text-gray-500 mt-1">Ujian yang sudah berakhir</p>
+                        </div>
+                    </section>
+
+                    <section className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+                        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                            <input
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                placeholder="Cari ujian berdasarkan judul, mapel, atau kelas"
+                                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-200"
+                            />
+                            <div className="flex w-full flex-col gap-3 sm:flex-row sm:w-auto sm:items-center">
+                                <select
+                                    value={filterMataPelajaran}
+                                    onChange={(e) => setFilterMataPelajaran(e.target.value)}
+                                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-200 sm:w-48"
+                                >
+                                    <option value="all">Semua Mata Pelajaran</option>
+                                    {uniqueSubjects.map((mataPelajaran) => (
+                                        <option key={mataPelajaran} value={mataPelajaran}>
+                                            {mataPelajaran}
+                                        </option>
+                                    ))}
+                                </select>
+                                <select
+                                    value={filterStatus}
+                                    onChange={(e) => setFilterStatus(e.target.value)}
+                                    className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-200 sm:w-40"
+                                >
+                                    <option value="all">Semua Status</option>
+                                    <option value="upcoming">Belum Mulai</option>
+                                    <option value="ongoing">Sedang Berlangsung</option>
+                                    <option value="completed">Sudah Selesai</option>
+                                </select>
+                            </div>
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => router.push("/edu/ujian/manage/new")}
+                                    className="inline-flex items-center gap-2 rounded-lg bg-orange-500 px-4 py-2 text-sm font-medium text-white shadow hover:bg-orange-400"
+                                >
+                                    Tambah Ujian
+                                </button>
+                                {(searchQuery || filterMataPelajaran !== "all" || filterStatus !== "all") && (
+                                    <button
+                                        onClick={handleResetFilter}
+                                        className="rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50"
+                                    >
+                                        Reset
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="grid gap-3">
+                        {isFetching && (
+                            <div className="flex items-center justify-center gap-2 rounded-2xl border border-gray-200 bg-white py-12 text-gray-500">
+                                <Loader2 className="h-5 w-5 animate-spin" />
+                                Memuat daftar ujian...
+                            </div>
+                        )}
+
+                        {!isFetching && filteredUjian.length === 0 && (
+                            <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-6 text-center text-gray-400">
+                                Tidak ada ujian yang cocok dengan filter.
+                            </div>
+                        )}
+
+                        {filteredUjian.map((item: any) => {
+                            const startDate = new Date(item.date);
+                            const startTime = `${item.start_time}`;
+                            const endTime = `${item.end_time}`;
+
+                            return (
+                                <div
+                                    key={item.id}
+                                    className="flex flex-col gap-3 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow"
+                                >
+                                    <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-orange-500">
+                                        <span>{item.subject?.name ?? "Mata Pelajaran"}</span>
+                                        <span className="text-gray-300">•</span>
+                                        <span>{item.class?.name ?? "Kelas"}</span>
+                                    </div>
+                                    <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                                        <div>
+                                            <h2 className="text-lg font-semibold text-gray-900">{item.title}</h2>
+                                            <p className="text-sm text-gray-500">
+                                                {startDate.toLocaleDateString("id-ID", {
+                                                    day: "2-digit",
+                                                    month: "long",
+                                                    year: "numeric",
+                                                })}
+                                                {" • "}
+                                                {startTime} - {endTime}
+                                            </p>
+                                        </div>
+                                        <div className="flex flex-wrap items-center gap-2">
+                                            <button
+                                                onClick={() => router.push(`/edu/ujian/${item.id}?mode=hasil`)}
+                                                className="rounded-lg border border-emerald-200 px-3 py-2 text-xs font-medium text-emerald-600 hover:bg-emerald-50"
+                                            >
+                                                Cek Nilai & Jawaban
+                                            </button>
+                                            <button
+                                                onClick={() => router.push(`/edu/ujian/manage/${item.id}`)}
+                                                className="rounded-lg border border-gray-200 px-3 py-2 text-xs font-medium text-gray-600 hover:bg-gray-50"
+                                            >
+                                                Kelola Ujian
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </section>
                 </div>
             )}
         </div>
