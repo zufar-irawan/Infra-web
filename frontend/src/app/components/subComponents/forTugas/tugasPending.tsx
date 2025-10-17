@@ -8,8 +8,6 @@ export default function TugasPending(
     const date = tugas.deadline
     const formattedDate = format(parseISO(date), 'd MMM yyyy', {locale: id});
 
-    console.log(tugas)
-
     return (
         <div className="flex items-start sm:items-center justify-between py-4 gap-2">
             <div className="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1">

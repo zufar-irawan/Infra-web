@@ -304,7 +304,7 @@ export default function Tugas() {
                                                 { // @ts-ignore
                                                     tugasList.map((item) => (
                                                         <TugasItem 
-
+                                                            student={student}
                                                             key={item.id} 
                                                             tugas={item} 
                                                             isCompleted={item.submissions && item.submissions.length > 0}
