@@ -131,9 +131,7 @@ export default function Sidebar({ isOpen, onClose, user }: SidebarProps) {
     { href: "/edu/guru", icon: Users, label: "Guru" },
     { href: "/edu/siswa", icon: Users, label: "Siswa" },
     { href: "/edu/kelas", icon: Shapes, label: "Kelas" },
-    { href: "/edu/tugas", icon: BookMarked, label: "Tugas" },
     { href: "/edu/ujian", icon: BookMarked, label: "Ujian" },
-    { href: "/edu/nilai", icon: BarChart3, label: "Nilai" },
     { href: "/edu/jadwal", icon: Calendar, label: "Jadwal" },
     { href: "/edu/laporan", icon: Clipboard, label: "Laporan" },
   ];
@@ -172,13 +170,13 @@ export default function Sidebar({ isOpen, onClose, user }: SidebarProps) {
       )}
 
       <aside
-        className={`w-full fixed lg:relative max-w-xs min-h-screen bg-gradient-to-b from-slate-50 to-white text-gray-700
+        className={`w-full fixed lg:relative max-w-xs h-screen bg-gradient-to-b from-slate-50 to-white text-gray-700
           border-r border-gray-200 shadow-sm flex flex-col justify-between z-50 transition-transform duration-300 ease-in-out
           ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
       >
-        <div>
+        <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-300 hover:scrollbar-thumb-gray-400">
           {/* === Header === */}
-          <section className="w-full bg-gradient-to-br from-orange-600 via-orange-500 to-orange-600 flex justify-between items-center gap-3 p-6 relative overflow-hidden">
+          <section className="w-full bg-gradient-to-br from-orange-600 via-orange-500 to-orange-600 flex justify-between items-center gap-3 p-6 relative overflow-hidden flex-shrink-0">
             <div className="absolute inset-0 bg-white/5 backdrop-blur-3xl"></div>
             <div className="relative z-10 flex items-center gap-3">
               <div className="bg-white/20 p-2 rounded-2xl backdrop-blur-sm shadow-lg">
@@ -203,7 +201,7 @@ export default function Sidebar({ isOpen, onClose, user }: SidebarProps) {
           </section>
 
           {/* === User Card === */}
-          <section className="w-full p-5">
+          <section className="w-full p-5 flex-shrink-0">
             <div className="bg-white rounded-2xl p-4 shadow-md border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5">
               <div className="flex gap-3 items-center">
                 <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 text-white font-bold text-xl flex items-center justify-center shadow-lg ring-4 ring-orange-100">
@@ -269,7 +267,7 @@ export default function Sidebar({ isOpen, onClose, user }: SidebarProps) {
         </div>
 
         {/* === Logout Button === */}
-        <div className="border-t border-gray-200 bg-gradient-to-b from-white to-slate-50">
+        <div className="border-t border-gray-200 bg-gradient-to-b from-white to-slate-50 flex-shrink-0">
           <button
             onClick={handleLogout}
             className="group w-full flex items-center gap-3 p-5 hover:bg-red-50 transition-all duration-300 cursor-pointer bg-transparent border-none text-left"
