@@ -32,7 +32,7 @@ export async function GET(
 // Payload accepted (JSON): { grade: number|string, feedback?: string, submission_id?: string|number }
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const cookieStore = await cookies();
@@ -40,7 +40,7 @@ export async function PUT(
     if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const body = await req.json().catch(() => ({} as any));
-    const pathId = params?.id;
+    const { id: pathId } = await context.params;
 
     // Allow submission_id in body; otherwise use [id] from path.
     const submissionIdRaw = body?.submission_id ?? pathId;
