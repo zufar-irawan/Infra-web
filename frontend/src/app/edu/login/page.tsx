@@ -36,6 +36,13 @@ export default function LoginRegisterPage() {
                     // Notify layout to re-fetch auth-dependent data
                     try {
                         if (typeof window !== 'undefined') {
+                            if (res.data.token) {
+                                try {
+                                    sessionStorage.setItem('token', res.data.token)
+                                } catch (err) {
+                                    console.warn('Gagal menyimpan token ke sessionStorage', err)
+                                }
+                            }
                             // Cross-tab: toggle a storage key so other tabs/layouts can react
                             try { localStorage.setItem('edu:login', Date.now().toString()) } catch (e) { /* ignore */ }
                             // Same-tab: dispatch a custom event

@@ -153,6 +153,7 @@ Route::get('/portal/dashboard', [PortalController::class, 'dashboard']);
 // === FAQ API ===
 // daftar FAQ untuk publik (tanpa login)
 Route::get('/faq/list', [FaqController::class, 'publicList']);
+Route::apiResource('faqs', FaqController::class);
 
 // CRUD FAQ
 Route::get('/faq', [FaqController::class, 'index']);     // tampil semua

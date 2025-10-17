@@ -36,6 +36,13 @@ export default function Sidebar({ isOpen, onClose, user }: SidebarProps) {
     try {
       const res = await axios.post("/api/logout");
       if (res.status === 200 && res.data.logout) {
+        if (typeof window !== "undefined") {
+          try {
+            sessionStorage.removeItem("token");
+          } catch (err) {
+            console.warn("Gagal menghapus token dari sessionStorage", err);
+          }
+        }
         Swal.fire({
           icon: "success",
           title: "Berhasil",
@@ -58,6 +65,13 @@ export default function Sidebar({ isOpen, onClose, user }: SidebarProps) {
         timer: 2000,
         showConfirmButton: false,
       });
+      if (typeof window !== "undefined") {
+        try {
+          sessionStorage.removeItem("token");
+        } catch (err) {
+          console.warn("Gagal menghapus token dari sessionStorage", err);
+        }
+      }
       router.push("/edu/login");
     }
   };

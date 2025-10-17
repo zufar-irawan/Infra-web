@@ -30,8 +30,9 @@ export default function AdminFaqPage() {
   const fetchFaqs = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${API_BASE_URL}/faq`);
-      setFaqList(res.data.data);
+      const res = await axios.get(`${API_BASE_URL}/faqs`);
+      // Laravel resource bisa nested (pagination)
+      setFaqList(res.data.data?.data || res.data.data || []);
     } catch (err) {
       console.error(err);
       MySwal.fire("Gagal", "Tidak bisa memuat data FAQ.", "error");
@@ -53,10 +54,16 @@ export default function AdminFaqPage() {
 
     try {
       if (editId) {
-        await axios.put(`${API_BASE_URL}/faq/${editId}`, form);
+        // Update FAQ
+        await axios.put(`${API_BASE_URL}/faqs/${editId}`, form, {
+          headers: { "Content-Type": "application/json" },
+        });
         MySwal.fire("Berhasil", "FAQ berhasil diperbarui.", "success");
       } else {
-        await axios.post(`${API_BASE_URL}/faq`, form);
+        // Tambah FAQ baru
+        await axios.post(`${API_BASE_URL}/faqs`, form, {
+          headers: { "Content-Type": "application/json" },
+        });
         MySwal.fire("Berhasil", "FAQ berhasil ditambahkan.", "success");
       }
 
@@ -84,7 +91,7 @@ export default function AdminFaqPage() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axios.delete(`${API_BASE_URL}/faq/${id}`);
+          await axios.delete(`${API_BASE_URL}/faqs/${id}`);
           fetchFaqs();
           MySwal.fire("Terhapus!", "FAQ berhasil dihapus.", "success");
         } catch (err) {
