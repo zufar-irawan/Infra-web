@@ -10,6 +10,7 @@ interface CreateExamModalProps {
     classes: any[];
     rooms: any[];
     onSubmit: (examData: ExamFormData) => void;
+    isLoading?: boolean;
 }
 
 interface ExamFormData {
@@ -23,7 +24,7 @@ interface ExamFormData {
     room_id: string;
 }
 
-export default function CreateExamModal({ isOpen, onClose, subjects, classes, rooms, onSubmit }: CreateExamModalProps) {
+export default function CreateExamModal({ isOpen, onClose, subjects, classes, rooms, onSubmit, isLoading }: CreateExamModalProps) {
     const [formData, setFormData] = useState<ExamFormData>({
         subject_id: '',
         class_id: '',
@@ -78,13 +79,15 @@ export default function CreateExamModal({ isOpen, onClose, subjects, classes, ro
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (validateForm()) {
+        if (validateForm() && !isLoading) {
             onSubmit(formData);
-            handleClose();
+            // Don't reset form here - let parent component handle it after successful submission
         }
     };
 
     const handleClose = () => {
+        if (isLoading) return; // Prevent closing while loading
+
         setFormData({
             subject_id: '',
             class_id: '',
@@ -117,6 +120,16 @@ export default function CreateExamModal({ isOpen, onClose, subjects, classes, ro
 
                 {/* Form */}
                 <form onSubmit={handleSubmit} className="p-6 space-y-6">
+                    {/* Loading Overlay */}
+                    {isLoading && (
+                        <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10 rounded-2xl">
+                            <div className="flex flex-col items-center gap-3">
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+                                <p className="text-sm text-gray-600">Sedang membuat ujian...</p>
+                            </div>
+                        </div>
+                    )}
+
                     {/* Subject and Class Row */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* Subject */}
@@ -129,9 +142,10 @@ export default function CreateExamModal({ isOpen, onClose, subjects, classes, ro
                                 name="subject_id"
                                 value={formData.subject_id}
                                 onChange={handleInputChange}
+                                disabled={isLoading}
                                 className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
                                     errors.subject_id ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                } ${isLoading ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                             >
                                 <option value="">Pilih Mata Pelajaran</option>
                                 {subjects.map((subject) => (
@@ -155,9 +169,10 @@ export default function CreateExamModal({ isOpen, onClose, subjects, classes, ro
                                 name="class_id"
                                 value={formData.class_id}
                                 onChange={handleInputChange}
+                                disabled={isLoading}
                                 className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
                                     errors.class_id ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                } ${isLoading ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                             >
                                 <option value="">Pilih Kelas</option>
                                 {classes.map((classItem) => (
@@ -183,10 +198,11 @@ export default function CreateExamModal({ isOpen, onClose, subjects, classes, ro
                             name="title"
                             value={formData.title}
                             onChange={handleInputChange}
+                            disabled={isLoading}
                             placeholder="Masukkan judul ujian"
                             className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
                                 errors.title ? 'border-red-500' : 'border-gray-300'
-                            }`}
+                            } ${isLoading ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                         />
                         {errors.title && (
                             <p className="mt-1 text-sm text-red-600">{errors.title}</p>
@@ -203,9 +219,12 @@ export default function CreateExamModal({ isOpen, onClose, subjects, classes, ro
                             name="description"
                             value={formData.description}
                             onChange={handleInputChange}
+                            disabled={isLoading}
                             placeholder="Masukkan deskripsi ujian (opsional)"
                             rows={3}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all resize-none"
+                            className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all resize-none ${
+                                isLoading ? 'bg-gray-100 cursor-not-allowed' : ''
+                            }`}
                         />
                     </div>
 
@@ -222,9 +241,10 @@ export default function CreateExamModal({ isOpen, onClose, subjects, classes, ro
                                 name="date"
                                 value={formData.date}
                                 onChange={handleInputChange}
+                                disabled={isLoading}
                                 className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
                                     errors.date ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                } ${isLoading ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                             />
                             {errors.date && (
                                 <p className="mt-1 text-sm text-red-600">{errors.date}</p>
@@ -242,9 +262,10 @@ export default function CreateExamModal({ isOpen, onClose, subjects, classes, ro
                                 name="start_time"
                                 value={formData.start_time}
                                 onChange={handleInputChange}
+                                disabled={isLoading}
                                 className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
                                     errors.start_time ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                } ${isLoading ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                             />
                             {errors.start_time && (
                                 <p className="mt-1 text-sm text-red-600">{errors.start_time}</p>
@@ -262,9 +283,10 @@ export default function CreateExamModal({ isOpen, onClose, subjects, classes, ro
                                 name="end_time"
                                 value={formData.end_time}
                                 onChange={handleInputChange}
+                                disabled={isLoading}
                                 className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
                                     errors.end_time ? 'border-red-500' : 'border-gray-300'
-                                }`}
+                                } ${isLoading ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                             />
                             {errors.end_time && (
                                 <p className="mt-1 text-sm text-red-600">{errors.end_time}</p>
@@ -282,9 +304,10 @@ export default function CreateExamModal({ isOpen, onClose, subjects, classes, ro
                             name="room_id"
                             value={formData.room_id}
                             onChange={handleInputChange}
+                            disabled={isLoading}
                             className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
                                 errors.room_id ? 'border-red-500' : 'border-gray-300'
-                            }`}
+                            } ${isLoading ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                         >
                             <option value="">Pilih Ruangan</option>
                             {rooms.map((room) => (
@@ -303,15 +326,24 @@ export default function CreateExamModal({ isOpen, onClose, subjects, classes, ro
                         <button
                             type="button"
                             onClick={handleClose}
-                            className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                            disabled={isLoading}
+                            className={`px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors ${
+                                isLoading ? 'opacity-50 cursor-not-allowed' : ''
+                            }`}
                         >
                             Batal
                         </button>
                         <button
                             type="submit"
-                            className="px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors"
+                            disabled={isLoading}
+                            className={`px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors flex items-center gap-2 ${
+                                isLoading ? 'opacity-75 cursor-not-allowed' : ''
+                            }`}
                         >
-                            Buat Ujian
+                            {isLoading && (
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                            )}
+                            {isLoading ? 'Membuat Ujian...' : 'Buat Ujian'}
                         </button>
                     </div>
                 </form>

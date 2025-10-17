@@ -21,7 +21,7 @@ class LmsExamController extends Controller
         $user = Auth::user();
 
         // ✅ Hanya admin & teacher boleh buat ujian
-        if (!in_array($user->role, ['admin', 'teacher'])) {
+        if (!in_array($user->role, ['admin', 'guru'])) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 

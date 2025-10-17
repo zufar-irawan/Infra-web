@@ -39,7 +39,7 @@ export default function Tugas() {
             // Untuk siswa, filter tugas berdasarkan classId
             tugasList = tugas.filter((t: any) => t.class_id === classId);
         } else {
-            setTugasWithTeacher([]); // Kosongkan jika tidak ada data
+            setTugasWithTeacher([]);
             return;
         }
 
