@@ -18,9 +18,10 @@ function EduLayoutContent({children}: {children?: React.ReactNode}) {
     // Central data states
     const [user, setUser] = useState<any>(null)
     const [student, setStudent] = useState<any>(null)
+    const [students, setStudents] = useState<any[] | null>(null)
     const [tugas, setTugas] = useState<any[] | null>(null)
     const [teachers, setTeachers] = useState<any[] | null>(null)
-    const [teacher, setTeacher] = useState<any[] | null>(null)
+    const [teacher, setTeacher] = useState<any | null>(null)
     const [subjects, setSubjects] = useState<any[] | null>(null)
     const [exams, setExams] = useState<any | null>(null)
     const [nilai, setNilai] = useState<{ nilaiMapel: any | null; ringkasanNilai: any | null } | null>(null)
@@ -49,12 +50,23 @@ function EduLayoutContent({children}: {children?: React.ReactNode}) {
             const res = await axios.get('/api/student')
             const studentPayload = res.data?.data ?? res.data
             const studentList = Array.isArray(studentPayload) ? studentPayload : (studentPayload?.data ?? [])
-            const studentMe = studentList.find((s:any) => (s.userId ?? s.user_id) === me?.id)
-            setStudent(studentMe || null)
-            return studentMe || null
+
+            if(me.role === 'siswa') {
+                const studentMe = studentList.find((s:any) => (s.userId ?? s.user_id) === me?.id)
+                setStudent(studentMe || null)
+                // also cache list for potential teacher views, safe for siswa as well
+                setStudents(studentList || null)
+                return studentMe || null
+            } else {
+                // for guru/admin, expose the list and clear single student
+                setStudent(null)
+                setStudents(studentList || null)
+                return studentList || null
+            }
         } catch (err) {
             console.error(err)
             setStudent(null)
+            setStudents(null)
             return null
         }
     }
@@ -90,12 +102,16 @@ function EduLayoutContent({children}: {children?: React.ReactNode}) {
                 axios.get('/api/classes').catch(() => ({ data: { data: [] }})),
             ]
 
-            // Fetch nilai only if student id exists
-            const sid = studentMe?.id ?? studentMe?.student_id
-            if (sid) {
-                promises.push(
-                    axios.get('/api/nilai', { params: { student_id: sid } }).catch(() => ({ data: {} }))
-                )
+            // Fetch nilai only if the logged-in user is a student and has an id
+            let sid: any = undefined
+            if (user?.role === 'siswa') {
+                const s = Array.isArray(studentMe) ? null : studentMe
+                sid = s?.id ?? s?.student_id
+                if (sid) {
+                    promises.push(
+                        axios.get('/api/nilai', { params: { student_id: sid } }).catch(() => ({ data: {} }))
+                    )
+                }
             }
 
             const results = await Promise.all(promises)
@@ -106,12 +122,11 @@ function EduLayoutContent({children}: {children?: React.ReactNode}) {
             setTeachers(teachersRes?.data?.data ?? null)
             setExams(examsRes?.data ?? null)
             setSubjects(subjectsRes?.data?.data ?? null)
-            setSchedules(scheduleRes.data.data ?? null)
-            setRooms(roomRes.data.data ?? null)
-            setClasses(classRes.data?.data ?? null)
-            setTeachers(teachersRes.data?.data ?? null)
+            setSchedules(scheduleRes?.data?.data ?? null)
+            setRooms(roomRes?.data?.data ?? null)
+            setClasses(classRes?.data?.data ?? null)
 
-            if (sid) {
+            if (user?.role === 'siswa' && sid) {
                 setNilai({
                     nilaiMapel: nilaiRes?.data?.nilai_mapel ?? null,
                     ringkasanNilai: nilaiRes?.data?.ringkasan ?? null,
@@ -146,6 +161,29 @@ function EduLayoutContent({children}: {children?: React.ReactNode}) {
     }, [isLogin, bootstrapped])
 
     useEffect(() => {
+        if (isLogin) return
+        if (typeof window === 'undefined') return
+
+        const ensureTokenSynced = async () => {
+            const existing = sessionStorage.getItem('token')
+            if (existing) return
+
+            try {
+                const res = await fetch('/api/auth/token', { cache: 'no-store' })
+                if (!res.ok) return
+                const data = await res.json()
+                if (data?.token) {
+                    sessionStorage.setItem('token', data.token)
+                }
+            } catch (err) {
+                console.error('Gagal sinkron token dari cookie', err)
+            }
+        }
+
+        ensureTokenSynced()
+    }, [isLogin])
+
+    useEffect(() => {
         // After user fetched, fetch student, then other data
         if (!user || isLogin) return
         (async () => {
@@ -166,7 +204,7 @@ function EduLayoutContent({children}: {children?: React.ReactNode}) {
                 if (me) {
                     const stu = await fetchStudent(me)
                     await fetchTeacher(me)
-                    await fetchCoreData(stu, user)
+                    await fetchCoreData(stu, me)
                 }
             } catch (err) {
                 console.error('Error refetching after auth event', err)
@@ -197,6 +235,7 @@ function EduLayoutContent({children}: {children?: React.ReactNode}) {
     const contextValue: EduData = useMemo(() => ({
         user,
         student,
+        students,
         tugas,
         subjects,
         teacher,
@@ -206,7 +245,7 @@ function EduLayoutContent({children}: {children?: React.ReactNode}) {
         schedules,
         rooms,
         classes,
-    }), [user, student, tugas, subjects, teacher, teachers, exams, nilai, schedules, rooms, classes])
+    }), [user, student, students, tugas, subjects, teacher, teachers, exams, nilai, schedules, rooms, classes])
 
     return (
         <div className="flex flex-row min-h-screen bg-gray-100">

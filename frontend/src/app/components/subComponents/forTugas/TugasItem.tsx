@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState } from 'react';
-import { Upload, CheckCircle, Clock, User, Calendar } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { Upload, CheckCircle, Clock, User, Calendar, Users } from 'lucide-react';
 import TugasUploadModal from './TugasUploadModal';
 import {useEduData} from "@/app/edu/context";
+import { useRouter } from "next/navigation";
 
 interface TugasItemProps {
     tugas: any;
@@ -12,8 +13,10 @@ interface TugasItemProps {
 }
 
 export default function TugasItem({ student, tugas, isCompleted = false }: TugasItemProps) {
+    const { user, students } = useEduData();
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const router = useRouter();
 
     const formatDeadline = (dateString: string) => {
         const date = new Date(dateString);
@@ -31,6 +34,30 @@ export default function TugasItem({ student, tugas, isCompleted = false }: Tugas
         const deadline = new Date(tugas.deadline);
         return now > deadline;
     };
+
+    // Teacher-specific counters
+    const { submittedCount, notSubmittedCount, totalClassStudents } = useMemo(() => {
+        if (user?.role !== 'guru') return { submittedCount: 0, notSubmittedCount: 0, totalClassStudents: 0 };
+
+        const classId = tugas?.class_id;
+        const classStudents = (students || [])
+            .filter((s: any) => {
+                const sid = s?.class_id ?? s?.class?.id;
+                return sid != null && classId != null && String(sid) === String(classId);
+            });
+
+        const subs = Array.isArray(tugas?.submissions) ? tugas.submissions : [];
+        const uniqueSubmitters = new Set<string>();
+        subs.forEach((sub: any) => {
+            const sid = sub?.student_id ?? sub?.student?.id;
+            if (sid != null) uniqueSubmitters.add(String(sid));
+        });
+
+        const submitted = classStudents.filter((s: any) => uniqueSubmitters.has(String(s.id))).length;
+        const notSubmitted = Math.max(classStudents.length - submitted, 0);
+
+        return { submittedCount: submitted, notSubmittedCount: notSubmitted, totalClassStudents: classStudents.length };
+    }, [user?.role, tugas?.class_id, tugas?.submissions, students]);
 
     const handleUploadComplete = async (files: any[]) => {
         if (isSubmitting) return;
@@ -107,6 +134,14 @@ export default function TugasItem({ student, tugas, isCompleted = false }: Tugas
         }
     };
 
+    const isTeacher = user?.role === 'guru';
+
+    const goToDetail = () => {
+        const id = tugas?.id;
+        if (id == null) return;
+        router.push(`/edu/tugas/${id}`);
+    };
+
     return (
         <>
             {/* Uploading overlay */}
@@ -124,7 +159,13 @@ export default function TugasItem({ student, tugas, isCompleted = false }: Tugas
 
             <div className="flex items-start sm:items-center justify-between py-4 gap-2">
                 <div className="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1">
-                    <div className="flex-1">
+                    <div
+                        className="flex-1 cursor-pointer rounded-lg p-1 -m-1 hover:bg-gray-50"
+                        onClick={goToDetail}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goToDetail(); } }}
+                    >
                         <h3 className="font-medium text-gray-800 mb-1">{tugas.title}</h3>
                         <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
                             <div className="flex items-center gap-1">
@@ -135,6 +176,12 @@ export default function TugasItem({ student, tugas, isCompleted = false }: Tugas
                                 <Calendar className="w-4 h-4" />
                                 <span>Deadline: {formatDeadline(tugas.deadline)}</span>
                             </div>
+                            {isTeacher && (
+                                <div className="flex items-center gap-1">
+                                    <Users className="w-4 h-4" />
+                                    <span>Total siswa kelas: {totalClassStudents}</span>
+                                </div>
+                            )}
                         </div>
                         {tugas.description && (
                             <p className="text-sm text-gray-600 mt-2 line-clamp-2">
@@ -144,65 +191,83 @@ export default function TugasItem({ student, tugas, isCompleted = false }: Tugas
                     </div>
                     
                     <div className="flex items-center gap-2">
-                        {/* Status Badge */}
-                        <div className={`px-3 py-1 rounded-full text-xs font-medium ${
-                            isCompleted 
-                                ? 'bg-green-100 text-green-700' 
-                                : isOverdue()
-                                ? 'bg-red-100 text-red-700'
-                                : 'bg-orange-100 text-orange-700'
-                        }`}>
-                            {isCompleted ? (
-                                <div className="flex items-center gap-1">
+                        {!isTeacher ? (
+                            // Student status badge
+                            <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                                isCompleted 
+                                    ? 'bg-green-100 text-green-700' 
+                                    : isOverdue()
+                                    ? 'bg-red-100 text-red-700'
+                                    : 'bg-orange-100 text-orange-700'
+                            }`}>
+                                {isCompleted ? (
+                                    <div className="flex items-center gap-1">
+                                        <CheckCircle className="w-3 h-3" />
+                                        Selesai
+                                    </div>
+                                ) : isOverdue() ? (
+                                    <div className="flex items-center gap-1">
+                                        <Clock className="w-3 h-3" />
+                                        Terlambat
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center gap-1">
+                                        <Clock className="w-3 h-3" />
+                                        Pending
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            // Teacher counters
+                            <div className="flex items-center gap-2">
+                                <div className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 flex items-center gap-1">
                                     <CheckCircle className="w-3 h-3" />
-                                    Selesai
+                                    Mengumpulkan: {submittedCount}
                                 </div>
-                            ) : isOverdue() ? (
-                                <div className="flex items-center gap-1">
+                                <div className="px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700 flex items-center gap-1">
                                     <Clock className="w-3 h-3" />
-                                    Terlambat
+                                    Belum: {notSubmittedCount}
                                 </div>
-                            ) : (
-                                <div className="flex items-center gap-1">
-                                    <Clock className="w-3 h-3" />
-                                    Pending
-                                </div>
-                            )}
-                        </div>
+                            </div>
+                        )}
                     </div>
                 </div>
                 
-                <div className="flex flex-col sm:flex-row items-center gap-2">
-                    {isCompleted ? (
-                        <button className="text-sm bg-emerald-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-emerald-600 hover:shadow transition-all duration-200">
-                            <CheckCircle className="w-4 h-4" />
-                            Sudah Dikumpulkan
-                        </button>
-                    ) : (
-                        <button 
-                            onClick={() => setIsUploadModalOpen(true)}
-                            className={`text-sm px-4 py-2 rounded-lg flex items-center gap-2 hover:shadow transition-all duration-200 ${
-                                isOverdue()
-                                    ? 'bg-red-500 text-white hover:bg-red-600'
-                                    : 'bg-orange-500 text-white hover:bg-orange-600'
-                            }`}
-                        >
-                            <Upload className="w-4 h-4" />
-                            {isOverdue() ? 'Upload (Terlambat)' : 'Upload Tugas'}
-                        </button>
-                    )}
-                </div>
+                {!isTeacher && (
+                    <div className="flex flex-col sm:flex-row items-center gap-2">
+                        {isCompleted ? (
+                            <button className="text-sm bg-emerald-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-emerald-600 hover:shadow transition-all duration-200">
+                                <CheckCircle className="w-4 h-4" />
+                                Sudah Dikumpulkan
+                            </button>
+                        ) : (
+                            <button
+                                onClick={() => setIsUploadModalOpen(true)}
+                                className={`text-sm px-4 py-2 rounded-lg flex items-center gap-2 hover:shadow transition-all duration-200 ${
+                                    isOverdue()
+                                        ? 'bg-red-500 text-white hover:bg-red-600'
+                                        : 'bg-orange-500 text-white hover:bg-orange-600'
+                                }`}
+                            >
+                                <Upload className="w-4 h-4" />
+                                {isOverdue() ? 'Upload (Terlambat)' : 'Upload Tugas'}
+                            </button>
+                        )}
+                    </div>
+                )}
             </div>
 
-            {/* Upload Modal */}
-            <TugasUploadModal
-                isOpen={isUploadModalOpen}
-                onClose={() => setIsUploadModalOpen(false)}
-                tugasId={tugas.id}
-                tugasTitle={tugas.title}
-                deadline={tugas.deadline}
-                onUploadComplete={(files) => { void handleUploadComplete(files as any[]); }}
-            />
+            {/* Upload Modal (students only) */}
+            {!isTeacher && (
+                <TugasUploadModal
+                    isOpen={isUploadModalOpen}
+                    onClose={() => setIsUploadModalOpen(false)}
+                    tugasId={tugas.id}
+                    tugasTitle={tugas.title}
+                    deadline={tugas.deadline}
+                    onUploadComplete={(files) => { void handleUploadComplete(files as any[]); }}
+                />
+            )}
         </>
     );
 }

@@ -6,6 +6,14 @@ import Image from "next/image";
 import {usePathname} from "next/navigation";
 import {ExternalLink, ChevronDown} from "lucide-react";
 
+type HeaderMenuItem = {
+  id: string;
+  name_id: string;
+  name_en: string;
+  href?: string;
+  submenu?: Array<{ href: string; id: string; en: string }>;
+};
+
 export default function Header() {
   const pathname = usePathname();
   const {lang, setLang} = useLang();
@@ -45,6 +53,43 @@ export default function Header() {
     }, 200);
   };
 
+  const headerMenus: HeaderMenuItem[] = [
+    {
+      id: "tentang",
+      name_id: "Tentang Kami",
+      name_en: "About Us",
+      submenu: [
+        {href: "/tentang/identitas", id: "Identitas Sekolah", en: "School Identity"},
+        {href: "/tentang/visi-misi", id: "Visi & Misi", en: "Vision & Mission"},
+        {href: "/tentang/manajemen", id: "Manajemen Staff", en: "Management Staff"},
+        {href: "/tentang/fasilitas", id: "Fasilitas", en: "Facilities"},
+        {href: "/tentang/mitra", id: "Mitra", en: "Partners"},
+        {href: "/program", id: "Program Keahlian", en: "Expertise Programs"},
+      ],
+    },
+    {
+      id: "siswa",
+      name_id: "Kehidupan Siswa",
+      name_en: "Student Life",
+      submenu: [
+        {href: "/kehidupan-siswa/prestasi", id: "Prestasi", en: "Achievements"},
+        {href: "/kehidupan-siswa/ekstrakurikuler", id: "Ekstrakurikuler", en: "Extracurricular"},
+        {href: "/kehidupan-siswa/penerimaan", id: "Penerimaan Siswa", en: "Admissions"},
+        {href: "/kehidupan-siswa/testimoni", id: "Testimoni", en: "Testimonials"},
+      ],
+    },
+    {
+      id: "info",
+      name_id: "Informasi",
+      name_en: "Information",
+      submenu: [
+        {href: "/informasi/berita", id: "Berita", en: "News"},
+        {href: "/informasi/kegiatan", id: "Kegiatan", en: "Events"},
+        {href: "/informasi/faq", id: "FAQ", en: "FAQ"},
+      ],
+    },
+  ];
+
   const flagUrl =
     lang === "id"
       ? "https://flagcdn.com/w20/id.png"
@@ -79,42 +124,7 @@ export default function Header() {
           {/* Desktop Menu */}
           {!isMobile ? (
             <nav className="hidden md:flex items-center gap-6 text-[15px] text-white relative">
-              {[
-                {
-                  id: "tentang",
-                  name_id: "Tentang Kami",
-                  name_en: "About Us",
-                  submenu: [
-                      { href: "/tentang/identitas", id: "Identitas Sekolah", en: "School Identity" },
-                      { href: "/tentang/visi-misi", id: "Visi & Misi", en: "Vision & Mission" },
-                      { href: "/tentang/manajemen", id: "Manajemen Staff", en: "Management Staff" },
-                      { href: "/tentang/fasilitas", id: "Fasilitas", en: "Facilities" },
-                      { href: "/tentang/mitra", id: "Mitra", en: "Partners" },
-                      { href: "/program", id: "Program Keahlian", en: "Expertise Programs" },
-                  ],
-                },
-                {
-                  id: "siswa",
-                  name_id: "Kehidupan Siswa",
-                  name_en: "Student Life",
-                  submenu: [
-                    { href: "/kehidupan-siswa/prestasi", id: "Prestasi", en: "Achievements" },
-                    { href: "/kehidupan-siswa/ekstrakurikuler", id: "Ekstrakurikuler", en: "Extracurricular" },
-                    { href: "/kehidupan-siswa/penerimaan", id: "Penerimaan Siswa", en: "Admissions" },
-                    { href: "/kehidupan-siswa/testimoni", id: "Testimoni", en: "Testimonials" },
-                  ],
-                },
-                {
-                  id: "info",
-                  name_id: "Informasi",
-                  name_en: "Information",
-                  submenu: [
-                    { href: "/informasi/berita", id: "Berita", en: "News" },
-                    { href: "/informasi/kegiatan", id: "Kegiatan", en: "Events" },
-                    { href: "/informasi/faq", id: "FAQ", en: "FAQ" },
-                  ],
-                },
-              ].map((menu) =>
+              {headerMenus.map((menu) =>
                 menu.submenu ? (
                   <div
                     key={menu.id}
@@ -149,9 +159,8 @@ export default function Header() {
                   </div>
                 ) : (
                   <div key={menu.id}>
-                    {/* @ts-ignore */}
                     <a
-                      href={menu.href}
+                      href={menu.href ?? "#"}
                       className="relative font-medium transition cursor-pointer group"
                     >
                       {lang === "id" ? menu.name_id : menu.name_en}

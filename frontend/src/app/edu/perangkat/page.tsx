@@ -76,26 +76,17 @@ export default function DevicePage() {
   };
 
   return (
-    <div className="overflow-y-auto min-h-screen bg-gray-50">
+    <div className="overflow-y-auto min-h-screen">
       <DashHeader user={user} />
 
       <section className="p-6">
         {/* === Header Section === */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-          <div>
-            <h1 className="text-2xl font-semibold text-gray-800">
-              Manajemen Perangkat
-            </h1>
-            <p className="text-gray-500 text-sm">
-              Lihat dan kelola daftar perangkat RFID aktif dan mode-nya
-            </p>
-          </div>
-
-          <div className="relative w-full sm:w-64">
+          <div className="relative w-full sm:w-md">
             <input
               type="text"
               placeholder="Cari nama perangkat..."
-              className="w-full px-4 py-2 rounded-xl border border-gray-200 focus:ring-2 focus:ring-orange-500 focus:outline-none"
+              className="w-full px-4 py-2 rounded-md border border-gray-300 focus:ring-2 focus:ring-orange-500 focus:outline-none bg-white float-end"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -120,7 +111,7 @@ export default function DevicePage() {
         <div className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm text-left">
-              <thead className="bg-gray-100 text-gray-700 text-sm font-semibold uppercase">
+              <thead className=" bg-orange-400 text-white text-sm font-semibold uppercase">
                 <tr>
                   <th className="px-6 py-3">No</th>
                   <th className="px-6 py-3">Nama</th>
