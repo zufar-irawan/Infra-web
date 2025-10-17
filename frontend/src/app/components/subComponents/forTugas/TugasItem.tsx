@@ -4,6 +4,7 @@ import React, { useMemo, useState } from 'react';
 import { Upload, CheckCircle, Clock, User, Calendar, Users } from 'lucide-react';
 import TugasUploadModal from './TugasUploadModal';
 import {useEduData} from "@/app/edu/context";
+import { useRouter } from "next/navigation";
 
 interface TugasItemProps {
     tugas: any;
@@ -15,6 +16,7 @@ export default function TugasItem({ student, tugas, isCompleted = false }: Tugas
     const { user, students } = useEduData();
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const router = useRouter();
 
     const formatDeadline = (dateString: string) => {
         const date = new Date(dateString);
@@ -134,6 +136,12 @@ export default function TugasItem({ student, tugas, isCompleted = false }: Tugas
 
     const isTeacher = user?.role === 'guru';
 
+    const goToDetail = () => {
+        const id = tugas?.id;
+        if (id == null) return;
+        router.push(`/edu/tugas/${id}`);
+    };
+
     return (
         <>
             {/* Uploading overlay */}
@@ -151,7 +159,13 @@ export default function TugasItem({ student, tugas, isCompleted = false }: Tugas
 
             <div className="flex items-start sm:items-center justify-between py-4 gap-2">
                 <div className="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1">
-                    <div className="flex-1">
+                    <div
+                        className="flex-1 cursor-pointer rounded-lg p-1 -m-1 hover:bg-gray-50"
+                        onClick={goToDetail}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goToDetail(); } }}
+                    >
                         <h3 className="font-medium text-gray-800 mb-1">{tugas.title}</h3>
                         <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
                             <div className="flex items-center gap-1">
