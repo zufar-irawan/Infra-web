@@ -99,14 +99,6 @@ export default function PPDB() {
                     ? "Kami menyambut siswa dari berbagai latar belakang, di mana mereka dan seluruh keluarga mereka menjadi bagian dari komunitas kami yang suportif. Kami percaya bahwa keberagaman adalah salah satu kekuatan terbesar kami, dan kami bangga akan hubungan erat yang kami bangun dengan setiap keluarga di SMK Prestasi Prima. Bergabunglah bersama kami dan temukan bagaimana kesatuan visi dan perbedaan latar belakang dapat menciptakan sesuatu yang istimewa!"
                     : "We welcome students from diverse backgrounds, where they and their families become part of our supportive community. We believe that diversity is one of our greatest strengths, and we take pride in the strong relationships we have built with every family at SMK Prestasi Prima. Join us and discover how unity of vision and diversity of backgrounds can create something truly special!"}
                 </p>
-
-                {/* Tombol Daftar Sekarang */}
-                <Link
-                  href="/daftar"
-                  className="inline-block bg-[#FE4D01] text-white font-medium px-6 py-3 rounded-lg shadow-md hover:bg-[#e34400] transition-all duration-300"
-                >
-                  {lang === "id" ? "Daftar Sekarang" : "Register Now"}
-                </Link>
               </div>
             </div>
           </div>
