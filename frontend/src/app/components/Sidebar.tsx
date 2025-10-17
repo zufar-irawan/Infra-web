@@ -133,7 +133,6 @@ export default function Sidebar({ isOpen, onClose, user }: SidebarProps) {
     { href: "/edu/dashboard", icon: LayoutDashboard, label: "Dashboard" },
     { href: "/edu/tugas", icon: BookMarked, label: "Tugas" },
     { href: "/edu/ujian", icon: BookMarked, label: "Ujian" },
-    { href: "/edu/nilai", icon: BarChart3, label: "Nilai" },
     { href: "/edu/jadwal", icon: Calendar, label: "Jadwal" },
     { href: "/edu/laporan", icon: Clipboard, label: "Laporan" },
   ];

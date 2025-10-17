@@ -20,11 +20,13 @@ function EduLayoutContent({children}: {children?: React.ReactNode}) {
     const [student, setStudent] = useState<any>(null)
     const [tugas, setTugas] = useState<any[] | null>(null)
     const [teachers, setTeachers] = useState<any[] | null>(null)
+    const [teacher, setTeacher] = useState<any[] | null>(null)
     const [subjects, setSubjects] = useState<any[] | null>(null)
     const [exams, setExams] = useState<any | null>(null)
     const [nilai, setNilai] = useState<{ nilaiMapel: any | null; ringkasanNilai: any | null } | null>(null)
     const [schedules, setSchedules] = useState<any[] | null>(null)
     const [rooms, setRooms] = useState<any[] | null>(null)
+    const [classes, setClasses] = useState<any[] | null>(null)
 
     const [bootstrapped, setBootstrapped] = useState(false)
 
@@ -57,7 +59,25 @@ function EduLayoutContent({children}: {children?: React.ReactNode}) {
         }
     }
 
-    const fetchCoreData = async (studentMe: any) => {
+    const fetchTeacher = async (me: any) => {
+        if (!me) return null
+
+        await axios.get('/api/teachers')
+            .then (res => {
+                const teacherPayload = res.data?.data ?? res.data
+                const teacherList = Array.isArray(teacherPayload) ? teacherPayload : (teacherPayload?.data ?? [])
+                const teacherMe = teacherList.find((t:any) => (t.userId ?? t.user_id) === me?.id)
+                setTeacher(teacherMe || null)
+                return teacherMe || null
+            })
+            .catch(err => {
+                console.error(err)
+                setTeacher(null)
+                return null
+            })
+    }
+
+    const fetchCoreData = async (studentMe: any, user: any) => {
         try {
             // Parallel fetches that don't depend on each other
             const promises: Promise<any>[] = [
@@ -67,6 +87,7 @@ function EduLayoutContent({children}: {children?: React.ReactNode}) {
                 axios.get('/api/subject').catch(() => ({ data: { data: [] }})),
                 axios.get('/api/jadwal').catch(() => ({ data: { data: [] }})),
                 axios.get('/api/rooms').catch(() => ({ data: { data: [] }})),
+                axios.get('/api/classes').catch(() => ({ data: { data: [] }})),
             ]
 
             // Fetch nilai only if student id exists
@@ -80,13 +101,15 @@ function EduLayoutContent({children}: {children?: React.ReactNode}) {
             const results = await Promise.all(promises)
 
             // Map results
-            const [tugasRes, teachersRes, examsRes, subjectsRes, scheduleRes, roomRes, nilaiRes] = results
+            const [tugasRes, teachersRes, examsRes, subjectsRes, scheduleRes, roomRes, classRes, nilaiRes] = results
             setTugas(tugasRes?.data?.data ?? null)
             setTeachers(teachersRes?.data?.data ?? null)
             setExams(examsRes?.data ?? null)
             setSubjects(subjectsRes?.data?.data ?? null)
             setSchedules(scheduleRes.data.data ?? null)
             setRooms(roomRes.data.data ?? null)
+            setClasses(classRes.data?.data ?? null)
+            setTeachers(teachersRes.data?.data ?? null)
 
             if (sid) {
                 setNilai({
@@ -127,7 +150,8 @@ function EduLayoutContent({children}: {children?: React.ReactNode}) {
         if (!user || isLogin) return
         (async () => {
             const stu = await fetchStudent(user)
-            await fetchCoreData(stu)
+            await fetchTeacher(user)
+            await fetchCoreData(stu, user)
         })()
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -141,7 +165,8 @@ function EduLayoutContent({children}: {children?: React.ReactNode}) {
                 const me = await fetchUser()
                 if (me) {
                     const stu = await fetchStudent(me)
-                    await fetchCoreData(stu)
+                    await fetchTeacher(me)
+                    await fetchCoreData(stu, user)
                 }
             } catch (err) {
                 console.error('Error refetching after auth event', err)
@@ -173,13 +198,15 @@ function EduLayoutContent({children}: {children?: React.ReactNode}) {
         user,
         student,
         tugas,
-        teachers,
         subjects,
+        teacher,
+        teachers,
         exams,
         nilai,
         schedules,
         rooms,
-    }), [user, student, tugas, teachers, subjects, exams, nilai, schedules, rooms])
+        classes,
+    }), [user, student, tugas, subjects, teacher, teachers, exams, nilai, schedules, rooms, classes])
 
     return (
         <div className="flex flex-row min-h-screen bg-gray-100">

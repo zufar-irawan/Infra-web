@@ -3,54 +3,54 @@ import {NextResponse} from "next/server";
 import api from "@/app/lib/api";
 
 export async function GET() {
-    const cookieStore = cookies()
-    // @ts-ignore
-    const token = cookieStore.get("secure-auth-token")?.value;
+  const cookieStore = await cookies();
+  const token = cookieStore.get("secure-auth-token")?.value;
 
-    if(!token) return NextResponse.json({ error: "Token tidak ada!" }, { status: 401 });
+  if (!token)
+    return NextResponse.json({ error: "Token tidak ada!" }, { status: 401 });
 
-    try {
-        // Fetch exams
-        const examsRes = await api.get("/lms/exams", {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            }
-        });
+  try {
+    const [examsRes, examResultsRes] = await Promise.all([
+      api.get("/lms/exams", {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+      api.get("/lms/exam-results", {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+    ]);
 
-        // Fetch exam results
-        const examResultsRes = await api.get("/lms/exam-results", {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            }
-        });
+    if (examsRes.status === 200 && examResultsRes.status === 200) {
+      const exams = examsRes.data.data;
+      const examResults = examResultsRes.data.data;
 
-        if (examsRes.status === 200 && examResultsRes.status === 200) {
-            const exams = examsRes.data.data;
-            const examResults = examResultsRes.data.data;
+      const completedExamIds = new Set(examResults.map((r: any) => r.exam_id));
 
-            // Map exam results by exam_id
-            // @ts-ignore
-            const completedExamIds = new Set(examResults.map(result => result.exam_id));
+      const totalExams = exams.length;
+      const completedExams = exams.filter((e: any) =>
+        completedExamIds.has(e.id)
+      ).length;
+      const uncompletedExams = exams.filter(
+        (e: any) => !completedExamIds.has(e.id)
+      );
+      const pendingExams = totalExams - completedExams;
+      const selesaiExams = exams.filter((e: any) =>
+        completedExamIds.has(e.id)
+      );
 
-            // Calculate completed and pending exams
-            const totalExams = exams.length;
-            // @ts-ignore
-            const completedExams = exams.filter(exam => completedExamIds.has(exam.id)).length;
-            const uncompletedExams = exams.filter((exam: { id: number; }) => !completedExamIds.has(exam.id));
-            const pendingExams = totalExams - completedExams;
-            const selesaiExams = exams.filter((exam: { id: number; }) => completedExamIds.has(exam.id))
-
-            return NextResponse.json({
-                totalExams,
-                completedExams,
-                pendingExams,
-                selesaiExams,
-                uncompletedExams,
-                exams
-            });
-        }
-    } catch (e) {
-        console.error(e);
-        return NextResponse.json({ error: "Terjadi kesalahan saat mengambil data." }, { status: 500 });
+      return NextResponse.json({
+        totalExams,
+        completedExams,
+        pendingExams,
+        selesaiExams,
+        uncompletedExams,
+        exams,
+      });
     }
+  } catch (e) {
+    console.error(e);
+    return NextResponse.json(
+      { error: "Terjadi kesalahan saat mengambil data." },
+      { status: 500 }
+    );
+  }
 }

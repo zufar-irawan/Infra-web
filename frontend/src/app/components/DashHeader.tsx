@@ -8,6 +8,8 @@ export default function DashHeader({student, user, teacher} : {student?: any, us
     const classStudent = student?.class.name || "Tidak ada kelas";
     const isUser = user?.role || "guest";
 
+    const subjectTeacher = teacher?.specialization || "Tidak ada mapel"
+
     return (
         <section id="header" className="w-full flex items-center justify-between p-4">
             <div className="flex items-center gap-4">
@@ -28,7 +30,7 @@ export default function DashHeader({student, user, teacher} : {student?: any, us
                             (() => {
                                 switch (true) {
                                     case pathname.startsWith('/edu/dashboard'):
-                                        return `Dashboard ${isUser === 'admin' ? 'Admin' : isUser === 'teacher' ? 'Guru' : 'Siswa'}`;
+                                        return `Dashboard ${isUser === 'admin' ? 'Admin' : isUser === 'guru' ? 'Guru' : 'Siswa'}`;
                                     case pathname.startsWith('/edu/tugas'):
                                         return 'Tugas Anda';
                                     case pathname.startsWith('/edu/ujian'):
@@ -55,7 +57,10 @@ export default function DashHeader({student, user, teacher} : {student?: any, us
             </div>
 
             <p className="bg-emerald-200 text-emerald-800 px-3 py-2 text-xs sm:text-sm rounded-sm">
-                {classStudent.replaceAll("-", " ")}
+                { user?.role === "siswa" ? classStudent.replaceAll("-", " ") :
+                    user?.role === "guru" ? subjectTeacher.replaceAll("-", " ") :
+                        user?.role === "admin" ? "Administrator" : "Tamu"
+                }
             </p>
         </section>
     )

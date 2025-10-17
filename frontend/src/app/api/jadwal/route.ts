@@ -3,8 +3,7 @@ import api from '@/app/lib/api';
 import { NextResponse } from 'next/server';
 
 export async function GET(req: Request) {
-  const cookieStore = cookies();
-  // @ts-ignore
+  const cookieStore = await cookies();
   const token = cookieStore.get('secure-auth-token')?.value;
 
   try {
