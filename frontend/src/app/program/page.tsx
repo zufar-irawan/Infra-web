@@ -40,15 +40,12 @@ export default function Program() {
         {/* === Desain Komunikasi Visual === */}
         <section className="relative w-full bg-white py-12 md:py-16 overflow-visible">
           <div
-            className="
-              max-w-7xl mx-auto px-6
-              grid grid-cols-1 lg:grid-cols-2 gap-12 items-center
-            "
+            className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
           >
-            {/* Kiri: Gambar fdkv.svg */}
+            {/* Kiri: Gambar */}
             <div className="relative flex justify-center">
               <img
-                src="/svg/fdkv.svg"
+                src="/webp/pdkv-w.webp"
                 alt="Desain Komunikasi Visual"
                 loading="lazy"
                 className="w-[92%] max-w-[325px] object-contain"
@@ -75,10 +72,7 @@ export default function Program() {
         {/* === Broadcasting dan Film === */}
         <section className="relative w-full bg-white py-16 md:py-20 overflow-visible">
           <div
-            className="
-              max-w-7xl mx-auto px-6
-              grid grid-cols-1 lg:grid-cols-2 gap-12 items-center
-            "
+            className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
           >
             {/* Kiri: Teks */}
             <div className="relative order-2 lg:order-1">
@@ -95,10 +89,10 @@ export default function Program() {
               </p>
             </div>
 
-            {/* Kanan: Gambar fbcf.svg */}
+            {/* Kanan: Gambar */}
             <div className="relative flex justify-center order-1 lg:order-2">
               <img
-                src="/svg/fbc.svg"
+                src="/webp/pfbc-w.webp"
                 alt="Broadcasting dan Film"
                 loading="lazy"
                 className="w-[92%] max-w-[325px] object-contain"
@@ -107,19 +101,16 @@ export default function Program() {
           </div>
         </section>
 
-        {/* === Desain Komunikasi Visual === */}
+        {/* === Pengembangan Perangkat Lunak dan Gim (RPL/PPLG) === */}
         <section className="relative w-full bg-white py-12 md:py-16 overflow-visible">
           <div
-            className="
-              max-w-7xl mx-auto px-6
-              grid grid-cols-1 lg:grid-cols-2 gap-12 items-center
-            "
+            className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
           >
-            {/* Kiri: Gambar fdkv.svg */}
+            {/* Kiri: Gambar */}
             <div className="relative flex justify-center">
               <img
-                src="/svg/fdkv.svg"
-                alt="Desain Komunikasi Visual"
+                src="/webp/prpl-w.webp"
+                alt="Pengembangan Perangkat Lunak dan Gim"
                 loading="lazy"
                 className="w-[92%] max-w-[325px] object-contain"
               />
@@ -129,47 +120,44 @@ export default function Program() {
             <div className="relative">
               <h3 className="text-2xl sm:text-3xl font-bold text-[#FE4D01] mb-5 leading-snug">
                 {lang === "id"
-                  ? "Desain Komunikasi Visual"
-                  : "Visual Communication Design"}
+                  ? "Pengembangan Perangkat Lunak dan Gim"
+                  : "Software and Game Development"}
               </h3>
 
               <p className="text-[#243771] leading-relaxed text-base sm:text-lg max-w-2xl">
                 {lang === "id"
-                  ? "Jurusan ini melatih siswa untuk menyampaikan pesan atau informasi melalui media visual yang kreatif dan efektif. Siswa belajar tentang desain grafis (logo, branding, poster), ilustrasi, fotografi, hingga UI/UX design (merancang antarmuka aplikasi). Lulusannya bekerja sebagai desainer grafis, illustrator, atau content creator."
-                  : "This major trains students to deliver messages or information through creative and effective visual media. Students learn graphic design (logos, branding, posters), illustration, photography, and UI/UX design (designing application interfaces). Graduates work as graphic designers, illustrators, or content creators."}
+                  ? "Jurusan ini mengajarkan siswa cara merancang, membuat, dan menguji aplikasi perangkat lunak (seperti aplikasi desktop, web, dan mobile) serta mengembangkan permainan digital (game development). Lulusannya disiapkan menjadi programmer, pengembang aplikasi, atau game developer."
+                  : "This major teaches students how to design, build, and test software applications (such as desktop, web, and mobile apps) as well as develop digital games. Graduates are prepared to become programmers, application developers, or game developers."}
               </p>
             </div>
           </div>
         </section>
 
-        {/* === Broadcasting dan Film === */}
+        {/* === Teknik Jaringan Komputer dan Telekomunikasi (TKJ/TJKT) === */}
         <section className="relative w-full bg-white py-16 md:py-20 overflow-visible">
           <div
-            className="
-              max-w-7xl mx-auto px-6
-              grid grid-cols-1 lg:grid-cols-2 gap-12 items-center
-            "
+            className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
           >
             {/* Kiri: Teks */}
             <div className="relative order-2 lg:order-1">
               <h3 className="text-2xl sm:text-3xl font-bold text-[#FE4D01] mb-5 leading-snug">
                 {lang === "id"
-                  ? "Broadcasting dan Film"
-                  : "Broadcasting and Film"}
+                  ? "Teknik Jaringan Komputer dan Telekomunikasi"
+                  : "Computer and Telecommunication Network"}
               </h3>
 
               <p className="text-[#243771] leading-relaxed text-base sm:text-lg max-w-2xl">
                 {lang === "id"
-                  ? "Jurusan ini fokus pada proses produksi konten audio-visual untuk penyiaran (televisi, radio) dan industri film. Siswa mempelajari teknik penyutradaraan, sinematografi (pengambilan gambar), penulisan skenario, dan editing video. Lulusannya bisa bekerja di stasiun TV, rumah produksi, atau sebagai filmmaker dan editor profesional."
-                  : "This major focuses on audio-visual content production for broadcasting (television, radio) and the film industry. Students learn directing techniques, cinematography (shooting), scriptwriting, and video editing. Graduates can work in TV stations, production houses, or as filmmakers and professional editors."}
+                  ? "Fokus utamanya adalah mempelajari cara membangun, mengkonfigurasi, dan merawat infrastruktur jaringan komputer dan sistem telekomunikasi. Siswa ahli dalam routing, switching, dan keamanan siber (mengamankan jaringan). Lulusannya bisa menjadi teknisi jaringan, administrator server, atau spesialis cloud computing."
+                  : "This major focuses on building, configuring, and maintaining computer network infrastructure and telecommunication systems. Students specialize in routing, switching, and cybersecurity (protecting networks). Graduates can become network technicians, server administrators, or cloud computing specialists."}
               </p>
             </div>
 
-            {/* Kanan: Gambar fbcf.svg */}
+            {/* Kanan: Gambar */}
             <div className="relative flex justify-center order-1 lg:order-2">
               <img
-                src="/svg/fbc.svg"
-                alt="Broadcasting dan Film"
+                src="/webp/ptkj-w.webp"
+                alt="Teknik Jaringan Komputer dan Telekomunikasi"
                 loading="lazy"
                 className="w-[92%] max-w-[325px] object-contain"
               />
@@ -178,7 +166,7 @@ export default function Program() {
         </section>
 
         {/* === Testimoni === */}
-        <Testimoni />
+        <Testimoni hideDecorations />
 
         {/* === Section Gedung === */}
         <section className="relative w-full bg-white overflow-hidden">
@@ -189,11 +177,7 @@ export default function Program() {
                 ? "Gedung SMK Prestasi Prima"
                 : "Prestasi Prima Building"
             }
-            className="
-              w-full h-[40vh] sm:h-[55vh] lg:h-screen
-              object-cover object-center
-              hover:scale-[1.02] transition-transform duration-700
-            "
+            className="w-full h-[40vh] sm:h-[55vh] lg:h-screen object-cover object-center hover:scale-[1.02] transition-transform duration-700"
           />
         </section>
       </main>

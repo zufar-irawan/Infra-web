@@ -29,14 +29,15 @@ export default function Dashboard() {
 
   const classId = useMemo(
     () =>
-      student?.class?.id ??
       student?.class_id ??
-      student?.classId ??
+      student?.class?.id ??
       teacher?.class_id ??
       teacher?.class?.id ??
       null,
     [student, teacher]
   );
+
+  // console.log("GURU DI HEADER", teacher);
 
   // === Hitung statistik siswa ===
   useEffect(() => {
@@ -65,8 +66,8 @@ export default function Dashboard() {
   useEffect(() => {
     if (user?.role !== "guru") return;
 
-    const tugasGuru = tugas?.filter((t: any) => t.class_id === classId) ?? [];
-    const ujianGuru = exams?.exams?.filter((u: any) => u.class_id === classId) ?? [];
+    const tugasGuru = tugas?.filter((t: any) => t.created_by === user.id) ?? [];
+    const ujianGuru = exams?.exams?.filter((u: any) => u.created_by === user.id) ?? [];
 
     setTugasKelas(tugasGuru);
     setUjianKelas(ujianGuru);
@@ -183,8 +184,8 @@ export default function Dashboard() {
       {user?.role === "guru" && (
         <>
           <section className="w-full grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-4 gap-4 p-4">
-            <TugasCard value={tugasKelas.length} title="Total Tugas Diajarkan" />
-            <TugasCard value={ujianKelas.length} title="Total Ujian Diajarkan" />
+            <TugasCard value={tugasKelas.length} title="Total Tugas" />
+            <TugasCard value={ujianKelas.length} title="Total Ujian" />
             <TugasCard value={teacher?.students?.length || 0} title="Jumlah Siswa" />
             <TugasCard value={teacher?.subjects?.length || 0} title="Mata Pelajaran" />
           </section>

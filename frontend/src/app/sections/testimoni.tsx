@@ -3,7 +3,11 @@
 import Image from "next/image";
 import { useLang } from "../components/LangContext";
 
-export default function Testimoni() {
+interface TestimoniProps {
+  hideDecorations?: boolean; // ✅ opsional: untuk sembunyikan dekorasi
+}
+
+export default function Testimoni({ hideDecorations = false }: TestimoniProps) {
   const { lang } = useLang();
 
   return (
@@ -34,17 +38,17 @@ export default function Testimoni() {
           {/* Isi Testimoni */}
           <p className="text-[#1e2a5e] leading-relaxed mb-6 text-[15px] md:text-[17px]">
             {lang === "id"
-              ? "Saya sungguh terkesan dengan apa yang telah saya saksikan di SMK Prestasi Prima hari ini. Saya datang ke Indonesia dengan harapan dapat melihat semangat generasi muda yang baru, dan sekolah ini telah melampaui ekspektasi saya."
-              : "I am truly impressed with what I have witnessed at SMK Prestasi Prima today. I came to Indonesia hoping to see the spirit of a new young generation, and this school has exceeded my expectations."}
+              ? "Kami sungguh bangga dengan sekolah kami karena mewadahi bakat dan minat kami di bidang IT hingga memperoleh banyak prestasi. Berkat itu kini kami mendapatkan beasiswa 100% di MNC University."
+              : "We are truly proud of our school for supporting our talents and interests in the field of IT, which has led us to achieve many accomplishments. Thanks to that, we have now received 100% scholarships at MNC University."}
           </p>
 
           <p className="text-[#1e2a5e] font-semibold">
-            Yao Ming Abdul Rahman{" "}
+            Erlangga dan Ayyub{" "}
             <span className="font-normal">
               –{" "}
               {lang === "id"
-                ? "Desain Komunikasi Visual"
-                : "Visual Communication Design"}
+                ? "Pengembangan Perangkat Lunak dan Gim"
+                : "Software & Game Development"}
             </span>
           </p>
         </div>
@@ -54,8 +58,8 @@ export default function Testimoni() {
           {/* Foto */}
           <div className="relative w-[300px] sm:w-[370px] md:w-[430px] h-[529px] overflow-hidden rounded-tr-[20px] rounded-bl-[20px]">
             <Image
-              src="/svg/yoming.svg"
-              alt="Yao Ming Abdul Rahman"
+              src="/webp/erlang.webp"
+              alt="Erlangga & Ayyub"
               width={430}
               height={529}
               className="object-cover"
@@ -75,9 +79,13 @@ export default function Testimoni() {
         </div>
       </div>
 
-      {/* Ornamen Background */}
-      <div className="absolute top-0 left-0 w-[50px] h-[50px] bg-[#FE4D01]" />
-      <div className="absolute top-0 left-25 w-[50px] h-[50px] bg-[#FE4D01]" />
+      {/* ✅ Ornamen Background hanya muncul jika tidak disembunyikan */}
+      {!hideDecorations && (
+        <>
+          <div className="absolute top-0 left-0 w-[50px] h-[50px] bg-[#FE4D01]" />
+          <div className="absolute top-0 left-25 w-[50px] h-[50px] bg-[#FE4D01]" />
+        </>
+      )}
     </section>
   );
 }

@@ -35,6 +35,7 @@ export type EduData = {
     nilai: EduNilaiPayload;
     schedules: any[] | null;
     rooms: any[] | null;
+    classes: any[] | null;
 };
 
 const defaultEduData: EduData = {
@@ -49,6 +50,7 @@ const defaultEduData: EduData = {
     nilai: null,
     schedules: null,
     rooms: null,
+    classes: null,
 };
 
 const EduDataContext = createContext<EduData>(defaultEduData);

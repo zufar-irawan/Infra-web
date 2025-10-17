@@ -46,6 +46,13 @@ export default function VirtualTour360() {
                     tooltip: 'To Cooperative',
                     data: {targetScene: 'scene2'},
                 },
+                {
+                    id: 'toExc',
+                    position: {yaw: -0.08, pitch: 0.36},
+                    html: '<div class="select-none custom-marker">!</div>',
+                    tooltip: 'To Executive',
+                    data: {targetScene: 'scene5'},
+                },
             ],
         },
         {
@@ -93,7 +100,7 @@ export default function VirtualTour360() {
             markers: [
                 {
                     id: 'toField',
-                    position: {yaw: 2.84, pitch: -0.3},
+                    position: {yaw: 2.83, pitch: -0.3},
                     html: '<div class="select-none custom-marker">→</div>',
                     tooltip: 'To Field',
                     data: {targetScene: 'scene1'},
@@ -101,8 +108,8 @@ export default function VirtualTour360() {
                 {
                     id: 'toExc',
                     position: {yaw: 4.14, pitch: -0.02},
-                    html: '<div class="select-none custom-marker">←</div>',
-                    tooltip: 'To Excecutive',
+                    html: '<div class="select-none custom-marker">!</div>',
+                    tooltip: 'To Executive',
                     data: {targetScene: 'scene5'},
                 },
             ],
@@ -111,22 +118,22 @@ export default function VirtualTour360() {
             id: 'scene5',
             panorama: '/360/v360-10.jpg',
             name: 'Executive',
-            description: 'Corridor of Prestasi Prima School',
+            description: 'Executive of Prestasi Prima School',
             markers: [
-                // {
-                //   id: 'toField',
-                //   position: { yaw: 2.84, pitch: -0.3 },
-                //   html: '<div class="select-none custom-marker">→</div>',
-                //   tooltip: 'To Field',
-                //   data: { targetScene: 'scene1' },
-                // },
-                // {
-                //   id: 'toExc',
-                //   position: { yaw: 4.14, pitch: -0.02 },
-                //   html: '<div class="select-none custom-marker">←</div>',
-                //   tooltip: 'To Excecutive',
-                //   data: { targetScene: 'scene1' },
-                // },
+                {
+                  id: 'toField',
+                  position: { yaw: 1.18, pitch: 0 },
+                  html: '<div class="select-none custom-marker">←</div>',
+                  tooltip: 'To Field',
+                  data: { targetScene: 'scene1' },
+                },
+                {
+                  id: 'toCorridor',
+                  position: { yaw: -2.08, pitch: -0.05 },
+                  html: '<div class="select-none custom-marker">!</div>',
+                  tooltip: 'To Corridor',
+                  data: { targetScene: 'scene4' },
+                },
             ],
         },
     ];

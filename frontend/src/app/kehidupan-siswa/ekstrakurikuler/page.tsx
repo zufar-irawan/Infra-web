@@ -2,41 +2,35 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import axios from "axios";
 import { useLang } from "../../components/LangContext";
-import { useEffect, useState } from "react";
-
-interface Ekskul {
-  id: number;
-  name_id: string;
-  name_en: string;
-  img: string;
-  ig: string;
-}
 
 export default function Ekstrakurikuler() {
   const { lang } = useLang();
-  const [ekskul, setEkskul] = useState<Ekskul[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  const API_BASE_URL =
-    process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
-
-  useEffect(() => {
-    const fetchEkskul = async () => {
-      try {
-        const res = await axios.get(`${API_BASE_URL}/ekskul/list`);
-        setEkskul(res.data.data);
-      } catch (err) {
-        console.error("Gagal memuat data ekskul:", err);
-        setError("Gagal memuat data ekstrakurikuler.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchEkskul();
-  }, []);
+  // === Static 21 Ekskul (gambar sama: /svg/ekskul.svg) ===
+  const ekskul = [
+    { id: 1,  name_id: "Badminton",         name_en: "Badminton Club",       img: "/svg/bultang.svg", ig: "#" },
+    { id: 2,  name_id: "Basket",            name_en: "Basketball Club",      img: "/svg/basket.svg", ig: "#" },
+    { id: 3,  name_id: "Voli",              name_en: "Volleyball Club",      img: "/svg/voli.svg", ig: "#" },
+    { id: 4,  name_id: "English Club",      name_en: "English Club",         img: "/svg/ec.svg", ig: "#" },
+    { id: 5,  name_id: "Futsal",            name_en: "Futsal Club",          img: "/svg/futsal.svg", ig: "#" },
+    { id: 6,  name_id: "GANEFO",            name_en: "GANEFO",                img: "/svg/ganefo.svg", ig: "#" },
+    { id: 7,  name_id: "ICT Club",          name_en: "ICT Club",              img: "/svg/ict.svg", ig: "#" },
+    { id: 8,  name_id: "KIR",               name_en: "Scientific Youth (KIR)",img: "/svg/kir.svg", ig: "#" },
+    { id: 9,  name_id: "Modern Dance",      name_en: "Modern Dance",         img: "/svg/geniale.svg", ig: "#" },
+    { id: 10, name_id: "Orens Digital",     name_en: "Orens Digital",        img: "/svg/digital.svg", ig: "#" },
+    { id: 11, name_id: "Orens Network",     name_en: "Orens Network",        img: "/svg/network.svg", ig: "#" },
+    { id: 12, name_id: "Orens Solution",    name_en: "Orens Solution",       img: "/svg/solution.svg", ig: "#" },
+    { id: 13, name_id: "Orens Studio",      name_en: "Orens Studio",         img: "/svg/studio.svg", ig: "#" },
+    { id: 14, name_id: "PMR",               name_en: "Red Cross Youth (PMR)",img: "/svg/pmr.svg", ig: "#" },
+    { id: 15, name_id: "PPOC",              name_en: "PPOC",                  img: "/svg/ppoc.svg", ig: "#" },
+    { id: 16, name_id: "Pramuka",           name_en: "Scouting",              img: "/svg/pramuka.svg", ig: "#" },
+    { id: 17, name_id: "Rohis",             name_en: "Islamic Spirituality",  img: "/svg/rohis.svg", ig: "#" },
+    { id: 18, name_id: "Rohkris",           name_en: "Christian Spirituality",img: "/svg/rohkris.svg", ig: "#" },
+    { id: 19, name_id: "Silat",             name_en: "Pencak Silat",          img: "/svg/silat.svg", ig: "#" },
+    { id: 20, name_id: "Tari Tradisional",  name_en: "Traditional Dance",     img: "/svg/tari.svg", ig: "#" },
+    { id: 21, name_id: "Esport",            name_en: "E-sport Team",          img: "/svg/esports.svg", ig: "#" },
+  ];
 
   return (
     <>
@@ -77,57 +71,47 @@ export default function Ekstrakurikuler() {
               : "Extracurricular: A place to develop talents and create achievers."}
           </p>
 
-          {/* === Kondisi Loading / Error === */}
-          {loading ? (
-            <p className="text-gray-500 italic">Memuat data...</p>
-          ) : error ? (
-            <p className="text-red-500 italic">{error}</p>
-          ) : ekskul.length === 0 ? (
-            <p className="text-gray-500 italic">
-              Tidak ada data ekstrakurikuler.
-            </p>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 justify-items-center">
-              {ekskul.map((item) => (
-                <a
-                  key={item.id}
-                  href={item.ig}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="relative group flex items-center justify-between w-[297.04px] h-[168.47px] bg-white rounded-[10px] shadow-[0_4px_4px_rgba(0,0,0,0.25)] overflow-hidden hover:scale-[1.02] transition-transform duration-300"
-                >
-                  {/* Gambar Ekskul */}
-                  <div className="flex-1 flex items-center justify-center">
-                    <Image
-                      src={item.img}
-                      alt={item.name_id}
-                      width={95}
-                      height={95}
-                      className="object-contain z-10"
-                      unoptimized
-                    />
-                  </div>
+          {/* === Grid Ekskul (desain tidak diubah) === */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 justify-items-center">
+            {ekskul.map((item) => (
+              <a
+                key={item.id}
+                href={item.ig}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="relative group flex items-center justify-between w-[297.04px] h-[168.47px] bg-white rounded-[10px] shadow-[0_4px_4px_rgba(0,0,0,0.25)] overflow-hidden hover:scale-[1.02] transition-transform duration-300"
+              >
+                {/* Gambar Ekskul */}
+                <div className="flex-1 flex items-center justify-center">
+                  <Image
+                    src={item.img}
+                    alt={item.name_id}
+                    width={95}
+                    height={95}
+                    className="object-contain z-10"
+                    unoptimized
+                  />
+                </div>
 
-                  {/* Panel Biru Kanan */}
-                  <div className="h-full w-[50.84px] bg-[#243771] flex items-center justify-center rounded-r-[10px] z-10">
-                    <span
-                      className="text-white font-semibold text-[13px] transform -rotate-90 whitespace-nowrap"
-                      style={{ letterSpacing: "0.5px" }}
-                    >
-                      {lang === "id" ? item.name_id : item.name_en}
-                    </span>
-                  </div>
+                {/* Panel Biru Kanan */}
+                <div className="h-full w-[50.84px] bg-[#243771] flex items-center justify-center rounded-r-[10px] z-10">
+                  <span
+                    className="text-white font-semibold text-[13px] transform -rotate-90 whitespace-nowrap"
+                    style={{ letterSpacing: "0.5px" }}
+                  >
+                    {lang === "id" ? item.name_id : item.name_en}
+                  </span>
+                </div>
 
-                  {/* Overlay Hover */}
-                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center text-white text-sm font-medium z-20 text-center px-2">
-                    {lang === "id"
-                      ? "Klik untuk menuju Instagram"
-                      : "Click to open Instagram"}
-                  </div>
-                </a>
-              ))}
-            </div>
-          )}
+                {/* Overlay Hover */}
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center text-white text-sm font-medium z-20 text-center px-2">
+                  {lang === "id"
+                    ? "Klik untuk menuju Instagram"
+                    : "Click to open Instagram"}
+                </div>
+              </a>
+            ))}
+          </div>
         </div>
       </section>
 
