@@ -70,7 +70,7 @@ export default function Prestasi() {
               <p className="text-[#243771] text-sm md:text-base leading-relaxed">
                 {lang === "id"
                   ? "Dari berbagai macam program keahlian yang ada, lahirlah berbagai prestasi yang membanggakan nama sekolah. Namun, tidak hanya dari bidang akademik. Bidang non akademik juga sama membanggakannya."
-                  : "From various expertise programs, achievements were born that make the school proud. Not only in academics but also in non-academic fields."}
+                  : "From various expertise programs, numerous achievements have brought pride to our school. These accomplishments come not only from academic areas but also from non-academic fields that are equally outstanding."}
               </p>
             </motion.div>
 
@@ -129,7 +129,11 @@ export default function Prestasi() {
         <div className="relative w-full h-[40vh] sm:h-[55vh] lg:h-screen">
           <Image
             src="/svg/gedung.svg"
-            alt="Gedung SMK Prestasi Prima"
+            alt={
+              lang === "id"
+                ? "Gedung SMK Prestasi Prima"
+                : "Prestasi Prima Building"
+            }
             fill
             priority
             sizes="0vw"
@@ -148,12 +152,16 @@ export default function Prestasi() {
 
               {/* Heading Utama */}
               <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2 sm:mb-3">
-                Mulai Pengalaman Virtual
+                {lang === "id"
+                  ? "Mulai Pengalaman Virtual"
+                  : "Start Your Virtual Experience"}
               </h2>
 
               {/* Subheading */}
               <p className="text-white/90 text-xs sm:text-sm md:text-base max-w-[700px] leading-relaxed mb-5 sm:mb-6 px-2">
-                Ikuti tur virtual kami untuk melihat SMK Prestasi Prima kapan saja dan di mana saja
+                {lang === "id"
+                  ? "Ikuti tur virtual kami untuk melihat SMK Prestasi Prima kapan saja dan di mana saja."
+                  : "Join our virtual tour to explore SMK Prestasi Prima anytime and anywhere."}
               </p>
 
               {/* Tombol */}
@@ -161,7 +169,9 @@ export default function Prestasi() {
                 href="/virtual-tour"
                 className="inline-block px-5 sm:px-6 py-2.5 sm:py-3 rounded-[8px] sm:rounded-[10px] bg-white text-[#243771] font-semibold text-xs sm:text-sm md:text-base shadow-[0_4px_10px_rgba(0,0,0,0.15)] hover:shadow-[0_6px_14px_rgba(254,77,1,0.3)] transition"
               >
-                TUR VIRTUAL SEKOLAH
+                {lang === "id"
+                  ? "TUR VIRTUAL SEKOLAH"
+                  : "SCHOOL VIRTUAL TOUR"}
               </a>
             </div>
           </div>

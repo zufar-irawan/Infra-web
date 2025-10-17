@@ -89,12 +89,6 @@ export default function Berita() {
                   ? "Telusuri berita terbaru untuk mendapatkan informasi terkini tentang kegiatan, prestasi, dan inovasi di SMK Prestasi Prima."
                   : "Explore the latest news to stay updated on SMK Prestasi Prima’s activities, achievements, and innovations."}
               </p>
-
-              <p className="text-sm text-gray-500">
-                {isBackendActive
-                  ? "✅ Data diambil dari server Laravel."
-                  : "⚠️ Backend belum aktif atau tidak ada data."}
-              </p>
             </div>
           </div>
         </div>

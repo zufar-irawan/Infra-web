@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
+import Cookies from "js-cookie";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 
@@ -13,7 +14,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const fetchAdmin = async () => {
-      const token = sessionStorage.getItem("token");
+      const token = Cookies.get("portal-auth-token");
 
       if (!token) {
         MySwal.fire({
@@ -56,18 +57,27 @@ export default function AdminDashboard() {
     fetchAdmin();
   }, []);
 
+  const handleLogout = () => {
+    Cookies.remove("portal-auth-token");
+    window.location.href = "/portal";
+  };
+
   return (
     <main className="min-h-screen bg-[#f9fafb] p-8">
       <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow p-6">
         <h1 className="text-3xl font-bold text-[#243771] mb-2">Dashboard Admin</h1>
-        <p className="text-gray-600">
+        <p className="text-gray-600 mb-4">
           Selamat datang kembali,{" "}
-          <span className="text-[#FE4D01] font-semibold">
-            {admin?.name || "Admin"}
-          </span>
+          <span className="text-[#FE4D01] font-semibold">{admin?.name || "Admin"}</span>
           <br />
           <span className="text-gray-400 text-sm">{admin?.email || "memuat..."}</span>
         </p>
+        <button
+          onClick={handleLogout}
+          className="px-4 py-2 bg-[#FE4D01] text-white rounded-lg hover:bg-[#e14400] transition"
+        >
+          Logout
+        </button>
       </div>
     </main>
   );

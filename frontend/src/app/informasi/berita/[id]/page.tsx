@@ -16,7 +16,8 @@ interface BeritaItem {
   image: string;
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
 export default function DetailBerita() {
   const { lang } = useLang();
@@ -30,7 +31,9 @@ export default function DetailBerita() {
 
     const fetchDetail = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/news/${id}`, { cache: "no-store" });
+        const res = await fetch(`${API_BASE_URL}/news/${id}`, {
+          cache: "no-store",
+        });
         if (!res.ok) throw new Error("Not Found");
 
         const json = await res.json();
@@ -51,7 +54,6 @@ export default function DetailBerita() {
     fetchDetail();
   }, [id]);
 
-  // === Loading State ===
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -62,35 +64,39 @@ export default function DetailBerita() {
     );
   }
 
-  // === Tidak ditemukan ===
   if (notFound || !berita) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-20 text-center">
         <h1 className="text-3xl font-bold text-[#243771] mb-4">
           {lang === "id" ? "Berita tidak ditemukan" : "News not found"}
         </h1>
-        <Link href="/informasi/berita" className="text-[#FE4D01] font-semibold hover:underline">
+        <Link
+          href="/informasi/berita"
+          className="text-[#FE4D01] font-semibold hover:underline"
+        >
           ← {lang === "id" ? "Kembali ke Berita" : "Back to News"}
         </Link>
       </div>
     );
   }
 
-  // === Tampilan Detail ===
   return (
     <>
       {/* Spacer biar gak ketutup navbar */}
       <div className="h-[100px] bg-white" />
 
       {/* === Breadcrumbs === */}
-      <section className="w-full py-4 bg-white border-b border-gray-100">
+      <section className="w-full py-4 bg-white">
         <div className="container mx-auto px-4">
           <nav className="flex items-center text-sm font-medium space-x-2">
             <Link href="/" className="text-[#FE4D01] hover:underline">
               {lang === "id" ? "Beranda" : "Home"}
             </Link>
             <span className="text-[#FE4D01]">{">"}</span>
-            <Link href="/informasi/berita" className="text-[#FE4D01] hover:underline">
+            <Link
+              href="/informasi/berita"
+              className="text-[#FE4D01] hover:underline"
+            >
               {lang === "id" ? "Berita" : "News"}
             </Link>
             <span className="text-[#243771]">{">"}</span>
@@ -102,16 +108,26 @@ export default function DetailBerita() {
       </section>
 
       {/* === Konten Utama === */}
-      <div className="max-w-4xl mx-auto px-4 py-10">
-        <h1 className="text-3xl sm:text-4xl font-bold text-[#243771] mb-2">
-          {lang === "id" ? berita.title_id : berita.title_en}
-        </h1>
+      <div className="max-w-4xl mx-auto px-4 py-12">
+        {/* Judul dan Tanggal */}
+        <div className="text-center mb-6">
+          <h1 className="text-3xl sm:text-4xl font-bold text-[#243771] mb-2 leading-snug">
+            {lang === "id" ? berita.title_id : berita.title_en}
+          </h1>
+          <p className="text-sm text-gray-500">
+            {new Date(berita.date).toLocaleDateString(
+              lang === "id" ? "id-ID" : "en-US",
+              {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              }
+            )}
+          </p>
+        </div>
 
-        <p className="text-sm text-gray-500 mb-6">
-          {new Date(berita.date).toLocaleDateString(lang === "id" ? "id-ID" : "en-US")}
-        </p>
-
-        <div className="relative w-full h-80 sm:h-96 mb-8 rounded-xl overflow-hidden shadow-md">
+        {/* Gambar Berita */}
+        <div className="relative w-full h-80 sm:h-96 mb-8 rounded-xl overflow-hidden">
           <Image
             src={berita.image}
             alt={lang === "id" ? berita.title_id : berita.title_en}
@@ -120,18 +136,19 @@ export default function DetailBerita() {
           />
         </div>
 
-        <p className="text-gray-700 leading-relaxed text-justify text-lg whitespace-pre-line">
-          {lang === "id" ? berita.desc_id : berita.desc_en}
-        </p>
-
-        {/* Tombol kembali */}
-        <div className="mt-10 text-center">
+        {/* Tombol kembali ke berita */}
+        <div className="flex justify-center mb-10">
           <Link
             href="/informasi/berita"
-            className="inline-block text-[#FE4D01] font-semibold hover:underline"
+            className="inline-block bg-[#FE4D01] hover:bg-orange-600 text-white font-semibold px-6 py-2.5 rounded-md transition-all duration-300"
           >
             ← {lang === "id" ? "Kembali ke Berita" : "Back to News"}
           </Link>
+        </div>
+
+        {/* Isi berita */}
+        <div className="text-gray-700 leading-relaxed text-justify text-lg whitespace-pre-line">
+          {lang === "id" ? berita.desc_id : berita.desc_en}
         </div>
       </div>
     </>

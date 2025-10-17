@@ -11,9 +11,8 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/a
 export default function VerifyCodePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const emailFromParam = searchParams.get("email") || "";
-
-  const [email, setEmail] = useState(emailFromParam);
+  const emailParam = searchParams.get("email") || "";
+  const [email] = useState(emailParam);
   const [code, setCode] = useState(["", "", "", "", "", ""]);
   const [loading, setLoading] = useState(false);
 
@@ -22,9 +21,7 @@ export default function VerifyCodePage() {
     const newCode = [...code];
     newCode[index] = val;
     setCode(newCode);
-    if (val && index < 5) {
-      document.getElementById(`code-${index + 1}`)?.focus();
-    }
+    if (val && index < 5) document.getElementById(`code-${index + 1}`)?.focus();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -36,7 +33,6 @@ export default function VerifyCodePage() {
     }
 
     setLoading(true);
-
     try {
       const res = await fetch(`${API_BASE_URL}/auth/verify-code`, {
         method: "POST",
@@ -54,13 +50,10 @@ export default function VerifyCodePage() {
           text: "Kode verifikasi benar. Anda akan diarahkan ke dashboard.",
           icon: "success",
           showConfirmButton: false,
-          timer: 2000,
+          timer: 1800,
         });
 
-        // Simpan token ke sessionStorage (opsional)
-        sessionStorage.setItem("token", data.token);
-
-        // Simpan token ke cookie (🔥 agar bisa dibaca middleware)
+        // Simpan ke cookie agar middleware bisa baca
         Cookies.set("portal-auth-token", data.token, {
           expires: 1, // 1 hari
           secure: true,
@@ -68,7 +61,6 @@ export default function VerifyCodePage() {
           path: "/",
         });
 
-        // Redirect ke dashboard
         router.push("/portal/dashboard");
       }
     } catch (err: any) {
@@ -79,30 +71,27 @@ export default function VerifyCodePage() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-[#243771] relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-[#243771] via-[#1e2b63] to-[#111b45]"></div>
-      <div className="absolute w-[400px] h-[400px] bg-[#FE4D01]/20 rounded-full blur-[120px] -top-20 -left-20"></div>
-      <div className="absolute w-[300px] h-[300px] bg-[#FE4D01]/10 rounded-full blur-[100px] bottom-0 right-0"></div>
+    <main className="min-h-screen flex items-center justify-center bg-[#243771] relative">
+      <div className="absolute inset-0 bg-gradient-to-br from-[#243771] via-[#1e2b63] to-[#111b45]" />
+      <div className="absolute w-[400px] h-[400px] bg-[#FE4D01]/20 rounded-full blur-[120px] -top-20 -left-20" />
 
-      <div className="relative z-10 bg-white/10 backdrop-blur-xl border border-white/10 rounded-2xl p-8 sm:p-10 w-[90%] max-w-md text-center">
+      <div className="relative z-10 bg-white/10 backdrop-blur-xl border border-white/10 rounded-2xl p-8 w-[90%] max-w-md text-center">
         <button
           onClick={() => router.push("/portal")}
-          className="absolute left-6 top-6 text-white/70 hover:text-white transition"
+          className="absolute left-6 top-6 text-white/70 hover:text-white"
         >
           <ChevronLeft size={22} />
         </button>
 
-        <div className="flex flex-col items-center mb-8">
-          <Lock size={46} className="text-[#FE4D01] mb-3" />
-          <h1 className="text-2xl font-bold text-white mb-1">Verifikasi Kode</h1>
-          <p className="text-white/70 text-sm max-w-xs">
-            Masukkan 6 digit kode yang dikirim ke <br />
-            <span className="text-[#FE4D01] font-semibold">{email}</span>
-          </p>
-        </div>
+        <Lock size={46} className="text-[#FE4D01] mb-3 mx-auto" />
+        <h1 className="text-2xl font-bold text-white mb-1">Verifikasi Kode</h1>
+        <p className="text-white/70 text-sm mb-6">
+          Masukkan 6 digit kode yang dikirim ke <br />
+          <span className="text-[#FE4D01] font-semibold">{email}</span>
+        </p>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="flex justify-center gap-3 sm:gap-4">
+          <div className="flex justify-center gap-3">
             {code.map((num, i) => (
               <input
                 key={i}
@@ -111,7 +100,7 @@ export default function VerifyCodePage() {
                 maxLength={1}
                 value={num}
                 onChange={(e) => handleChange(e.target.value, i)}
-                className="w-10 h-12 sm:w-12 sm:h-14 rounded-md bg-white/20 text-white text-center text-lg sm:text-2xl font-semibold focus:ring-2 focus:ring-[#FE4D01] outline-none transition-all"
+                className="w-10 h-12 sm:w-12 sm:h-14 rounded-md bg-white/20 text-white text-center text-lg font-semibold focus:ring-2 focus:ring-[#FE4D01] outline-none"
               />
             ))}
           </div>
@@ -119,7 +108,7 @@ export default function VerifyCodePage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-gradient-to-r from-[#FE4D01] to-[#FE7A32] text-white font-semibold hover:scale-[1.02] hover:shadow-lg transition-all duration-200 disabled:opacity-60"
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-gradient-to-r from-[#FE4D01] to-[#FE7A32] text-white font-semibold hover:scale-[1.02] transition-all disabled:opacity-60"
           >
             {loading ? (
               <>
