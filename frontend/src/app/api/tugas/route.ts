@@ -3,8 +3,7 @@ import {NextResponse} from "next/server";
 import api from "@/app/lib/api";
 
 export async function GET() {
-    const cookieStore = cookies()
-    // @ts-ignore
+    const cookieStore = await cookies();
     const token = cookieStore.get('secure-auth-token')?.value;
 
     if (!token) return NextResponse.json({ error: "Token tidak ada!" }, { status: 401 });
