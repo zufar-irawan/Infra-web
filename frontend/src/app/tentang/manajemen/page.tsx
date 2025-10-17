@@ -121,7 +121,7 @@ export default function Manajemen() {
         {/* === Section Gedung === */}
         <section className="relative w-full bg-white overflow-hidden">
           <img
-            src="/svg/gedung.svg"
+            src="/avif/gedung.avif"
             alt={
               lang === "id"
                 ? "Gedung SMK Prestasi Prima"

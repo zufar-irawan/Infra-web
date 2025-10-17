@@ -1,10 +1,10 @@
 "use client";
 
-import {useEffect, useState, useRef} from "react";
-import {useLang} from "./LangContext";
+import { useEffect, useState, useRef } from "react";
+import { useLang } from "./LangContext";
 import Image from "next/image";
-import {usePathname} from "next/navigation";
-import {ExternalLink, ChevronDown} from "lucide-react";
+import { usePathname } from "next/navigation";
+import { ExternalLink, ChevronDown } from "lucide-react";
 
 type HeaderMenuItem = {
   id: string;
@@ -16,7 +16,7 @@ type HeaderMenuItem = {
 
 export default function Header() {
   const pathname = usePathname();
-  const {lang, setLang} = useLang();
+  const { lang, setLang } = useLang();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -24,11 +24,11 @@ export default function Header() {
   const [hoveredDropdown, setHoveredDropdown] = useState<string | null>(null);
   const hoverTimeout = useRef<NodeJS.Timeout | null>(null);
 
-  // detect mobile (biarkan seperti versi kamu)
+  // detect mobile
   useEffect(() => {
     const mediaQuery = window.matchMedia("(max-width: 1300px)");
     const handleChange = (e: MediaQueryListEvent | MediaQueryList) => {
-      // @ts-ignore – kompatibel untuk first run + event listener
+      // @ts-ignore
       setIsMobile(e.matches);
     };
     handleChange(mediaQuery);
@@ -53,18 +53,25 @@ export default function Header() {
     }, 200);
   };
 
+  // === Header Menu ===
   const headerMenus: HeaderMenuItem[] = [
+    {
+      id: "beranda",
+      name_id: "Beranda",
+      name_en: "Home",
+      href: "/",
+    },
     {
       id: "tentang",
       name_id: "Tentang Kami",
       name_en: "About Us",
       submenu: [
-        {href: "/tentang/identitas", id: "Identitas Sekolah", en: "School Identity"},
-        {href: "/tentang/visi-misi", id: "Visi & Misi", en: "Vision & Mission"},
-        {href: "/tentang/manajemen", id: "Manajemen Staff", en: "Management Staff"},
-        {href: "/tentang/fasilitas", id: "Fasilitas", en: "Facilities"},
-        {href: "/tentang/mitra", id: "Mitra", en: "Partners"},
-        {href: "/program", id: "Program Keahlian", en: "Expertise Programs"},
+        { href: "/tentang/identitas", id: "Identitas Sekolah", en: "School Identity" },
+        { href: "/tentang/visi-misi", id: "Visi & Misi", en: "Vision & Mission" },
+        { href: "/tentang/manajemen", id: "Manajemen Staff", en: "Management Staff" },
+        { href: "/tentang/fasilitas", id: "Fasilitas", en: "Facilities" },
+        { href: "/tentang/mitra", id: "Mitra", en: "Partners" },
+        { href: "/program", id: "Program Keahlian", en: "Expertise Programs" },
       ],
     },
     {
@@ -72,10 +79,10 @@ export default function Header() {
       name_id: "Kehidupan Siswa",
       name_en: "Student Life",
       submenu: [
-        {href: "/kehidupan-siswa/prestasi", id: "Prestasi", en: "Achievements"},
-        {href: "/kehidupan-siswa/ekstrakurikuler", id: "Ekstrakurikuler", en: "Extracurricular"},
-        {href: "/kehidupan-siswa/penerimaan", id: "Penerimaan Siswa", en: "Admissions"},
-        {href: "/kehidupan-siswa/testimoni", id: "Testimoni", en: "Testimonials"},
+        { href: "/kehidupan-siswa/prestasi", id: "Prestasi", en: "Achievements" },
+        { href: "/kehidupan-siswa/ekstrakurikuler", id: "Ekstrakurikuler", en: "Extracurricular" },
+        { href: "/kehidupan-siswa/penerimaan", id: "Penerimaan Siswa", en: "Admissions" },
+        { href: "/kehidupan-siswa/testimoni", id: "Testimoni", en: "Testimonials" },
       ],
     },
     {
@@ -83,17 +90,15 @@ export default function Header() {
       name_id: "Informasi",
       name_en: "Information",
       submenu: [
-        {href: "/informasi/berita", id: "Berita", en: "News"},
-        {href: "/informasi/kegiatan", id: "Kegiatan", en: "Events"},
-        {href: "/informasi/faq", id: "FAQ", en: "FAQ"},
+        { href: "/informasi/berita", id: "Berita", en: "News" },
+        { href: "/informasi/kegiatan", id: "Kegiatan", en: "Events" },
+        { href: "/informasi/faq", id: "FAQ", en: "FAQ" },
       ],
     },
   ];
 
   const flagUrl =
-    lang === "id"
-      ? "https://flagcdn.com/w20/id.png"
-      : "https://flagcdn.com/w20/us.png";
+    lang === "id" ? "https://flagcdn.com/w20/id.png" : "https://flagcdn.com/w20/us.png";
 
   return (
     <header className="fixed top-0 w-full z-50 select-none">
@@ -132,19 +137,13 @@ export default function Header() {
                     onMouseEnter={() => handleMouseEnter(menu.id)}
                     onMouseLeave={handleMouseLeave}
                   >
-                    <button
-                      className="relative flex items-center gap-1 font-medium transition group cursor-pointer"
-                    >
+                    <button className="relative flex items-center gap-1 font-medium transition group cursor-pointer">
                       {lang === "id" ? menu.name_id : menu.name_en}
                       <ChevronDown size={16} className="ml-1" />
-                      <span
-                        className="absolute -bottom-1 left-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"
-                      ></span>
+                      <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
                     </button>
                     {hoveredDropdown === menu.id && (
-                      <div
-                        className="absolute left-0 mt-3 text-sm bg-white/95 shadow-lg rounded text-orange-600 w-52 transition duration-300 z-50"
-                      >
+                      <div className="absolute left-0 mt-3 text-sm bg-white/95 shadow-lg rounded text-orange-600 w-52 transition duration-300 z-50">
                         {menu.submenu.map((sub, i) => (
                           <a
                             key={i}
@@ -164,9 +163,7 @@ export default function Header() {
                       className="relative font-medium transition cursor-pointer group"
                     >
                       {lang === "id" ? menu.name_id : menu.name_en}
-                      <span
-                        className="absolute -bottom-1 left-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"
-                      ></span>
+                      <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
                     </a>
                   </div>
                 )
@@ -178,15 +175,11 @@ export default function Header() {
                 className="relative font-medium flex items-center gap-1 transition group"
               >
                 Presma Edu <ExternalLink size={16} />
-                <span
-                  className="absolute -bottom-1 left-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"
-                ></span>
+                <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
               </a>
 
               <div className="flex items-center gap-2 ml-4">
-                <button
-                  className="px-4 py-2 rounded bg-orange-600 hover:bg-orange-700 transition font-semibold"
-                >
+                <button className="px-4 py-2 rounded bg-orange-600 hover:bg-orange-700 transition font-semibold">
                   {lang === "id" ? "Pendaftaran" : "Registration"}
                 </button>
                 <button
@@ -233,10 +226,7 @@ export default function Header() {
         }`}
       >
         <div className="flex items-center justify-between px-6 py-4">
-          <button
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="text-white text-xl"
-          >
+          <button onClick={() => setIsMobileMenuOpen(false)} className="text-white text-xl">
             ✕
           </button>
           <button
@@ -249,6 +239,15 @@ export default function Header() {
         </div>
 
         <div className="flex flex-col px-6 py-4 space-y-2">
+          {/* === Tambahan Beranda di Mobile === */}
+          <a
+            href="/"
+            className="relative py-2 block font-medium group border-b border-white/20"
+          >
+            {lang === "id" ? "Beranda" : "Home"}
+            <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+          </a>
+
           {[
             {
               title_id: "Tentang Kami",
@@ -283,52 +282,38 @@ export default function Header() {
             },
           ].map((menu, i) => (
             <div key={i}>
-              {menu.submenu ? (
-                <div className="relative">
-                  <button
-                    onClick={() =>
-                      setOpenMobileDropdown(
-                        openMobileDropdown === menu.title_id ? null : menu.title_id
-                      )
-                    }
-                    className="w-full flex justify-between items-center py-2 relative font-medium group"
-                  >
-                    <span>
-                      {lang === "id" ? menu.title_id : menu.title_en}
-                      <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
-                    </span>
-                    <span className="text-lg">
-                      {openMobileDropdown === menu.title_id ? "−" : "+"}
-                    </span>
-                  </button>
-                  <div
-                    className={`pl-4 overflow-hidden transition-all duration-300 ease-in-out ${
-                      openMobileDropdown === menu.title_id
-                        ? "max-h-96 opacity-100"
-                        : "max-h-0 opacity-0"
-                    }`}
-                  >
-                    {menu.submenu.map((sub, j) => (
-                      <a
-                        key={j}
-                        href={sub.href}
-                        className="block py-1 text-sm relative group"
-                      >
-                        {lang === "id" ? sub.id : sub.en}
-                        <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <>
-                  {/* @ts-ignore */}
-                  <a href={menu.href} className="relative py-2 block font-medium group">
+              <div className="relative">
+                <button
+                  onClick={() =>
+                    setOpenMobileDropdown(
+                      openMobileDropdown === menu.title_id ? null : menu.title_id
+                    )
+                  }
+                  className="w-full flex justify-between items-center py-2 relative font-medium group"
+                >
+                  <span>
                     {lang === "id" ? menu.title_id : menu.title_en}
                     <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
-                  </a>
-                </>
-              )}
+                  </span>
+                  <span className="text-lg">
+                    {openMobileDropdown === menu.title_id ? "−" : "+"}
+                  </span>
+                </button>
+                <div
+                  className={`pl-4 overflow-hidden transition-all duration-300 ease-in-out ${
+                    openMobileDropdown === menu.title_id
+                      ? "max-h-96 opacity-100"
+                      : "max-h-0 opacity-0"
+                  }`}
+                >
+                  {menu.submenu.map((sub, j) => (
+                    <a key={j} href={sub.href} className="block py-1 text-sm relative group">
+                      {lang === "id" ? sub.id : sub.en}
+                      <span className="absolute left-0 bottom-0 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+                    </a>
+                  ))}
+                </div>
+              </div>
             </div>
           ))}
 

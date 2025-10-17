@@ -42,8 +42,8 @@ export default function Sekilas() {
             <Image
               src={
                 lang === "id"
-                  ? "/webp/sirHendry.webp"
-                  : "/webp/sirHendry-eng (1).webp"
+                  ? "/atas-id.png"
+                  : "/atas-eng.png"
               }
               alt={lang === "id" ? "Kepala Sekolah" : "Principal"}
               width={500}
