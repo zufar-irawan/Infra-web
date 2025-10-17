@@ -111,7 +111,7 @@ export default function DevicePage() {
         <div className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm text-left">
-              <thead className="bg-gray-100 text-gray-700 text-sm font-semibold uppercase">
+              <thead className=" bg-orange-400 text-white text-sm font-semibold uppercase">
                 <tr>
                   <th className="px-6 py-3">No</th>
                   <th className="px-6 py-3">Nama</th>
