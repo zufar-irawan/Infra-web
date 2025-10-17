@@ -7,6 +7,7 @@ import UjianCard from "@/components/subComponents/forUjian/Ujiancard";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import axios from "axios";
 
 type ScheduleStatus = "upcoming" | "ongoing" | "completed";
 
@@ -98,7 +99,7 @@ const getStaffStatusClass = (status: ScheduleStatus): string => {
 
 export default function UjianSiswa() {
     const router = useRouter();
-    const { user, student, exams, subjects, classes, rooms } = useEduData();
+    const { user, student, exams, subjects, classes, rooms, teacher } = useEduData();
 
     const isStudent = user?.role === "siswa";
     const isStaff = user?.role === "guru" || user?.role === "admin";
@@ -109,6 +110,7 @@ export default function UjianSiswa() {
     const [filterStatus, setFilterStatus] = useState("all");
     const [openSubjects, setOpenSubjects] = useState<Record<string, boolean>>({});
     const [isCreateExamModalOpen, setIsCreateExamModalOpen] = useState(false);
+    const [isCreatingExam, setIsCreatingExam] = useState(false);
 
     const subjectsList = useMemo(() => coerceToArray(subjects), [subjects]);
     const classesList = useMemo(() => coerceToArray(classes), [classes]);
@@ -342,10 +344,62 @@ export default function UjianSiswa() {
         setFilterStatus("all");
     }, []);
 
-    const handleCreateExam = useCallback((examData: any) => {
-        console.log("Creating exam with data:", examData);
-        setIsCreateExamModalOpen(false);
-    }, []);
+    const handleCreateExam = useCallback(async (examData: any) => {
+        try {
+            setIsCreatingExam(true);
+
+            // Determine creator (LMS user id). Prefer teacher.user_id if available, fallback to user.id, then provided value
+            const creatorIdRaw = examData.created_by ?? teacher?.user_id ?? user?.id;
+            const creatorId = creatorIdRaw != null ? Number(creatorIdRaw) : undefined;
+
+            // Format data sesuai dengan backend requirements
+            const formattedData = {
+                subject_id: Number(examData.subject_id ?? examData.subjectId),
+                class_id: Number(examData.class_id ?? examData.classId),
+                title: String(examData.title ?? ""),
+                description: String(examData.description ?? ""),
+                date: String(examData.date), // Format: YYYY-MM-DD
+                start_time: String(examData.start_time ?? examData.startTime), // Format: HH:mm
+                end_time: String(examData.end_time ?? examData.endTime), // Format: HH:mm
+                room_id: Number(examData.room_id ?? examData.roomId),
+                created_by: creatorId,
+            };
+
+            const response = await axios.post("/api/exams", formattedData);
+
+            if (response.status === 200 || response.status === 201) {
+                // Success notification
+                alert("Ujian berhasil dibuat!");
+
+                // Close modal
+                setIsCreateExamModalOpen(false);
+
+                // Refresh page to show new exam
+                window.location.reload();
+            }
+        } catch (error: any) {
+            console.error("Error creating exam:", error);
+
+            // Handle validation errors
+            if (error.response?.data?.errors) {
+                const errors = error.response.data.errors as Record<string, string[] | string>;
+                const errorMessages = Object.values(errors)
+                  .flatMap((v) => Array.isArray(v) ? v : [v])
+                  .join("\n");
+                alert(`Gagal membuat ujian:\n${errorMessages}`);
+            } else if (error.response?.data?.message) {
+                alert(`Gagal membuat ujian: ${error.response.data.message}`);
+            } else if (error.response?.status === 401) {
+                alert("Sesi login berakhir atau tidak valid. Silakan login kembali.");
+            } else if (error.response?.status === 404) {
+                alert("Endpoint pembuatan ujian tidak ditemukan. Pastikan server backend berjalan.");
+            } else {
+                alert("Gagal membuat ujian. Silakan coba lagi.");
+            }
+        } finally {
+            setIsCreatingExam(false);
+        }
+    }, [teacher?.user_id, user?.id]);
 
     return (
         <>
@@ -576,7 +630,7 @@ export default function UjianSiswa() {
 
             {isStaff && (
                 <div className="overflow-y-auto min-h-screen">
-                    <DashHeader user={user} student={student} />
+                    <DashHeader user={user} teacher={teacher} />
 
                     <div id="ujian-main-data" className="w-full p-4 flex flex-col lg:flex-row gap-4">
                         <div className="lg:flex-1 bg-white rounded-2xl p-4 shadow-md border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 flex flex-col gap-4 h-[200px]">
@@ -771,6 +825,7 @@ export default function UjianSiswa() {
                 classes={classesList}
                 rooms={roomsList}
                 onSubmit={handleCreateExam}
+                isLoading={isCreatingExam}
             />
         </>
     );

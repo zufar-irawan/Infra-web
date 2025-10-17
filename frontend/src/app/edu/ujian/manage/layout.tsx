@@ -12,7 +12,7 @@ export default function ManageExamLayout({
   const { user } = useEduData();
 
   const isStaff = useMemo(
-    () => Boolean(user && ["teacher", "admin"].includes(user.role)),
+    () => Boolean(user && ["guru", "admin"].includes(user.role)),
     [user]
   );
 

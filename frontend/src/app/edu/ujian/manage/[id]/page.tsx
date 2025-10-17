@@ -381,7 +381,6 @@ export default function ManageExamDetailPage() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <DashHeader user={user} student={student} />
 
       <main className="mx-auto max-w-6xl px-4 py-6 space-y-6">
         <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

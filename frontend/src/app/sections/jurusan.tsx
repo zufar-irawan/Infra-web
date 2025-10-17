@@ -1,7 +1,7 @@
 "use client";
 
 import { useLang } from "../components/LangContext";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import { useState } from "react";
 
 interface JurusanProps {
@@ -39,7 +39,7 @@ export default function Jurusan({ hideDecoration = false }: JurusanProps) {
     },
   ];
 
-  const cardVariants = {
+  const cardVariants: Variants = {
     hidden: { opacity: 0, y: 50, scale: 0.9 },
     visible: (i: number) => ({
       opacity: 1,
@@ -48,7 +48,7 @@ export default function Jurusan({ hideDecoration = false }: JurusanProps) {
       transition: {
         delay: i * 0.2,
         duration: 0.8,
-        ease: "easeOut",
+        ease: [0.16, 1, 0.3, 1],
       },
     }),
   };

@@ -78,12 +78,12 @@ export default function Dashboard() {
     if (user?.role !== "admin") return;
 
     setStatAdmin([
-      { title: "Total Siswa", value: student?.length ?? 0 },
+      { title: "Total Siswa", value: students?.length ?? 0 },
       { title: "Total Guru", value: teachers?.length ?? 0 },
       { title: "Total Tugas", value: tugas?.length ?? 0 },
       { title: "Total Ujian", value: exams?.exams?.length ?? 0 },
     ]);
-  }, [user, student, teachers, tugas, exams]);
+  }, [user, students, teachers, tugas, exams]);
 
   return (
     <div className="overflow-y-auto min-h-screen bg-gray-50">
