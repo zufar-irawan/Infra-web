@@ -166,7 +166,7 @@ export default function VisiMisi() {
         {/* === Section Gedung === */}
         <section className="relative w-full bg-white overflow-hidden">
           <img
-            src="/svg/gedung.svg"
+            src="/avif/gedung.avif"
             alt={lang === "id" ? "Gedung SMK Prestasi Prima" : "Prestasi Prima Building"}
             className="
               w-full h-[40vh] sm:h-[50vh] lg:h-screen

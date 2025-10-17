@@ -7,7 +7,6 @@ import { Menu, X, LogOut } from "lucide-react";
 import Cookies from "js-cookie";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  // --- HOOKS WAJIB TETAP URUT ---
   const [open, setOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isReady, setIsReady] = useState(false);
@@ -16,24 +15,23 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname();
   const router = useRouter();
 
-  // --- MENU SIDEBAR ---
+  // === MENU ===
   const menus = [
-    { name: "Dashboard", href: "/portal/dashboard", icon: "📊" },
-    { name: "Staff", href: "/portal/staff", icon: "👩‍🏫" },
-    { name: "Fasilitas", href: "/portal/fasilitas", icon: "🏫" },
-    { name: "Mitra", href: "/portal/mitra", icon: "🤝" },
-    { name: "Prestasi", href: "/portal/prestasi", icon: "🏆" },
-    { name: "Ekstrakurikuler", href: "/portal/ekstrakurikuler", icon: "🎭" },
-    { name: "Testimoni", href: "/portal/testimoni", icon: "💬" },
-    { name: "Berita", href: "/portal/news", icon: "📰" },
-    { name: "Kegiatan", href: "/portal/kegiatan", icon: "📅" },
-    { name: "FAQ", href: "/portal/faq", icon: "❓" },
+    { name: "Dashboard", href: "/portal/dashboard" },
+    { name: "Staff", href: "/portal/staff" },
+    { name: "Fasilitas", href: "/portal/fasilitas" },
+    { name: "Mitra", href: "/portal/mitra" },
+    { name: "Prestasi", href: "/portal/prestasi" },
+    { name: "Ekstrakurikuler", href: "/portal/ekstrakurikuler" },
+    { name: "Testimoni", href: "/portal/testimoni" },
+    { name: "Berita", href: "/portal/news" },
+    { name: "Kegiatan", href: "/portal/kegiatan" },
+    { name: "FAQ", href: "/portal/faq" },
   ];
 
-  const isAuthPage =
-    pathname === "/portal" || pathname.startsWith("/portal/verify");
+  const isAuthPage = pathname === "/portal" || pathname.startsWith("/portal/verify");
 
-  // --- CEK LOGIN ---
+  // === CEK LOGIN ===
   useEffect(() => {
     const token = Cookies.get("portal-auth-token");
     if (!token && !isAuthPage) {
@@ -44,7 +42,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     }
   }, [pathname, isAuthPage, router]);
 
-  // --- RESPONSIVE SIDEBAR ---
+  // === RESPONSIVE ===
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 1024);
     handleResize();
@@ -52,7 +50,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // --- KLIK LUAR SIDEBAR (MOBILE) ---
+  // === CLICK OUTSIDE (MOBILE) ===
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (
@@ -68,7 +66,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [open, isMobile]);
 
-  // --- LOGOUT ---
+  // === LOGOUT ===
   const handleLogout = () => {
     Cookies.remove("portal-auth-token");
     sessionStorage.removeItem("token");
@@ -76,34 +74,30 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     router.replace("/portal");
   };
 
-  // --- RENDER UTAMA DALAM SATU BLOK (NO HOOKS DALAM KONDISI) ---
+  // === RENDER ===
   let content: React.ReactNode = null;
 
   if (!isReady) {
-    // belum siap render apa pun
     content = null;
   } else if (isAuthPage) {
-    // halaman login / verifikasi
     content = <>{children}</>;
   } else if (!isLoggedIn) {
-    // belum login
     content = null;
   } else {
-    // halaman portal (sudah login)
     content = (
-      <div className="flex min-h-screen bg-gradient-to-br from-[#f9fafb] via-white to-[#eef2ff] text-gray-800 relative overflow-hidden">
+      <div className="flex min-h-screen bg-[#f4f6fb] text-gray-800">
         {/* Sidebar */}
         <aside
           ref={sidebarRef}
-          className={`fixed top-0 left-0 z-40 h-full lg:w-64 transform transition-all duration-300
+          className={`fixed top-0 left-0 z-40 h-full lg:w-64 transform transition-transform duration-300
           ${open ? "translate-x-0" : "-translate-x-full"} 
-          lg:translate-x-0`}
+          lg:translate-x-0 bg-[#1e2b63] border-r border-[#141c44]`}
         >
-          <div className="relative h-full bg-[#243771]/95 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.25)] border-r border-white/10 flex flex-col">
+          <div className="h-full flex flex-col">
             {/* Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
-              <h1 className="font-bold text-lg tracking-wide text-white">
-                <span className="text-[#FE4D01]">SMK</span> Admin
+            <div className="flex items-center justify-between px-5 py-4 border-b border-[#141c44] bg-[#1a2554]">
+              <h1 className="font-semibold text-lg text-white tracking-wide">
+                SMK <span className="text-[#FE4D01]">Admin</span>
               </h1>
               {isMobile && (
                 <button
@@ -116,7 +110,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
 
             {/* Menu */}
-            <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+            <nav className="flex-1 overflow-y-auto px-3 py-5 space-y-1">
               {menus.map((menu) => {
                 const active = pathname === menu.href;
                 return (
@@ -124,37 +118,29 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     key={menu.href}
                     href={menu.href}
                     onClick={() => isMobile && setOpen(false)}
-                    className={`group flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 relative
+                    className={`block px-4 py-2.5 text-sm font-medium tracking-wide rounded-md transition-all duration-150
                       ${
                         active
-                          ? "bg-gradient-to-r from-[#FE4D01] to-[#FE7A32] text-white shadow-md"
-                          : "text-white/80 hover:bg-white/10 hover:text-white"
+                          ? "bg-[#FE4D01] text-white shadow-sm"
+                          : "text-gray-300 hover:bg-[#2b377a] hover:text-white"
                       }`}
                   >
-                    <span className="text-lg group-hover:scale-110 transition-transform">
-                      {menu.icon}
-                    </span>
-                    <span className="text-sm font-medium truncate">
-                      {menu.name}
-                    </span>
-                    {active && (
-                      <div className="absolute right-2 w-[6px] h-[6px] rounded-full bg-white shadow-md"></div>
-                    )}
+                    {menu.name}
                   </Link>
                 );
               })}
             </nav>
 
             {/* Footer */}
-            <div className="border-t border-white/10 px-4 py-5">
+            <div className="border-t border-[#141c44] px-4 py-5">
               <button
                 onClick={handleLogout}
-                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg font-semibold text-sm text-white bg-gradient-to-r from-[#FE4D01] to-[#FE7A32] hover:brightness-110 transition"
+                className="flex items-center justify-center gap-2 w-full py-2.5 rounded-md font-semibold text-sm text-white bg-[#FE4D01] hover:bg-[#ff6a33] transition"
               >
                 <LogOut size={18} />
                 Logout
               </button>
-              <p className="text-xs text-white/50 text-center mt-4">
+              <p className="text-xs text-gray-400 text-center mt-4">
                 © 2025 SMK Prestasi Prima
               </p>
             </div>
@@ -163,14 +149,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         {/* Overlay (mobile) */}
         {isMobile && open && (
-          <div className="fixed inset-0 bg-black/40 z-30 backdrop-blur-sm" />
+          <div className="fixed inset-0 bg-black/50 z-30" />
         )}
 
         {/* Tombol buka sidebar (mobile) */}
         {isMobile && (
           <button
             onClick={() => setOpen(true)}
-            className="fixed top-4 left-4 z-50 p-2 bg-gradient-to-br from-[#243771] to-[#2a4fa5] text-white rounded-lg shadow-lg hover:scale-105 transition"
+            className="fixed top-4 left-4 z-50 p-2 bg-[#1e2b63] text-white rounded-md shadow-md hover:bg-[#243771] transition"
           >
             <Menu size={20} />
           </button>
@@ -178,11 +164,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         {/* Konten utama */}
         <main
-          className={`flex-1 min-h-screen transition-all duration-300 overflow-y-auto ${
+          className={`flex-1 min-h-screen transition-all duration-300 ${
             !isMobile ? "lg:ml-64" : ""
           }`}
         >
-          <div className="p-6">{children}</div>
+          <div className="p-8">{children}</div>
         </main>
       </div>
     );

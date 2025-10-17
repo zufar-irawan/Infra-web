@@ -104,7 +104,7 @@ export default function Agenda() {
         {/* === Button === */}
         <div className="flex justify-center mt-14">
           <Link
-            href="/informasi/agenda"
+            href="/informasi/kegiatan"
             className="px-6 py-3 md:px-8 md:py-3 bg-white rounded-[10px] shadow-[0_4px_10px_rgba(0,0,0,0.15)] hover:shadow-[0_6px_14px_rgba(254,77,1,0.3)] transition font-semibold text-[#FE4D01]"
           >
             {lang === "id" ? "Selengkapnya" : "View More"}

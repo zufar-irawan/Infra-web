@@ -9,7 +9,8 @@ export async function GET(
 ) {
   const { id } = await context.params;
 
-  const cookieStore = await cookies();
+  const cookieStore = cookies();
+  // @ts-ignore
   const token = cookieStore.get("secure-auth-token")?.value;
 
   if (!token) return NextResponse.json({ error: "Token tidak ada!" }, { status: 401 });
@@ -35,7 +36,8 @@ export async function PUT(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const cookieStore = await cookies();
+    const cookieStore = cookies();
+    // @ts-ignore
     const token = cookieStore.get("secure-auth-token")?.value;
     if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 

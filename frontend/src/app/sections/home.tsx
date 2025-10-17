@@ -31,7 +31,7 @@ export default function Home() {
 <div className="flex flex-col sm:flex-row gap-4 mt-6 w-fit sm:w-auto">
   {/* Daftar Sekarang */}
   <a
-    href="/penerimaansiswa"
+    href="/kehidupan-siswa/penerimaan"
     className="w-full sm:w-auto text-center px-5 py-2 text-white rounded bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 transition font-semibold flex items-center justify-center gap-2"
   >
     {lang === "id" ? "DAFTAR SEKARANG" : "REGISTER NOW"}
