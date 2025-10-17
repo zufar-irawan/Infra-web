@@ -161,7 +161,7 @@ export default function VisiMisi() {
         </section>
 
         {/* === Section Jurusan tetap ada === */}
-        <Jurusan />
+        <Jurusan hideDecoration/>
 
         {/* === Section Gedung === */}
         <section className="relative w-full bg-white overflow-hidden">

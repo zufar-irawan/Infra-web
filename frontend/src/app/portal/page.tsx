@@ -17,7 +17,6 @@ export default function PortalLoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!email.trim()) {
       MySwal.fire({
         icon: "warning",
@@ -31,7 +30,6 @@ export default function PortalLoginPage() {
     }
 
     setLoading(true);
-
     try {
       const res = await axios.post(`${API_BASE_URL}/auth/request-code`, { email });
 
@@ -39,31 +37,29 @@ export default function PortalLoginPage() {
         MySwal.fire({
           icon: "success",
           title: "Kode Verifikasi Dikirim!",
-          html: `<p class="text-sm text-gray-200">Kami telah mengirimkan kode 6 digit ke <b>${email}</b>.</p>`,
+          html: `<p class="text-sm text-gray-200">Kode dikirim ke <b>${email}</b>.</p>`,
           confirmButtonText: "Verifikasi Sekarang",
           confirmButtonColor: "#FE4D01",
           background: "#1e2b63",
           color: "#fff",
         }).then(() => {
-          sessionStorage.setItem("verifyEmail", email);
           router.push(`/portal/verify?email=${encodeURIComponent(email)}`);
         });
       } else {
         MySwal.fire({
           icon: "error",
           title: "Gagal Mengirim!",
-          text: res.data.message || "Terjadi kesalahan saat mengirim kode verifikasi.",
+          text: res.data.message || "Terjadi kesalahan.",
           confirmButtonColor: "#FE4D01",
           background: "#1e2b63",
           color: "#fff",
         });
       }
     } catch (error: any) {
-      console.error("Login error:", error);
       MySwal.fire({
         icon: "error",
-        title: "Gagal Terhubung ke Server",
-        text: error.response?.data?.message || "Pastikan backend Laravel kamu sedang berjalan.",
+        title: "Server Error",
+        text: error.response?.data?.message || "Pastikan backend berjalan.",
         confirmButtonColor: "#FE4D01",
         background: "#1e2b63",
         color: "#fff",
@@ -79,9 +75,9 @@ export default function PortalLoginPage() {
       <div className="absolute w-[400px] h-[400px] bg-[#FE4D01]/20 rounded-full blur-[120px] -top-20 -left-20" />
       <div className="absolute w-[300px] h-[300px] bg-[#FE4D01]/10 rounded-full blur-[100px] bottom-0 right-0" />
 
-      <div className="relative z-10 bg-white/10 backdrop-blur-xl border border-white/10 rounded-2xl p-8 sm:p-10 w-[90%] max-w-md shadow-[0_8px_30px_rgba(0,0,0,0.4)] animate-fadeIn">
+      <div className="relative z-10 bg-white/10 backdrop-blur-xl border border-white/10 rounded-2xl p-8 sm:p-10 w-[90%] max-w-md">
         <div className="text-center mb-8">
-          <img src="/webp/smk.webp" alt="SMK Prestasi Prima" className="w-20 h-20 mx-auto mb-4 drop-shadow-lg" />
+          <img src="/webp/smk.webp" alt="SMK Prestasi Prima" className="w-20 h-20 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-white mb-1">Login Administrator</h1>
           <p className="text-white/70 text-sm">
             Masukkan email terdaftar untuk menerima kode verifikasi.
@@ -101,7 +97,7 @@ export default function PortalLoginPage() {
                 placeholder="contoh@smkpp.sch.id"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[#FE4D01] transition-all"
+                className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[#FE4D01]"
               />
             </div>
           </div>
@@ -109,7 +105,7 @@ export default function PortalLoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-gradient-to-r from-[#FE4D01] to-[#FE7A32] text-white font-semibold hover:scale-[1.02] hover:shadow-lg transition-all duration-200 disabled:opacity-60"
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-gradient-to-r from-[#FE4D01] to-[#FE7A32] text-white font-semibold hover:scale-[1.02] transition-all disabled:opacity-60"
           >
             {loading ? (
               <>

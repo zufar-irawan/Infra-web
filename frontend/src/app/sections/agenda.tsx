@@ -1,52 +1,42 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import { useLang } from "../components/LangContext";
+
+interface AgendaItem {
+  id: number;
+  title_id: string;
+  title_en: string;
+  desc_id: string;
+  desc_en: string;
+  date: string;
+  time: string;
+  place: string;
+}
+
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
 export default function Agenda() {
   const { lang } = useLang();
+  const [agenda, setAgenda] = useState<AgendaItem[]>([]);
 
-  const agenda = [
-    {
-      id: 1,
-      date_id: "Kamis, 2 Oktober 2025",
-      date_en: "Thursday, October 2, 2025",
-      title_id: "EXPONER 2025",
-      title_en: "EXPONER 2025",
-      time: "23.00",
-      desc_id:
-        "Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet.",
-      desc_en:
-        "Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet.",
-      place: "Lapangan SMK Prestasi Prima",
-    },
-    {
-      id: 2,
-      date_id: "Jumat, 3 Oktober 2025",
-      date_en: "Friday, October 3, 2025",
-      title_id: "Saintek Fair 2025",
-      title_en: "Saintek Fair 2025",
-      time: "23.00",
-      desc_id:
-        "Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet.",
-      desc_en:
-        "Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet.",
-      place: "Lapangan SMK Prestasi Prima",
-    },
-    {
-      id: 3,
-      date_id: "Sabtu, 4 Oktober 2025",
-      date_en: "Saturday, October 4, 2025",
-      title_id: "Job Fair 2025",
-      title_en: "Job Fair 2025",
-      time: "23.00",
-      desc_id:
-        "Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet.",
-      desc_en:
-        "Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet.",
-      place: "Lapangan SMK Prestasi Prima",
-    },
-  ];
+  // === Ambil data dari backend ===
+  useEffect(() => {
+    axios
+      .get(`${API_BASE_URL}/kegiatan/public`)
+      .then((res) => {
+        if (res.data.success && Array.isArray(res.data.data)) {
+          setAgenda(res.data.data);
+        } else {
+          console.warn("⚠️ Format API agenda tidak sesuai");
+          setAgenda([]);
+        }
+      })
+      .catch((err) => console.error("❌ Gagal load agenda:", err));
+  }, []);
 
   return (
     <section
@@ -54,7 +44,7 @@ export default function Agenda() {
       className="py-20 bg-[#243771] relative overflow-hidden flex flex-col items-center justify-center"
     >
       <div className="container mx-auto px-6 md:px-12 lg:px-20 text-center relative z-10">
-        {/* Title */}
+        {/* === Title === */}
         <h2 className="text-3xl md:text-4xl font-bold mb-3 text-white">
           {lang === "id" ? "Agenda Terbaru" : "Latest Agenda"}
         </h2>
@@ -64,41 +54,57 @@ export default function Agenda() {
             : "Follow the latest activities and events at SMK Prestasi Prima"}
         </p>
 
-        {/* Cards */}
+        {/* === Cards === */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 justify-items-center">
-          {agenda.map((item) => (
-            <div
-              key={item.id}
-              className="bg-white w-[410px] h-[245px] rounded-[10px] shadow-md border-t-[5px] border-[#FE4D01] p-6 text-left flex flex-col justify-between transition-transform duration-300 hover:-translate-y-2"
-            >
-              <div>
-                <div className="flex items-start gap-3 mb-3">
-                  <div className="w-6 h-6 rounded-full bg-[#FE4D01] mt-1"></div>
-                  <div>
-                    <p className="text-[#FE4D01] font-medium text-sm">
-                      {lang === "id" ? item.date_id : item.date_en}
-                    </p>
-                    <p className="text-gray-800 text-sm">{item.time}</p>
+          {agenda.length === 0 ? (
+            <p className="text-gray-200 italic col-span-full">
+              {lang === "id"
+                ? "Belum ada agenda yang tersedia."
+                : "No agenda available."}
+            </p>
+          ) : (
+            agenda.map((item) => (
+              <div
+                key={item.id}
+                className="bg-white w-[410px] h-[245px] rounded-[10px] shadow-md border-t-[5px] border-[#FE4D01] p-6 text-left flex flex-col justify-between transition-transform duration-300 hover:-translate-y-2"
+              >
+                <div>
+                  <div className="flex items-start gap-3 mb-3">
+                    <div className="w-6 h-6 rounded-full bg-[#FE4D01] mt-1"></div>
+                    <div>
+                      <p className="text-[#FE4D01] font-medium text-sm">
+                        {new Date(item.date).toLocaleDateString(
+                          lang === "id" ? "id-ID" : "en-US",
+                          {
+                            weekday: "long",
+                            day: "numeric",
+                            month: "long",
+                            year: "numeric",
+                          }
+                        )}
+                      </p>
+                      <p className="text-gray-800 text-sm">{item.time}</p>
+                    </div>
                   </div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-1">
+                    {lang === "id" ? item.title_id : item.title_en}
+                  </h3>
+                  <p className="text-sm text-gray-600 mb-4 leading-relaxed line-clamp-2">
+                    {lang === "id" ? item.desc_id : item.desc_en}
+                  </p>
                 </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-1">
-                  {lang === "id" ? item.title_id : item.title_en}
-                </h3>
-                <p className="text-sm text-gray-600 mb-4 leading-relaxed line-clamp-2">
-                  {lang === "id" ? item.desc_id : item.desc_en}
+                <p className="text-sm text-gray-700 font-medium mt-auto">
+                  {item.place}
                 </p>
               </div>
-              <p className="text-sm text-gray-700 font-medium mt-auto">
-                {item.place}
-              </p>
-            </div>
-          ))}
+            ))
+          )}
         </div>
 
-        {/* Button */}
+        {/* === Button === */}
         <div className="flex justify-center mt-14">
           <Link
-            href="#"
+            href="/informasi/agenda"
             className="px-6 py-3 md:px-8 md:py-3 bg-white rounded-[10px] shadow-[0_4px_10px_rgba(0,0,0,0.15)] hover:shadow-[0_6px_14px_rgba(254,77,1,0.3)] transition font-semibold text-[#FE4D01]"
           >
             {lang === "id" ? "Selengkapnya" : "View More"}
@@ -106,7 +112,7 @@ export default function Agenda() {
         </div>
       </div>
 
-      {/* Decorative Blocks */}
+      {/* === Decorative Blocks === */}
       <div className="absolute bottom-0 left-12.5 w-[50px] h-[50px] bg-[#FE4D01]" />
       <div className="absolute top-0 right-12.5 w-[50px] h-[50px] bg-[#FE4D01]" />
       <div className="absolute top-0 left-50 w-[50px] h-[50px] bg-white" />

@@ -15,6 +15,7 @@ interface Mitra {
 // base URL dari env (.env.local)
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+const BASE_URL = API_BASE_URL.replace("/api", "");
 
 export default function MitraIndustri() {
   const { lang } = useLang();
@@ -75,7 +76,7 @@ export default function MitraIndustri() {
                     className="w-[280px] sm:w-[320px] lg:w-[370px] h-[180px] bg-white border border-gray-100 rounded-tr-[70px] rounded-bl-[70px] flex items-center justify-center transition-transform duration-500 hover:scale-[1.04] shadow-md"
                   >
                     <img
-                      src={`http://localhost:8000${lang === "id" ? p.img_id : p.img_en}`}
+                      src={`${BASE_URL}${lang === "id" ? p.img_id : p.img_en}`}
                       alt={p.name}
                       loading="lazy"
                       className="max-h-[70%] max-w-[70%] object-contain"
