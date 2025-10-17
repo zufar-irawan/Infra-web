@@ -4,10 +4,10 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
-import DashHeader from "@/app/components/DashHeader";
 import { useEduData } from "@/app/edu/context";
 import { Calendar, FileText, Link as LinkIcon, Loader2, Download, ExternalLink } from "lucide-react";
 import TugasUploadModal from "@/app/components/subComponents/forTugas/TugasUploadModal";
+import Swal from "sweetalert2";
 
 // Types are defensive to tolerate partial payloads
 interface AssignmentFile {
@@ -72,6 +72,7 @@ export default function AssignmentDetailPage() {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isUploadOpen, setIsUploadOpen] = useState(false);
+  const [gradingBusyId, setGradingBusyId] = useState<string | null>(null);
 
   const hasSubmitted = useMemo(() => {
     if (user?.role !== 'siswa') return false;
@@ -80,6 +81,20 @@ export default function AssignmentDetailPage() {
     const subs = Array.isArray(data?.submissions) ? data!.submissions! : [];
     return subs.some((sub: any) => String(sub?.student_id ?? sub?.student?.id) === sid);
   }, [user?.role, student?.id, data?.submissions]);
+
+  // Student's own submission and grade (if any)
+  const mySubmission = useMemo(() => {
+    if (user?.role !== 'siswa') return null;
+    const sid = student?.id != null ? String(student.id) : "";
+    if (!sid) return null;
+    const subs = Array.isArray(data?.submissions) ? data!.submissions! : [];
+    return subs.find((sub: any) => String(sub?.student_id ?? sub?.student?.id) === sid) || null;
+  }, [user?.role, student?.id, data?.submissions]);
+
+  const myGrade = useMemo(() => {
+    const g = mySubmission?.grade ?? mySubmission?.score ?? mySubmission?.value;
+    return g !== undefined && g !== null && g !== "" ? g : null;
+  }, [mySubmission]);
 
   // Handle real upload after modal simulates progress
   const handleModalUploadComplete = async (picked: any[]) => {
@@ -118,7 +133,7 @@ export default function AssignmentDetailPage() {
       const res = await fetch("/api/tugas/submit", { method: "POST", body: fd });
       if (!res.ok) {
         const ct = res.headers.get('content-type') || '';
-        let errPayload: any = {};
+        let errPayload: any; // simplified: no redundant initializer
         if (ct.includes('application/json')) errPayload = await res.json().catch(() => ({}));
         else {
           const text = await res.text().catch(() => '');
@@ -213,7 +228,11 @@ export default function AssignmentDetailPage() {
     const url = buildFileUrl(file.path);
     try {
       const resp = await fetch(url);
-      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      if (!resp.ok) {
+        // If not ok, just open in a new tab as fallback instead of throwing
+        window.open(url, "_blank", "noopener,noreferrer");
+        return;
+      }
       const blob = await resp.blob();
       const dlUrl = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -253,6 +272,123 @@ export default function AssignmentDetailPage() {
     return { classStudents: classList, submittedIds: ids };
   }, [students, classId, data?.submissions]);
 
+  // Helpers to find a submission for a given student and extract its id
+  const findSubmissionByStudent = (studentId: any) => {
+    const subs = Array.isArray(data?.submissions) ? data!.submissions! : [];
+    const sidStr = String(studentId);
+    return subs.find((sub: any) => String(sub?.student_id ?? sub?.student?.id) === sidStr);
+  };
+  const getSubmissionId = (sub: any) => {
+    return (
+      sub?.id ??
+      sub?.submission_id ??
+      sub?.pivot?.id ??
+      sub?.pivot?.submission_id ??
+      sub?.assignment_submission_id ??
+      null
+    );
+  };
+
+  const handleGiveGrade = async (targetStudent: any) => {
+    try {
+      const sub = findSubmissionByStudent(targetStudent?.id);
+      if (!sub) {
+        await Swal.fire({ icon: "info", title: "Belum mengumpulkan", text: "Siswa belum mengumpulkan, tidak bisa memberikan nilai." });
+        return;
+      }
+      const submissionId = getSubmissionId(sub);
+      if (!submissionId) {
+        await Swal.fire({ icon: "error", title: "ID submission tidak ditemukan" });
+        return;
+      }
+
+      const currentGrade = sub?.grade ?? sub?.score ?? sub?.value ?? "";
+      const currentFeedback = sub?.feedback ?? "";
+
+      setGradingBusyId(String(targetStudent?.id ?? ""));
+      const result = await Swal.fire<{ grade: string | number; feedback?: string } | undefined>({
+        title: (currentGrade !== "" ? "Edit Nilai" : "Beri Nilai"),
+        html: `
+          <div style="text-align:left">
+            <label for="swal-input-grade" style="font-size:12px;color:#4b5563;">Nilai (0-100) <span style="color:#ef4444">*</span></label>
+            <input id="swal-input-grade" class="swal2-input" placeholder="Contoh: 85" value="${String(currentGrade)}" inputmode="numeric" />
+            <label for="swal-input-feedback" style="font-size:12px;color:#4b5563;margin-top:6px;display:block;">Feedback (opsional)</label>
+            <textarea id="swal-input-feedback" class="swal2-textarea" placeholder="Masukan feedback untuk siswa" rows="3">${String(currentFeedback)}</textarea>
+          </div>
+        `,
+        focusConfirm: false,
+        showCancelButton: true,
+        confirmButtonText: "Simpan",
+        cancelButtonText: "Batal",
+        showLoaderOnConfirm: true,
+        allowOutsideClick: () => !Swal.isLoading(),
+        preConfirm: async () => {
+          const gradeEl = document.getElementById("swal-input-grade") as HTMLInputElement | null;
+          const feedbackEl = document.getElementById("swal-input-feedback") as HTMLTextAreaElement | null;
+          const gradeInput = gradeEl?.value?.trim() ?? "";
+          const feedbackInput = feedbackEl?.value?.trim() ?? "";
+
+          if (!gradeInput) {
+            Swal.showValidationMessage("Nilai wajib diisi");
+            return;
+          }
+
+          const isNumeric = !Number.isNaN(Number(gradeInput));
+          if (isNumeric) {
+            const n = Number(gradeInput);
+            if (n < 0 || n > 100) {
+              Swal.showValidationMessage("Nilai harus antara 0 dan 100");
+              return;
+            }
+          }
+
+          try {
+            const res = await fetch(`/api/tugas/${encodeURIComponent(String(submissionId))}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ grade: gradeInput, ...(feedbackInput ? { feedback: feedbackInput } : {}) }),
+            });
+            const ct = res.headers.get('content-type') || '';
+            const payload = ct.includes('application/json') ? await res.json().catch(() => ({})) : await res.text().catch(() => '');
+            if (!res.ok) {
+              const msg = typeof payload === 'string' ? payload : (payload?.message || payload?.error || 'Gagal menyimpan nilai');
+              // Avoid throwing; use SweetAlert validation message instead
+              Swal.showValidationMessage(msg);
+              return;
+            }
+            return { grade: isNumeric ? Number(gradeInput) : gradeInput, feedback: feedbackInput || undefined };
+          } catch (err: any) {
+            Swal.showValidationMessage(err?.message || 'Gagal menyimpan nilai');
+            return;
+          }
+        },
+      });
+
+      if (result.isConfirmed && result.value) {
+        const { grade, feedback } = result.value;
+        setData((prev) => {
+          if (!prev) return prev;
+          const list = Array.isArray(prev.submissions) ? [...prev.submissions] : [];
+          const idx = list.findIndex((x: any) => String(x?.student_id ?? x?.student?.id) === String(targetStudent?.id));
+          if (idx >= 0) {
+            const updated = { ...list[idx] } as any;
+            updated.grade = grade as any;
+            if (feedback !== undefined) updated.feedback = feedback;
+            list[idx] = updated;
+          }
+          return { ...prev, submissions: list } as any;
+        });
+
+        await Swal.fire({ icon: "success", title: "Nilai berhasil disimpan" });
+      }
+    } catch (e) {
+      console.error("Grade error:", e);
+      await Swal.fire({ icon: "error", title: "Terjadi kesalahan", text: "Gagal menyimpan nilai." });
+    } finally {
+      setGradingBusyId(null);
+    }
+  };
+
   return (
     <div className="overflow-y-auto min-h-screen">
       {/*<DashHeader user={user} student={student} />*/}
@@ -279,9 +415,15 @@ export default function AssignmentDetailPage() {
             <div className="flex items-center gap-2">
               {user?.role === 'siswa' && (
                 hasSubmitted ? (
-                  <span className="px-3 py-2 text-sm rounded-lg bg-emerald-100 text-emerald-700">
-                    Sudah mengumpulkan
-                  </span>
+                  myGrade != null ? (
+                    <span className="px-3 py-2 text-sm rounded-lg bg-emerald-100 text-emerald-700">
+                      Nilai Anda: {String(myGrade)}
+                    </span>
+                  ) : (
+                    <span className="px-3 py-2 text-sm rounded-lg bg-emerald-100 text-emerald-700">
+                      Sudah mengumpulkan
+                    </span>
+                  )
                 ) : (
                   <button
                     onClick={() => setIsUploadOpen(true)}
@@ -403,6 +545,8 @@ export default function AssignmentDetailPage() {
                   {classStudents.map((s: any) => {
                     const sid = s?.id;
                     const submitted = sid != null && submittedIds.has(String(sid));
+                    const sub = submitted ? findSubmissionByStudent(sid) : null;
+                    const gradeVal = sub?.grade ?? sub?.score ?? sub?.value;
                     return (
                       <li key={String(sid)} className="flex items-center justify-between gap-3 p-3">
                         <div className="min-w-0 flex-1">
@@ -410,12 +554,24 @@ export default function AssignmentDetailPage() {
                           {s?.nis && (
                             <p className="text-xs text-gray-500 truncate">NIS: {s.nis}</p>
                           )}
+                          {submitted && gradeVal != null && (
+                            <p className="text-xs text-emerald-700 mt-1">Nilai: {String(gradeVal)}</p>
+                          )}
                         </div>
-                        <div>
+                        <div className="flex items-center gap-2">
                           {submitted ? (
-                            <span className="inline-flex items-center gap-1 text-xs px-3 py-1 rounded-full bg-green-100 text-green-700">
-                              Sudah mengerjakan
-                            </span>
+                            <>
+                              <span className="inline-flex items-center gap-1 text-xs px-3 py-1 rounded-full bg-green-100 text-green-700">
+                                Sudah mengerjakan
+                              </span>
+                              <button
+                                onClick={() => { void handleGiveGrade(s); }}
+                                className="px-3 py-1.5 text-xs bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:opacity-50"
+                                disabled={gradingBusyId === String(sid)}
+                              >
+                                {gradingBusyId === String(sid) ? 'Menyimpan...' : (gradeVal != null ? 'Edit Nilai' : 'Beri Nilai')}
+                              </button>
+                            </>
                           ) : (
                             <span className="inline-flex items-center gap-1 text-xs px-3 py-1 rounded-full bg-orange-100 text-orange-700">
                               Belum dikerjakan

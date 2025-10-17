@@ -9,7 +9,7 @@ import { useEduData } from "@/app/edu/context";
 import CreateTaskModal from "@/app/components/CreateTaskModal";
 
 export default function Tugas() {
-    const { user, student, tugas, teacher, subjects, classes, rooms } = useEduData();
+    const { user, student, tugas, teacher, teachers, subjects, classes, rooms } = useEduData();
 
     const [tugasPending, setTugasPending] = useState<any[]>([])
     const [tugasSelesai, setTugasSelesai] = useState<any[]>([])
@@ -29,10 +29,13 @@ export default function Tugas() {
 
         let tugasList: any[] = [];
         if (user?.role === 'guru') {
+
             // Untuk guru, filter tugas yang dibuat olehnya (tanpa memfilter teacher)
             const creatorId = teacher?.user_id ?? user.id;
             tugasList = tugas.filter((t: any) => (t.created_by ?? t.teacher_id) === creatorId);
+
         } else if (user?.role === 'siswa' && classId) {
+
             // Untuk siswa, filter tugas berdasarkan classId
             tugasList = tugas.filter((t: any) => t.class_id === classId);
         } else {
@@ -40,18 +43,26 @@ export default function Tugas() {
             return;
         }
 
-        // Jangan gunakan teacher.find karena teacher sudah objek tunggal
+        // Map tugas dengan teacher yang sesuai
         const tugasWithAssignedTeacher = tugasList.map((t: any) => {
+
             if (user?.role === 'guru') {
                 // Untuk guru, lampirkan objek teacher yang sudah tersedia
                 return { ...t, teacher };
+            } else if (user?.role === 'siswa') {
+                // Untuk siswa, cari teacher yang sesuai dari array teachers berdasarkan created_by
+                const teacherForThisTask = Array.isArray(teachers)
+                    ? teachers.find((tch: any) => tch.user_id === t.created_by)
+                    : null;
+                return { ...t, teacher: teacherForThisTask };
             }
-            // Untuk siswa, biarkan tugas apa adanya (asumsikan API sudah menyertakan info guru jika perlu)
+
             return t;
         });
 
         setTugasWithTeacher(tugasWithAssignedTeacher);
-    }, [tugas, teacher, classId, user]);
+
+    }, [tugas, teacher, teachers, classId, user]);
 
     useEffect(() => {
         if (!tugasWithTeacher) return;
