@@ -128,6 +128,7 @@ export default function Sidebar({ isOpen, onClose, user }: SidebarProps) {
   /** === Role-based Menu === **/
   const adminMenu = [
     { href: "/edu/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+    { href: "/edu/guru", icon: Users, label: "Guru" },
     { href: "/edu/siswa", icon: Users, label: "Siswa" },
     { href: "/edu/kelas", icon: Shapes, label: "Kelas" },
     { href: "/edu/tugas", icon: BookMarked, label: "Tugas" },
@@ -138,6 +139,7 @@ export default function Sidebar({ isOpen, onClose, user }: SidebarProps) {
   ];
 
   const presensiMenu = [
+    { href: "/edu/presensi", icon: Clipboard, label: "Presensi"},
     { href: "/edu/setelan", icon: Bolt, label: "Setelan" },
     { href: "/edu/perangkat", icon: Smartphone, label: "Perangkat" },
     { href: "/edu/rfid", icon: IdCard, label: "RFID" },

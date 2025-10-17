@@ -17,11 +17,19 @@ class LmsAttendanceController extends Controller
 
         // kalau admin/guru → lihat semua
         if (in_array($user->role, ['admin', 'guru'])) {
-            $attendances = LmsAttendance::with(['class', 'student'])->get();
+            $attendances = LmsAttendance::with(['class', 'student.user'])->get();
         } else {
             // kalau siswa → hanya lihat absensi dirinya
-            $attendances = LmsAttendance::with(['class', 'student'])
-                ->where('student_id', $user->id)
+            $studentRecord = $user->student;
+
+            $attendances = LmsAttendance::with(['class', 'student.user'])
+                ->when($studentRecord, function ($query) use ($studentRecord) {
+                    $query->where('student_id', $studentRecord->id);
+                }, function ($query) use ($user) {
+                    $query->whereHas('student', function ($q) use ($user) {
+                        $q->where('user_id', $user->id);
+                    });
+                })
                 ->get();
         }
 
@@ -76,6 +84,8 @@ class LmsAttendanceController extends Controller
             'description'
         ]));
 
+        $attendance->load(['class', 'student.user']);
+
         return response()->json([
             'success' => true,
             'message' => 'Attendance record created successfully',
@@ -97,7 +107,7 @@ class LmsAttendanceController extends Controller
             ], 403);
         }
 
-        $attendance = LmsAttendance::with(['class', 'student'])->find($id);
+    $attendance = LmsAttendance::with(['class', 'student.user'])->find($id);
 
         if (!$attendance) {
             return response()->json([
@@ -166,6 +176,8 @@ class LmsAttendanceController extends Controller
             'description'
         ]));
 
+        $attendance->load(['class', 'student.user']);
+
         return response()->json([
             'success' => true,
             'message' => 'Attendance record updated successfully',
@@ -218,7 +230,7 @@ class LmsAttendanceController extends Controller
             ], 403);
         }
 
-        $query = LmsAttendance::with(['class', 'student']);
+    $query = LmsAttendance::with(['class', 'student.user']);
 
         if ($request->has('class_id')) {
             $query->where('class_id', $request->class_id);

@@ -8,37 +8,83 @@ use Illuminate\Http\Request;
 
 class LmsClassController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $classes = LmsClass::with(['students', 'teachers'])->paginate(15);
+        $perPage = (int) $request->input('per_page', 15) ?: 15;
+
+        $classes = LmsClass::with([
+            'students.user',
+            'classStudents.student.user',
+            'teachers.user',
+            'classTeachers.teacher.user',
+            'classTeachers.subject',
+        ])
+            ->orderBy('name')
+            ->paginate($perPage);
+
         return response()->json($classes);
     }
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|unique:lms_classes,name',
             'description' => 'nullable|string',
             'status' => 'required|in:aktif,nonaktif',
         ]);
 
-        $class = LmsClass::create($request->all());
-        return response()->json($class, 201);
+        $payload = [
+            'name' => $validated['name'],
+            'description' => $validated['description'] ?? null,
+            'status' => $validated['status'] ?? 'aktif',
+        ];
+
+        $class = LmsClass::create($payload);
+
+        return response()->json(
+            $class->load([
+                'students.user',
+                'classStudents.student.user',
+                'teachers.user',
+                'classTeachers.teacher.user',
+                'classTeachers.subject',
+            ]),
+            201
+        );
     }
 
     public function show(LmsClass $class)
     {
-        return response()->json($class->load(['students', 'teachers']));
+        return response()->json(
+            $class->load([
+                'students.user',
+                'classStudents.student.user',
+                'teachers.user',
+                'classTeachers.teacher.user',
+                'classTeachers.subject',
+            ])
+        );
     }
 
     public function update(Request $request, LmsClass $class)
     {
-        $request->validate([
-            'name' => 'sometimes|unique:lms_classes,name,' . $class->id,
+        $validated = $request->validate([
+            'name' => 'sometimes|string|unique:lms_classes,name,' . $class->id,
+            'description' => 'sometimes|nullable|string',
+            'status' => 'sometimes|in:aktif,nonaktif',
         ]);
 
-        $class->update($request->all());
-        return response()->json($class);
+        $class->update($validated);
+
+        return response()->json(
+            $class->load([
+                'students.user',
+                'classStudents.student.user',
+                'teachers.user',
+                'classTeachers.teacher.user',
+                'classTeachers.subject',
+            ])
+        );
     }
 
     public function destroy(LmsClass $class)
