@@ -9,6 +9,10 @@ export default function Identitas() {
   const { lang } = useLang();
   const [showModal, setShowModal] = useState(false);
 
+  // === Tentukan gambar sesuai bahasa ===
+  const sejarahImage =
+    lang === "id" ? "/svg/sejarah.svg" : "/svg/sejarah-eng.svg";
+
   return (
     <>
       {/* Spacer biar tidak ketiban navbar */}
@@ -84,7 +88,7 @@ export default function Identitas() {
 
         {/* === Section Sejarah === */}
         <section className="relative w-full bg-white py-20 flex flex-col items-center">
-          {/* Dekorasi kotak - disembunyikan di mobile */}
+          {/* Dekorasi kotak */}
           <div className="absolute top-0 left-0 w-[50px] h-[50px] bg-[#243771] hidden sm:block" />
           <div className="absolute top-12 left-12 w-[50px] h-[50px] bg-[#243771] hidden sm:block" />
 
@@ -96,7 +100,7 @@ export default function Identitas() {
             </h2>
           </div>
 
-          {/* Gambar sejarah dengan overlay hover */}
+          {/* Gambar sejarah bilingual */}
           <div
             onClick={() => setShowModal(true)}
             className="
@@ -106,14 +110,18 @@ export default function Identitas() {
             "
           >
             <img
-              src="/svg/sejarah.svg"
-              alt={lang === "id" ? "Sejarah SMK Prestasi Prima" : "History of SMK Prestasi Prima"}
+              src={sejarahImage}
+              alt={
+                lang === "id"
+                  ? "Sejarah SMK Prestasi Prima"
+                  : "History of SMK Prestasi Prima"
+              }
               className="
                 w-full object-contain rounded-lg
                 hover:scale-[1.02] transition-transform duration-500
               "
             />
-            {/* Overlay gelap saat hover */}
+            {/* Overlay hover */}
             <div
               className="
                 absolute inset-0 bg-black/30
@@ -123,13 +131,15 @@ export default function Identitas() {
               "
             >
               <span className="text-white text-lg font-medium bg-black/40 px-4 py-2 rounded-md">
-                {lang === "id" ? "Klik untuk melihat gambar" : "Click to view image"}
+                {lang === "id"
+                  ? "Klik untuk melihat gambar"
+                  : "Click to view image"}
               </span>
             </div>
           </div>
         </section>
 
-        {/* === Modal fullscreen untuk sejarah === */}
+        {/* === Modal fullscreen Sejarah === */}
         {showModal && (
           <div
             className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
@@ -155,8 +165,12 @@ export default function Identitas() {
               </h3>
 
               <img
-                src="/svg/sejarah.svg"
-                alt={lang === "id" ? "Sejarah SMK Prestasi Prima" : "History of SMK Prestasi Prima"}
+                src={sejarahImage}
+                alt={
+                  lang === "id"
+                    ? "Sejarah SMK Prestasi Prima"
+                    : "History of SMK Prestasi Prima"
+                }
                 className="w-full object-contain rounded-lg"
               />
             </div>
@@ -166,8 +180,12 @@ export default function Identitas() {
         {/* === Section Gedung === */}
         <section className="relative w-full bg-white overflow-hidden">
           <img
-            src="/svg/gedung.svg"
-            alt={lang === "id" ? "Gedung SMK Prestasi Prima" : "Prestasi Prima Building"}
+            src="/avif/gedung.avif"
+            alt={
+              lang === "id"
+                ? "Gedung SMK Prestasi Prima"
+                : "Prestasi Prima Building"
+            }
             className="
               w-full h-[40vh] sm:h-[50vh] lg:h-screen
               object-cover object-center
