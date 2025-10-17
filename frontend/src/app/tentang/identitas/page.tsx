@@ -56,7 +56,7 @@ export default function Identitas() {
               {/* Gambar */}
               <div>
                 <img
-                  src="/pp.png"
+                  src="/ged.jpg"
                   alt="SMK Prestasi Prima"
                   className="rounded-lg w-full h-auto object-cover aspect-[4/3] hover:scale-[1.03] hover:shadow-xl transition-transform duration-500"
                 />
