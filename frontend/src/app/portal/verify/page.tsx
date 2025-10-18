@@ -43,31 +43,31 @@ export default function VerifyCodePage() {
 
     setLoading(true);
     try {
-      // 🔥 Kirim ke Next.js API Route (proxy ke Laravel)
+      // 🔥 Kirim ke backend (hybrid verify-code route)
       const res = await axios.post("/api/portal/verify-code", {
         email,
         code: fullCode,
       });
 
       if (res.data.success) {
+        // ✅ Cookie sudah tersimpan di response yang sama
         MySwal.fire({
           icon: "success",
           title: "Verifikasi Berhasil!",
-          text: "Kode benar. Anda akan diarahkan ke dashboard.",
+          text: "Selamat datang di Portal Admin.",
           showConfirmButton: false,
-          timer: 1800,
+          timer: 1400,
           background: "#1e2b63",
           color: "#fff",
         });
 
-        setTimeout(() => {
-          router.push("/portal/dashboard");
-        }, 1800);
+        // ⏩ Langsung redirect ke dashboard (tanpa delay)
+        router.push("/portal/dashboard");
       } else {
         MySwal.fire({
           icon: "error",
           title: "Verifikasi Gagal!",
-          text: res.data.message || "Kode salah atau sudah kadaluarsa.",
+          text: res.data.message || "Kode salah atau kadaluarsa.",
           confirmButtonColor: "#FE4D01",
           background: "#1e2b63",
           color: "#fff",
@@ -92,12 +92,10 @@ export default function VerifyCodePage() {
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-[#243771] relative">
-      {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#243771] via-[#1e2b63] to-[#111b45]" />
       <div className="absolute w-[400px] h-[400px] bg-[#FE4D01]/20 rounded-full blur-[120px] -top-20 -left-20" />
 
-      {/* Card */}
-      <div className="relative z-10 bg-white/10 backdrop-blur-xl border border-white/10 rounded-2xl p-8 w-[90%] max-w-md text-center">
+      <div className="relative z-10 bg-white/10 backdrop-blur-xl border border-white/10 rounded-2xl p-8 w-[90%] max-w-md text-center shadow-xl">
         <button
           onClick={() => router.push("/portal")}
           className="absolute left-6 top-6 text-white/70 hover:text-white"

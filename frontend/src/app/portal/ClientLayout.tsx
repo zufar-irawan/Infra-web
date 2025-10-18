@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import Sidebar from "./components/Sidebar";
 
@@ -11,13 +11,12 @@ export default function ClientLayout({
   token: string | null;
   children: React.ReactNode;
 }) {
-  const router = useRouter();
   const pathname = usePathname();
   const isAuthPage =
     pathname === "/portal" || pathname.startsWith("/portal/verify");
   const [isMobile, setIsMobile] = useState(false);
 
-  // Deteksi lebar layar
+  // 🔹 Deteksi lebar layar saja (layout logic)
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 1024);
     handleResize();
@@ -25,24 +24,11 @@ export default function ClientLayout({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Redirect jika belum login dan bukan halaman auth
-  useEffect(() => {
-    if (!token && !isAuthPage) {
-      router.replace("/portal");
-    }
-  }, [token, isAuthPage, router]);
-
-  // Halaman login/verify jangan render sidebar
+  // 🔹 Halaman login/verify jangan render sidebar
   if (isAuthPage) return <>{children}</>;
 
-  // Kalau belum login, tampilkan loader redirect
-  if (!token) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-[#1e2b63] text-white">
-        Mengalihkan ke halaman login...
-      </div>
-    );
-  }
+  // 🔹 Hilangkan semua redirect & tampilan “mengalihkan”
+  // Middleware sudah mengurus login protection
 
   // Layout admin tampil penuh
   return (

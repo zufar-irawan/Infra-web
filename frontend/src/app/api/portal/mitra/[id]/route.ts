@@ -6,9 +6,11 @@ import { cookies } from "next/headers";
  * PUT /api/portal/mitra/[id] → Update mitra
  * DELETE /api/portal/mitra/[id] → Hapus mitra
  */
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
-  const { id } = await params;
+
+// === UPDATE MITRA ===
+export async function PUT(req: Request, context: any) {
   try {
+    const id = context.params?.id; // ambil ID dari URL
     const formData = await req.formData();
     const cookieStore = await cookies();
     const token = cookieStore.get("portal-auth-token")?.value;
@@ -31,9 +33,10 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   }
 }
 
-export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
-  const { id } = await params;
+// === HAPUS MITRA ===
+export async function DELETE(_req: Request, context: any) {
   try {
+    const id = context.params?.id; // ambil ID dari URL
     const cookieStore = await cookies();
     const token = cookieStore.get("portal-auth-token")?.value;
 
