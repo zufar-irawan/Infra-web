@@ -16,19 +16,18 @@ interface News {
   date: string;
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://api.smkprestasiprima.sch.id/api";
-
 export default function AdminNewsPage() {
   const [news, setNews] = useState<News[]>([]);
   const [form, setForm] = useState<Partial<News> & { imageFile?: File | null }>({});
   const [editId, setEditId] = useState<number | null>(null);
   const [isModalOpen, setModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
 
-  // === Ambil data dari API ===
+  // === Ambil data dari API Next.js (proxy ke Laravel)
   const fetchNews = async () => {
     try {
-      const res = await axios.get(`${API_BASE_URL}/news`);
+      const res = await axios.get("/api/portal/berita");
       if (res.data.success) setNews(res.data.data);
     } catch (err) {
       console.error("Gagal memuat berita:", err);
@@ -46,7 +45,7 @@ export default function AdminNewsPage() {
     if (!file) return;
 
     const allowed = [".webp", ".jpg", ".jpeg", ".png"];
-    if (!allowed.some((ext) => file.name.endsWith(ext))) {
+    if (!allowed.some((ext) => file.name.toLowerCase().endsWith(ext))) {
       Swal.fire("Format Salah", "Gunakan gambar .webp, .jpg, atau .png", "warning");
       return;
     }
@@ -56,13 +55,7 @@ export default function AdminNewsPage() {
 
   // === Simpan data (Tambah / Edit) ===
   const handleSave = async () => {
-    if (
-      !form.title_id ||
-      !form.title_en ||
-      !form.desc_id ||
-      !form.desc_en ||
-      !form.date
-    ) {
+    if (!form.title_id || !form.title_en || !form.desc_id || !form.desc_en || !form.date) {
       Swal.fire("Lengkapi Data", "Semua field wajib diisi!", "warning");
       return;
     }
@@ -76,11 +69,14 @@ export default function AdminNewsPage() {
     if (form.imageFile) formData.append("image", form.imageFile);
 
     try {
-      const url = editId
-        ? `${API_BASE_URL}/news/${editId}`
-        : `${API_BASE_URL}/news`;
+      setLoading(true);
+      const url = editId ? `/api/portal/berita/${editId}` : `/api/portal/berita`;
+      const method = editId ? "put" : "post";
 
-      await axios.post(url, formData, {
+      await axios({
+        method,
+        url,
+        data: formData,
         headers: { "Content-Type": "multipart/form-data" },
       });
 
@@ -95,8 +91,10 @@ export default function AdminNewsPage() {
       setEditId(null);
       fetchNews();
     } catch (err: any) {
-      console.error("Gagal menyimpan berita:", err);
+      console.error("❌ Gagal menyimpan berita:", err);
       Swal.fire("Gagal", err.response?.data?.message || "Upload gagal", "error");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -116,7 +114,7 @@ export default function AdminNewsPage() {
     if (!result.isConfirmed) return;
 
     try {
-      await axios.delete(`${API_BASE_URL}/news/${id}`);
+      await axios.delete(`/api/portal/berita/${id}`);
       Swal.fire("Terhapus!", "Berita berhasil dihapus.", "success");
       fetchNews();
     } catch {
@@ -273,12 +271,14 @@ export default function AdminNewsPage() {
               <textarea
                 placeholder="Deskripsi (Indonesia)"
                 className="border p-2 w-full rounded"
+                rows={3}
                 value={form.desc_id || ""}
                 onChange={(e) => setForm({ ...form, desc_id: e.target.value })}
               />
               <textarea
                 placeholder="Deskripsi (English)"
                 className="border p-2 w-full rounded"
+                rows={3}
                 value={form.desc_en || ""}
                 onChange={(e) => setForm({ ...form, desc_en: e.target.value })}
               />
@@ -292,13 +292,13 @@ export default function AdminNewsPage() {
                 />
                 <input
                   type="file"
-                  accept=".webp,.jpg,.png"
+                  accept=".webp,.jpg,.jpeg,.png"
                   className="border p-2 rounded"
                   onChange={handleImageUpload}
                 />
               </div>
 
-              {form.image || form.imageFile ? (
+              {(form.image || form.imageFile) && (
                 <div className="mt-2 text-center">
                   <Image
                     src={
@@ -312,7 +312,7 @@ export default function AdminNewsPage() {
                     className="rounded border object-cover mx-auto"
                   />
                 </div>
-              ) : null}
+              )}
             </div>
 
             <div className="mt-6 flex justify-end gap-3">
@@ -324,9 +324,10 @@ export default function AdminNewsPage() {
               </button>
               <button
                 onClick={handleSave}
-                className="px-4 py-2 bg-[#FE4D01] text-white rounded-lg hover:bg-[#fe5d20]"
+                disabled={loading}
+                className="px-4 py-2 bg-[#FE4D01] text-white rounded-lg hover:bg-[#fe5d20] transition flex items-center gap-2"
               >
-                Simpan
+                {loading ? "Menyimpan..." : "Simpan"}
               </button>
             </div>
           </div>

@@ -10,9 +10,6 @@ interface Achievement {
   poster: string; // contoh: "storage/achievements/namafile.webp"
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://api.smkprestasiprima.sch.id/api";
-const BASE_URL = API_BASE_URL.replace(/\/api$/, "");
-
 export default function PrestasiPage() {
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [file, setFile] = useState<File | null>(null);
@@ -20,13 +17,13 @@ export default function PrestasiPage() {
   const [isModalOpen, setModalOpen] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
 
-  // === Ambil data dari API ===
+  // === Ambil data dari API (proxy Next.js) ===
   const fetchAchievements = async () => {
     try {
-      const res = await axios.get(`${API_BASE_URL}/achievements`);
+      const res = await axios.get("/api/portal/prestasi");
       if (res.data.success) setAchievements(res.data.data);
     } catch (err) {
-      console.error("Gagal memuat data prestasi:", err);
+      console.error("❌ Gagal memuat data prestasi:", err);
       Swal.fire("Gagal", "Tidak bisa memuat data prestasi", "error");
     }
   };
@@ -58,8 +55,8 @@ export default function PrestasiPage() {
 
     try {
       const url = editId
-        ? `${API_BASE_URL}/achievements/${editId}`
-        : `${API_BASE_URL}/achievements`;
+        ? `/api/portal/prestasi/${editId}`
+        : `/api/portal/prestasi`;
 
       await axios.post(url, formData, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -76,7 +73,7 @@ export default function PrestasiPage() {
       setEditId(null);
       fetchAchievements();
     } catch (err: any) {
-      console.error("Gagal menyimpan data:", err);
+      console.error("❌ Gagal menyimpan data:", err);
       Swal.fire("Gagal", err.response?.data?.message || "Upload gagal", "error");
     }
   };
@@ -104,7 +101,7 @@ export default function PrestasiPage() {
     if (!result.isConfirmed) return;
 
     try {
-      await axios.delete(`${API_BASE_URL}/achievements/${id}`);
+      await axios.delete(`/api/portal/prestasi/${id}`);
       Swal.fire("Terhapus!", "Data prestasi telah dihapus.", "success");
       fetchAchievements();
     } catch (err) {
@@ -162,11 +159,7 @@ export default function PrestasiPage() {
                   <td className="p-3 font-medium">{i + 1}</td>
                   <td className="p-3 text-center">
                     <img
-                      src={
-                        a.poster.startsWith("http")
-                          ? a.poster
-                          : `${BASE_URL}/${a.poster.replace(/^\/+/, "")}`
-                      }
+                      src={a.poster.startsWith("http") ? a.poster : `/storage/${a.poster}`}
                       alt={`Prestasi ${a.id}`}
                       className="w-[120px] h-auto rounded-md border object-contain mx-auto"
                     />

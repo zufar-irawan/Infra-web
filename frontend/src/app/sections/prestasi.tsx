@@ -113,7 +113,7 @@ export default function Prestasi() {
               {/* Tombol Selengkapnya — muncul di bawah card kanan */}
               <div className="mt-8 w-full flex justify-center md:justify-end">
                 <a
-                  href="/profil/prestasi"
+                  href="/kegiatan-siswa/prestasi"
                   className="inline-block px-8 py-3 md:px-10 md:py-3.5 rounded-lg bg-[#243771] text-white text-sm md:text-base font-semibold shadow-[0_4px_10px_rgba(0,0,0,0.2)] hover:shadow-[0_6px_14px_rgba(0,0,0,0.25)] hover:bg-[#1a2a5c] transition-all duration-300 text-center"
                 >
                   {lang === "id" ? "Selengkapnya" : "More"}

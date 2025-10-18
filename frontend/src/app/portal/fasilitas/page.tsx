@@ -13,8 +13,6 @@ interface Facility {
   category: string;
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://api.smkprestasiprima.sch.id/api";
-
 export default function FasilitasPage() {
   const [facilities, setFacilities] = useState<Facility[]>([]);
   const [form, setForm] = useState<{ img_id: File | null; img_en: File | null; category: string }>({
@@ -33,13 +31,13 @@ export default function FasilitasPage() {
     "Fasilitas Umum",
   ];
 
-  // === Ambil data dari API ===
+  // === Ambil data fasilitas dari Next.js API ===
   const fetchFacilities = async () => {
     try {
-      const res = await axios.get(`${API_BASE_URL}/facilities`);
+      const res = await axios.get("/api/portal/facilities");
       if (res.data.success) setFacilities(res.data.data);
     } catch (err) {
-      console.error("Gagal memuat data fasilitas:", err);
+      console.error("❌ Gagal memuat data fasilitas:", err);
       Swal.fire("Gagal", "Tidak bisa memuat data fasilitas", "error");
     }
   };
@@ -66,20 +64,20 @@ export default function FasilitasPage() {
 
   // === Simpan data (tambah / edit) ===
   const handleSave = async () => {
-    if (!form.img_id || !form.img_en || !form.category) {
+    if (!form.category) {
       Swal.fire("Lengkapi Data", "Semua field harus diisi.", "warning");
       return;
     }
 
     const formData = new FormData();
     formData.append("category", form.category);
-    formData.append("img_id", form.img_id);
-    formData.append("img_en", form.img_en);
+    if (form.img_id) formData.append("img_id", form.img_id);
+    if (form.img_en) formData.append("img_en", form.img_en);
 
     try {
       const url = editId
-        ? `${API_BASE_URL}/facilities/${editId}`
-        : `${API_BASE_URL}/facilities`;
+        ? `/api/portal/facilities/${editId}`
+        : `/api/portal/facilities`;
 
       await axios.post(url, formData, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -96,7 +94,7 @@ export default function FasilitasPage() {
       setEditId(null);
       fetchFacilities();
     } catch (err: any) {
-      console.error("Gagal menyimpan data:", err);
+      console.error("❌ Gagal menyimpan data:", err);
       Swal.fire("Gagal", err.response?.data?.message || "Upload gagal", "error");
     }
   };
@@ -128,7 +126,7 @@ export default function FasilitasPage() {
     if (!result.isConfirmed) return;
 
     try {
-      await axios.delete(`${API_BASE_URL}/facilities/${id}`);
+      await axios.delete(`/api/portal/facilities/${id}`);
       Swal.fire("Terhapus!", "Data fasilitas telah dihapus.", "success");
       fetchFacilities();
     } catch (err) {
@@ -250,6 +248,7 @@ export default function FasilitasPage() {
               {editId ? "Edit Fasilitas" : "Tambah Fasilitas"}
             </h2>
 
+            {/* Form Inputs */}
             <div className="space-y-4">
               <div>
                 <label className="text-sm font-medium text-gray-600 mb-1 block">
@@ -294,6 +293,7 @@ export default function FasilitasPage() {
               </div>
             </div>
 
+            {/* Tombol Aksi */}
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => setModalOpen(false)}

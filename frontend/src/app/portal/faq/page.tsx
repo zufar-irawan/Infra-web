@@ -16,9 +16,6 @@ interface FaqItem {
   a_en: string;
 }
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://api.smkprestasiprima.sch.id/api";
-
 export default function AdminFaqPage() {
   const [faqList, setFaqList] = useState<FaqItem[]>([]);
   const [form, setForm] = useState<Partial<FaqItem>>({});
@@ -26,12 +23,11 @@ export default function AdminFaqPage() {
   const [isModalOpen, setModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // === Ambil Data FAQ dari API ===
+  // === Ambil Data FAQ dari API Proxy ===
   const fetchFaqs = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${API_BASE_URL}/faqs`);
-      // Laravel resource bisa nested (pagination)
+      const res = await axios.get("/api/portal/faq");
       setFaqList(res.data.data?.data || res.data.data || []);
     } catch (err) {
       console.error(err);
@@ -54,16 +50,10 @@ export default function AdminFaqPage() {
 
     try {
       if (editId) {
-        // Update FAQ
-        await axios.put(`${API_BASE_URL}/faqs/${editId}`, form, {
-          headers: { "Content-Type": "application/json" },
-        });
+        await axios.put(`/api/portal/faq/${editId}`, form);
         MySwal.fire("Berhasil", "FAQ berhasil diperbarui.", "success");
       } else {
-        // Tambah FAQ baru
-        await axios.post(`${API_BASE_URL}/faqs`, form, {
-          headers: { "Content-Type": "application/json" },
-        });
+        await axios.post(`/api/portal/faq`, form);
         MySwal.fire("Berhasil", "FAQ berhasil ditambahkan.", "success");
       }
 
@@ -78,7 +68,7 @@ export default function AdminFaqPage() {
   };
 
   // === Hapus FAQ ===
-  const handleDelete = (id: number) => {
+  const handleDelete = async (id: number) => {
     MySwal.fire({
       title: "Hapus FAQ?",
       text: "Data yang dihapus tidak dapat dikembalikan.",
@@ -91,9 +81,9 @@ export default function AdminFaqPage() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axios.delete(`${API_BASE_URL}/faqs/${id}`);
-          fetchFaqs();
+          await axios.delete(`/api/portal/faq/${id}`);
           MySwal.fire("Terhapus!", "FAQ berhasil dihapus.", "success");
+          fetchFaqs();
         } catch (err) {
           console.error(err);
           MySwal.fire("Gagal", "Tidak bisa menghapus FAQ.", "error");
@@ -111,7 +101,6 @@ export default function AdminFaqPage() {
 
   return (
     <div className="space-y-8 animate-fadeIn p-8 max-w-6xl mx-auto">
-      {/* Header */}
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-[#243771]">❓ Manajemen FAQ</h1>
         <button
@@ -126,7 +115,6 @@ export default function AdminFaqPage() {
         </button>
       </div>
 
-      {/* Table */}
       <div className="bg-white rounded-2xl shadow-md overflow-x-auto">
         {loading ? (
           <div className="text-center py-10 text-gray-500">Memuat data...</div>

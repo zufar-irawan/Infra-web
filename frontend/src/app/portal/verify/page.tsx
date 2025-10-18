@@ -3,10 +3,11 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Swal from "sweetalert2";
-import Cookies from "js-cookie";
+import withReactContent from "sweetalert2-react-content";
+import axios from "axios";
 import { Loader2, Lock, ChevronLeft } from "lucide-react";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://api.smkprestasiprima.sch.id/api";
+const MySwal = withReactContent(Swal);
 
 export default function VerifyCodePage() {
   const router = useRouter();
@@ -27,44 +28,63 @@ export default function VerifyCodePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const fullCode = code.join("");
+
     if (fullCode.length !== 6) {
-      Swal.fire("Kode Tidak Lengkap", "Masukkan 6 digit kode verifikasi.", "warning");
+      MySwal.fire({
+        icon: "warning",
+        title: "Kode Tidak Lengkap",
+        text: "Masukkan 6 digit kode verifikasi.",
+        confirmButtonColor: "#FE4D01",
+        background: "#1e2b63",
+        color: "#fff",
+      });
       return;
     }
 
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/auth/verify-code`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, code: fullCode }),
+      // 🔥 Kirim ke Next.js API Route (proxy ke Laravel)
+      const res = await axios.post("/api/portal/verify-code", {
+        email,
+        code: fullCode,
       });
 
-      const data = await res.json();
-
-      if (!res.ok || !data.success) {
-        Swal.fire("Gagal", data.message || "Verifikasi gagal.", "error");
-      } else {
-        Swal.fire({
-          title: "Berhasil!",
-          text: "Kode verifikasi benar. Anda akan diarahkan ke dashboard.",
+      if (res.data.success) {
+        MySwal.fire({
           icon: "success",
+          title: "Verifikasi Berhasil!",
+          text: "Kode benar. Anda akan diarahkan ke dashboard.",
           showConfirmButton: false,
           timer: 1800,
+          background: "#1e2b63",
+          color: "#fff",
         });
 
-        // Simpan ke cookie agar middleware bisa baca
-        Cookies.set("portal-auth-token", data.token, {
-          expires: 1, // 1 hari
-          secure: true,
-          sameSite: "strict",
-          path: "/",
+        setTimeout(() => {
+          router.push("/portal/dashboard");
+        }, 1800);
+      } else {
+        MySwal.fire({
+          icon: "error",
+          title: "Verifikasi Gagal!",
+          text: res.data.message || "Kode salah atau sudah kadaluarsa.",
+          confirmButtonColor: "#FE4D01",
+          background: "#1e2b63",
+          color: "#fff",
         });
-
-        router.push("/portal/dashboard");
       }
-    } catch (err: any) {
-      Swal.fire("Kesalahan", err.message || "Tidak dapat terhubung ke server.", "error");
+    } catch (error: any) {
+      console.error("Verify Error:", error);
+      MySwal.fire({
+        icon: "error",
+        title: "Kesalahan Server",
+        text:
+          error.response?.data?.message ||
+          "Tidak dapat terhubung ke server backend.",
+        confirmButtonColor: "#FE4D01",
+        background: "#1e2b63",
+        color: "#fff",
+      });
     } finally {
       setLoading(false);
     }
@@ -72,9 +92,11 @@ export default function VerifyCodePage() {
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-[#243771] relative">
+      {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#243771] via-[#1e2b63] to-[#111b45]" />
       <div className="absolute w-[400px] h-[400px] bg-[#FE4D01]/20 rounded-full blur-[120px] -top-20 -left-20" />
 
+      {/* Card */}
       <div className="relative z-10 bg-white/10 backdrop-blur-xl border border-white/10 rounded-2xl p-8 w-[90%] max-w-md text-center">
         <button
           onClick={() => router.push("/portal")}

@@ -16,9 +16,6 @@ interface Kegiatan {
   place: string;
 }
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://api.smkprestasiprima.sch.id/api";
-
 export default function AdminKegiatanPage() {
   const [kegiatan, setKegiatan] = useState<Kegiatan[]>([]);
   const [form, setForm] = useState<Partial<Kegiatan>>({});
@@ -26,15 +23,14 @@ export default function AdminKegiatanPage() {
   const [isModalOpen, setModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // === Ambil Data dari API ===
+  // === Ambil data dari API Proxy Next.js ===
   const fetchData = async () => {
     try {
-      const res = await axios.get(`${API_BASE_URL}/kegiatan`);
-      if (res.data.success) {
-        setKegiatan(res.data.data);
-      }
+      const res = await axios.get("/api/portal/kegiatan");
+      if (res.data.success) setKegiatan(res.data.data);
     } catch (err) {
-      console.error("Gagal mengambil data kegiatan:", err);
+      console.error("❌ Gagal mengambil data kegiatan:", err);
+      Swal.fire("Gagal", "Tidak bisa memuat data kegiatan", "error");
     } finally {
       setLoading(false);
     }
@@ -44,7 +40,7 @@ export default function AdminKegiatanPage() {
     fetchData();
   }, []);
 
-  // === Simpan atau Update ===
+  // === Simpan atau update kegiatan ===
   const handleSave = async () => {
     if (
       !form.title_id ||
@@ -61,26 +57,26 @@ export default function AdminKegiatanPage() {
 
     try {
       if (editId) {
-        await axios.put(`${API_BASE_URL}/kegiatan/${editId}`, form);
-        Swal.fire("Berhasil", "Kegiatan berhasil diperbarui.", "success");
+        await axios.put(`/api/portal/kegiatan/${editId}`, form);
+        Swal.fire("Berhasil", "Kegiatan diperbarui.", "success");
       } else {
-        await axios.post(`${API_BASE_URL}/kegiatan`, form);
-        Swal.fire("Berhasil", "Kegiatan berhasil ditambahkan.", "success");
+        await axios.post("/api/portal/kegiatan", form);
+        Swal.fire("Berhasil", "Kegiatan ditambahkan.", "success");
       }
 
       setModalOpen(false);
       setForm({});
       setEditId(null);
       fetchData();
-    } catch (err) {
-      console.error(err);
-      Swal.fire("Gagal", "Terjadi kesalahan saat menyimpan data.", "error");
+    } catch (err: any) {
+      console.error("❌ Gagal menyimpan kegiatan:", err);
+      Swal.fire("Gagal", err.response?.data?.message || "Terjadi kesalahan.", "error");
     }
   };
 
-  // === Hapus Data ===
+  // === Hapus kegiatan ===
   const handleDelete = async (id: number) => {
-    Swal.fire({
+    const confirm = await Swal.fire({
       title: "Hapus Kegiatan?",
       text: "Data yang dihapus tidak dapat dikembalikan.",
       icon: "warning",
@@ -89,17 +85,17 @@ export default function AdminKegiatanPage() {
       cancelButtonColor: "#243771",
       confirmButtonText: "Ya, Hapus",
       cancelButtonText: "Batal",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          await axios.delete(`${API_BASE_URL}/kegiatan/${id}`);
-          Swal.fire("Terhapus!", "Kegiatan berhasil dihapus.", "success");
-          fetchData();
-        } catch (err) {
-          Swal.fire("Gagal", "Tidak dapat menghapus kegiatan.", "error");
-        }
-      }
     });
+
+    if (!confirm.isConfirmed) return;
+
+    try {
+      await axios.delete(`/api/portal/kegiatan/${id}`);
+      Swal.fire("Terhapus!", "Kegiatan berhasil dihapus.", "success");
+      fetchData();
+    } catch {
+      Swal.fire("Gagal", "Tidak dapat menghapus kegiatan.", "error");
+    }
   };
 
   const handleEdit = (item: Kegiatan) => {
@@ -110,10 +106,9 @@ export default function AdminKegiatanPage() {
 
   return (
     <div className="space-y-8 animate-fadeIn p-8 max-w-6xl mx-auto">
+      {/* Header */}
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-[#243771]">
-          📅 Manajemen Kegiatan
-        </h1>
+        <h1 className="text-3xl font-bold text-[#243771]">📅 Manajemen Kegiatan</h1>
         <button
           onClick={() => {
             setForm({});
@@ -126,6 +121,7 @@ export default function AdminKegiatanPage() {
         </button>
       </div>
 
+      {/* Table */}
       <div className="bg-white rounded-2xl shadow-md overflow-x-auto">
         <table className="min-w-full text-sm">
           <thead className="bg-[#243771] text-white text-left">
@@ -147,15 +143,10 @@ export default function AdminKegiatanPage() {
               </tr>
             ) : kegiatan.length > 0 ? (
               kegiatan.map((e, i) => (
-                <tr
-                  key={e.id}
-                  className="border-b border-gray-100 hover:bg-gray-50 transition"
-                >
+                <tr key={e.id} className="border-b border-gray-100 hover:bg-gray-50 transition">
                   <td className="p-3">{i + 1}</td>
                   <td className="p-3 font-semibold">{e.title_id}</td>
-                  <td className="p-3">
-                    {new Date(e.date).toLocaleDateString("id-ID")}
-                  </td>
+                  <td className="p-3">{new Date(e.date).toLocaleDateString("id-ID")}</td>
                   <td className="p-3">{e.time}</td>
                   <td className="p-3">{e.place}</td>
                   <td className="p-3 flex justify-center gap-2">

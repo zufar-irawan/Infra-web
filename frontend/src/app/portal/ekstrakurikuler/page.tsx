@@ -26,7 +26,7 @@ export default function EkstrakurikulerAdminPage() {
   const [uploading, setUploading] = useState(false);
 
   const API_BASE_URL =
-    process.env.NEXT_PUBLIC_API_URL || "http://api.smkprestasiprima.sch.id/api";
+    process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
   // === Ambil data dari backend ===
   const fetchEkskul = async () => {

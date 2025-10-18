@@ -14,9 +14,13 @@ export const metadata: Metadata = {
   title: "SMK Prestasi Prima",
   description: "Official Website of SMK Prestasi Prima",
   icons: {
-    icon: "/webp/smk.webp"
+    icon: [
+      { url: "/favicon.ico" }, // fallback, bisa tetap logo Next.js dulu
+      { url: "/webp/smk.webp", type: "image/webp" } // logo SMK kamu
+    ],
   },
 };
+
 
 export default function RootLayout({
   children,

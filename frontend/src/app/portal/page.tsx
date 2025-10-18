@@ -8,7 +8,6 @@ import withReactContent from "sweetalert2-react-content";
 import axios from "axios";
 
 const MySwal = withReactContent(Swal);
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://api.smkprestasiprima.sch.id/api";
 
 export default function PortalLoginPage() {
   const [email, setEmail] = useState("");
@@ -17,6 +16,7 @@ export default function PortalLoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!email.trim()) {
       MySwal.fire({
         icon: "warning",
@@ -31,7 +31,7 @@ export default function PortalLoginPage() {
 
     setLoading(true);
     try {
-      const res = await axios.post(`${API_BASE_URL}/auth/request-code`, { email });
+      const res = await axios.post("/api/portal/request-code", { email });
 
       if (res.data.success) {
         MySwal.fire({
@@ -59,7 +59,7 @@ export default function PortalLoginPage() {
       MySwal.fire({
         icon: "error",
         title: "Server Error",
-        text: error.response?.data?.message || "Pastikan backend berjalan.",
+        text: error.response?.data?.message || "Pastikan server backend berjalan.",
         confirmButtonColor: "#FE4D01",
         background: "#1e2b63",
         color: "#fff",
@@ -78,7 +78,7 @@ export default function PortalLoginPage() {
       <div className="relative z-10 bg-white/10 backdrop-blur-xl border border-white/10 rounded-2xl p-8 sm:p-10 w-[90%] max-w-md">
         <div className="text-center mb-8">
           <img src="/webp/smk.webp" alt="SMK Prestasi Prima" className="w-20 h-20 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-white mb-1">Login Administrator</h1>
+          <h1 className="text-2xl font-bold text-white mb-1">Login Portal Admin</h1>
           <p className="text-white/70 text-sm">
             Masukkan email terdaftar untuk menerima kode verifikasi.
           </p>

@@ -14,7 +14,7 @@ interface Partner {
 }
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://api.smkprestasiprima.sch.id/api";
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 const BASE_URL = API_BASE_URL.replace("/api", ""); // 👉 base Laravel tanpa /api
 
 export default function MitraPage() {
