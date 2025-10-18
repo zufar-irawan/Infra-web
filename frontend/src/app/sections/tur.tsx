@@ -15,32 +15,27 @@ interface NewsItem {
   image: string;
 }
 
-const API_BASE_URL = "http://api.smkprestasiprima.sch.id/api";
-
 export default function Berita() {
   const { lang } = useLang();
   const [news, setNews] = useState<NewsItem[]>([]);
   const [current, setCurrent] = useState(0);
 
-  // === Ambil data dari API ===
+  // === Ambil data dari API internal Next.js ===
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/news`, { cache: "no-store" });
+        const res = await fetch("/api/portal/berita/public", { cache: "no-store" });
         const json = await res.json();
         console.log("📦 Data berita:", json);
 
-        // Jika struktur Laravel pakai { success, data: [...] }
         if (json.success && Array.isArray(json.data)) {
           setNews(json.data);
-        } else if (Array.isArray(json)) {
-          setNews(json);
         } else {
           console.warn("⚠️ Format berita tidak sesuai, tampilkan kosong");
           setNews([]);
         }
       } catch (error) {
-        console.error("❌ Gagal ambil berita:", error);
+        console.error("❌ Gagal ambil berita publik:", error);
       }
     };
 
@@ -90,18 +85,14 @@ export default function Berita() {
               news.map((item, index) => (
                 <div
                   key={item.id}
-                  className={`absolute transition-all duration-700 ease-[cubic-bezier(0.68,-0.55,0.27,1.55)] ${getPositionClass(
-                    index
-                  )}`}
+                  className={`absolute transition-all duration-700 ease-[cubic-bezier(0.68,-0.55,0.27,1.55)] ${getPositionClass(index)}`}
                 >
                   <div className="bg-white rounded-[12px] shadow-xl border border-gray-100 overflow-hidden w-[280px] sm:w-[340px] md:w-[420px] h-[440px] flex flex-col mx-auto">
                     <div className="h-[200px] w-full overflow-hidden">
                       <img
-                        src={
-                          item.image?.startsWith("http")
-                            ? item.image
-                            : `http://api.smkprestasiprima.sch.id/storage/${item.image}`
-                        }
+                        src={item.image?.startsWith("http")
+                          ? item.image
+                          : `http://api.smkprestasiprima.sch.id/storage/${item.image}`}
                         alt={lang === "id" ? item.title_id : item.title_en}
                         className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
                       />

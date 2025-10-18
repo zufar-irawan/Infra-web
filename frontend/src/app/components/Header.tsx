@@ -55,12 +55,12 @@ export default function Header() {
 
   // === Header Menu ===
   const headerMenus: HeaderMenuItem[] = [
-    // {
-    //   id: "beranda",
-    //   name_id: "Beranda",
-    //   name_en: "Home",
-    //   href: "/",
-    // },
+    {
+      id: "beranda",
+      name_id: "Beranda",
+      name_en: "Home",
+      href: "/",
+    },
     {
       id: "tentang",
       name_id: "Tentang Kami",

@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useLang } from "../../components/LangContext";
 import { useEffect, useState } from "react";
-import axios from "axios";
 
 interface Facility {
   id: number;
@@ -11,8 +10,6 @@ interface Facility {
   img_en: string;
   category: string;
 }
-
-const API_BASE_URL = "http://api.smkprestasiprima.sch.id/api";
 
 export default function Fasilitas() {
   const { lang } = useLang();
@@ -29,8 +26,9 @@ export default function Fasilitas() {
   useEffect(() => {
     const fetchFacilities = async () => {
       try {
-        const res = await axios.get(`${API_BASE_URL}/facilities/public`);
-        if (res.data.success) setFacilities(res.data.data);
+        const res = await fetch("/api/portal/facilities/public");
+        const data = await res.json();
+        if (data.success) setFacilities(data.data);
       } catch (err) {
         console.error("Gagal memuat data fasilitas:", err);
       } finally {
@@ -47,6 +45,7 @@ export default function Fasilitas() {
 
   return (
     <>
+      {/* Spacer agar tidak tertutup navbar */}
       <div className="h-[100px] bg-white" />
 
       {/* === Breadcrumbs === */}
@@ -73,7 +72,6 @@ export default function Fasilitas() {
 
       {/* === Konten Utama === */}
       <main className="flex-1 w-full bg-white">
-        {/* === Section Fasilitas === */}
         <section className="w-full py-20">
           <div className="max-w-[95rem] mx-auto px-6">
             <h2 className="text-3xl sm:text-4xl font-bold text-[#243771] text-center mb-4">
@@ -85,7 +83,7 @@ export default function Fasilitas() {
                 : "We believe every student has potential and uniqueness to be developed into a whole individual with strong character, academic foundation, and skills."}
             </p>
 
-            {/* === Gambar Interaktif di bawah deskripsi === */}
+            {/* === Gambar Interaktif === */}
             <div className="flex justify-center mb-16">
               <Link
                 href="/virtual-tour"
@@ -108,7 +106,6 @@ export default function Fasilitas() {
                   className="w-full h-full object-cover transition-all duration-500"
                 />
 
-                {/* Overlay saat hover */}
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-all duration-500 flex items-center justify-center">
                   <span className="text-white text-2xl sm:text-3xl font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                     {lang === "id" ? "Mulai" : "Start"}
@@ -150,7 +147,6 @@ export default function Fasilitas() {
           </div>
         </section>
 
-        {/* === Section Gedung === */}
         <section className="relative w-full bg-white overflow-hidden">
           <img
             src="/avif/gedung.avif"

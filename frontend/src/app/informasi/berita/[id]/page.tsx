@@ -16,8 +16,6 @@ interface BeritaItem {
   image: string;
 }
 
-const API_BASE_URL = "http://api.smkprestasiprima.sch.id/api";
-
 export default function DetailBerita() {
   const { lang } = useLang();
   const { id } = useParams();
@@ -30,13 +28,11 @@ export default function DetailBerita() {
 
     const fetchDetail = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/news/${id}`, {
+        const res = await fetch(`/api/portal/berita/${id}/public`, {
           cache: "no-store",
         });
-        if (!res.ok) throw new Error("Not Found");
-
         const json = await res.json();
-        if (json?.success && json.data) {
+        if (json.success && json.data) {
           setBerita(json.data);
           setNotFound(false);
         } else {
@@ -116,11 +112,7 @@ export default function DetailBerita() {
           <p className="text-sm text-gray-500">
             {new Date(berita.date).toLocaleDateString(
               lang === "id" ? "id-ID" : "en-US",
-              {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              }
+              { day: "numeric", month: "long", year: "numeric" }
             )}
           </p>
         </div>
@@ -132,10 +124,11 @@ export default function DetailBerita() {
             alt={lang === "id" ? berita.title_id : berita.title_en}
             fill
             className="object-cover"
+            unoptimized
           />
         </div>
 
-        {/* Tombol kembali ke berita */}
+        {/* Tombol kembali */}
         <div className="flex justify-center mb-10">
           <Link
             href="/informasi/berita"

@@ -10,16 +10,20 @@ const poppins = Poppins({
   weight: ["400", "500", "600", "700"],
 });
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "SMK Prestasi Prima",
   description: "Official Website of SMK Prestasi Prima",
   icons: {
     icon: [
-      { url: "/favicon.ico" }, // fallback, bisa tetap logo Next.js dulu
-      { url: "/webp/smk.webp", type: "image/webp" } // logo SMK kamu
+      { url: "/smk.png", type: "image/png" },
     ],
+    apple: [
+      { url: "/smk.png", type: "image/png" },
+    ],
+    shortcut: ["/smk.png"],
   },
 };
+
 
 
 export default function RootLayout({

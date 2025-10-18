@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { useLang } from "../components/LangContext";
 
 interface AgendaItem {
@@ -16,25 +15,32 @@ interface AgendaItem {
   place: string;
 }
 
-const API_BASE_URL = "http://api.smkprestasiprima.sch.id/api";
-
 export default function Agenda() {
   const { lang } = useLang();
   const [agenda, setAgenda] = useState<AgendaItem[]>([]);
 
-  // === Ambil data dari backend ===
+  // === Ambil data dari API internal (Next.js proxy) ===
   useEffect(() => {
-    axios
-      .get(`${API_BASE_URL}/kegiatan/public`)
-      .then((res) => {
-        if (res.data.success && Array.isArray(res.data.data)) {
-          setAgenda(res.data.data);
+    const fetchAgenda = async () => {
+      try {
+        const res = await fetch("/api/portal/kegiatan/public", { cache: "no-store" });
+        const json = await res.json();
+        console.log("📅 Data agenda:", json);
+
+        if (json.success && Array.isArray(json.data)) {
+          // ambil 3 data teratas (terbaru)
+          const latest = json.data.slice(0, 3);
+          setAgenda(latest);
         } else {
           console.warn("⚠️ Format API agenda tidak sesuai");
           setAgenda([]);
         }
-      })
-      .catch((err) => console.error("❌ Gagal load agenda:", err));
+      } catch (err) {
+        console.error("❌ Gagal load agenda:", err);
+      }
+    };
+
+    fetchAgenda();
   }, []);
 
   return (

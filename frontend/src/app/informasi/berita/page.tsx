@@ -3,7 +3,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useLang } from "../../components/LangContext";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { motion } from "framer-motion";
 
 interface BeritaItem {
   id: number;
@@ -15,35 +16,33 @@ interface BeritaItem {
   image: string;
 }
 
-const API_BASE_URL = "http://api.smkprestasiprima.sch.id/api";
-
 export default function Berita() {
   const { lang } = useLang();
   const [beritaList, setBeritaList] = useState<BeritaItem[]>([]);
-  const [isBackendActive, setIsBackendActive] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef<HTMLDivElement | null>(null);
 
+  // === Ambil data dari API internal (route.ts) ===
   useEffect(() => {
-    const fetchBerita = async () => {
-      try {
-        const res = await fetch(`${API_BASE_URL}/news`, { cache: "no-store" });
-        const json = await res.json();
-        console.log("📦 Data dari backend:", json);
+    fetch("/api/portal/berita/public", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((j) => {
+        if (j.success) setBeritaList(j.data);
+      })
+      .catch((e) => console.error("❌ Gagal ambil berita publik:", e))
+      .finally(() => setLoading(false));
+  }, []);
 
-        // ✅ gunakan json.data sesuai struktur yang kamu kirim
-        if (json.success && Array.isArray(json.data)) {
-          setBeritaList(json.data);
-          setIsBackendActive(true);
-        } else {
-          console.warn("⚠️ Format tidak sesuai atau data kosong");
-          setIsBackendActive(false);
-        }
-      } catch (error) {
-        console.error("❌ Gagal ambil berita dari backend:", error);
-        setIsBackendActive(false);
-      }
-    };
-
-    fetchBerita();
+  // === Animasi muncul saat di-scroll ===
+  useEffect(() => {
+    const obs = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((entry) => entry.isIntersecting && setIsVisible(true)),
+      { threshold: 0.2 }
+    );
+    if (sectionRef.current) obs.observe(sectionRef.current);
+    return () => obs.disconnect();
   }, []);
 
   return (
@@ -62,12 +61,14 @@ export default function Berita() {
               {lang === "id" ? "Informasi" : "Information"}
             </Link>
             <span className="text-[#243771]">{">"}</span>
-            <span className="text-[#243771]">{lang === "id" ? "Berita" : "News"}</span>
+            <span className="text-[#243771]">
+              {lang === "id" ? "Berita" : "News"}
+            </span>
           </nav>
         </div>
       </section>
 
-      {/* === Intro Section === */}
+      {/* === Section Intro === */}
       <section className="relative w-full bg-white">
         <div className="max-w-6xl mx-auto px-4 pt-16 pb-24">
           <h2 className="text-3xl sm:text-4xl font-semibold text-[#243771] text-center mb-12">
@@ -95,13 +96,25 @@ export default function Berita() {
       </section>
 
       {/* === Section Berita === */}
-      <section className="w-full bg-white py-10 sm:py-16">
-        <div className="container mx-auto px-6">
+      <section
+        ref={sectionRef}
+        className="w-full bg-white py-10 sm:py-16 overflow-hidden"
+      >
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={isVisible ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="container mx-auto px-6"
+        >
           <h2 className="text-3xl md:text-4xl font-bold text-center text-[#243771] mb-10">
             {lang === "id" ? "Berita Terbaru" : "Latest News"}
           </h2>
 
-          {beritaList.length === 0 ? (
+          {loading ? (
+            <p className="text-center text-gray-500 italic">
+              {lang === "id" ? "Memuat berita..." : "Loading news..."}
+            </p>
+          ) : beritaList.length === 0 ? (
             <p className="text-center text-gray-500 italic">
               {lang === "id" ? "Belum ada berita." : "No news available."}
             </p>
@@ -118,12 +131,16 @@ export default function Berita() {
                       alt={lang === "id" ? b.title_id : b.title_en}
                       fill
                       className="object-cover"
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                      unoptimized
                     />
                   </div>
 
                   <div className="p-4 md:p-5">
                     <p className="text-xs md:text-sm font-semibold text-[#FE4D01] mb-2">
-                      {new Date(b.date).toLocaleDateString(lang === "id" ? "id-ID" : "en-US")}
+                      {new Date(b.date).toLocaleDateString(
+                        lang === "id" ? "id-ID" : "en-US"
+                      )}
                     </p>
 
                     <h3 className="text-[15px] md:text-lg font-semibold text-[#111820] leading-snug mb-2">
@@ -145,7 +162,7 @@ export default function Berita() {
               ))}
             </div>
           )}
-        </div>
+        </motion.div>
       </section>
 
       {/* === Section Gedung === */}

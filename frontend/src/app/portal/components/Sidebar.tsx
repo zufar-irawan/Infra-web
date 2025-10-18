@@ -15,6 +15,7 @@ export default function Sidebar({ isMobile }: { isMobile: boolean }) {
     { name: "Fasilitas", href: "/portal/fasilitas" },
     { name: "Prestasi", href: "/portal/prestasi" },
     { name: "Berita", href: "/portal/news" },
+    { name: "Mitra", href: "/portal/mitra" },
     { name: "Kegiatan", href: "/portal/kegiatan" },
     { name: "FAQ", href: "/portal/faq" },
   ];

@@ -20,6 +20,10 @@ export default function Program() {
               {lang === "id" ? "Beranda" : "Home"}
             </Link>
             <span className="text-[#243771]">{">"}</span>
+            <span className="text-[#243771]"><Link href="/" className="text-[#243771] hover:underline">
+              {lang === "id" ? "Tentang" : "About"}
+            </Link></span>
+            <span className="text-[#243771]">{">"}</span>
             <span className="text-[#243771]">
               {lang === "id" ? "Program Keahlian" : "Expertise Programs"}
             </span>

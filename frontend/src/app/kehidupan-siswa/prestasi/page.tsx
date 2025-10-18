@@ -5,12 +5,10 @@ import { useLang } from "../../components/LangContext";
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 
-type PrestasiItem = {
+interface PrestasiItem {
   id: number;
-  poster: string; // backend kirim "poster", bukan "poster_url"
-};
-
-const API_BASE = "http://api.smkprestasiprima.sch.id/api";
+  poster: string;
+}
 
 export default function Prestasi() {
   const { lang } = useLang();
@@ -18,10 +16,13 @@ export default function Prestasi() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
 
+  // === Ambil data lewat route proxy ===
   useEffect(() => {
-    fetch(`${API_BASE}/achievements`, { cache: "no-store" })
+    fetch("/api/portal/prestasi/public", { cache: "no-store" })
       .then((r) => r.json())
-      .then((j) => setItems(j?.data ?? []))
+      .then((j) => {
+        if (j.success) setItems(j.data);
+      })
       .catch((e) => console.error("Gagal memuat data prestasi:", e));
   }, []);
 
@@ -37,10 +38,9 @@ export default function Prestasi() {
 
   return (
     <>
-      {/* Spacer */}
       <div className="h-[100px] bg-white" />
 
-      {/* Breadcrumbs */}
+      {/* === Breadcrumbs === */}
       <section className="w-full py-3 bg-white">
         <div className="container mx-auto px-4">
           <nav className="flex items-center text-sm font-medium space-x-2">
@@ -49,10 +49,10 @@ export default function Prestasi() {
             </Link>
             <span className="text-[#FE4D01]">{">"}</span>
             <Link
-              href="/kehidupan-siswa/prestasi"
+              href="/kegiatan-siswa/prestasi"
               className="text-[#FE4D01] hover:underline"
             >
-              {lang === "id" ? "Informasi" : "Information"}
+              {lang === "id" ? "Kehidupan Siswa" : "Student Life"}
             </Link>
             <span className="text-[#243771]">{">"}</span>
             <span className="text-[#243771]">
@@ -62,7 +62,7 @@ export default function Prestasi() {
         </div>
       </section>
 
-      {/* Section Prestasi */}
+      {/* === Section Prestasi === */}
       <section
         ref={sectionRef}
         className={`py-16 bg-white transition-all duration-1000 ease-out ${
@@ -79,30 +79,33 @@ export default function Prestasi() {
               : "Achievements and pride of SMK Prestasi Prima"}
           </p>
 
-          {/* Grid dari API */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 justify-center">
-            {items.map((img) => (
-              <div
-                key={img.id}
-                className="w-full max-w-[295px] mx-auto bg-white rounded-md overflow-hidden shadow-[0_4px_4px_rgba(0,0,0,0.25)] hover:scale-[1.02] transition-transform duration-300"
-              >
-                <Image
-                  src={img.poster.startsWith("http")
-                    ? img.poster
-                    : `http://api.smkprestasiprima.sch.id/storage/${img.poster}`}
-                  alt={`Prestasi ${img.id}`}
-                  width={295}
-                  height={368}
-                  loading="lazy"
-                  className="w-full h-auto object-cover"
-                />
-              </div>
-            ))}
-          </div>
+          {items.length === 0 ? (
+            <p className="text-center text-gray-500 italic">
+              {lang === "id" ? "Memuat data prestasi..." : "Loading achievements..."}
+            </p>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 justify-center">
+              {items.map((img) => (
+                <div
+                  key={img.id}
+                  className="w-full max-w-[295px] mx-auto bg-white rounded-md overflow-hidden shadow-[0_4px_4px_rgba(0,0,0,0.25)] hover:scale-[1.02] transition-transform duration-300"
+                >
+                  <Image
+                    src={img.poster}
+                    alt={`Prestasi ${img.id}`}
+                    width={295}
+                    height={368}
+                    loading="lazy"
+                    className="w-full h-auto object-cover"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
-      {/* Section Gedung */}
+      {/* === Section Gedung === */}
       <main className="flex-1 w-full bg-white">
         <section className="relative w-full bg-white overflow-hidden">
           <img

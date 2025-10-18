@@ -3,22 +3,25 @@
 import Link from "next/link";
 import { useLang } from "../../components/LangContext";
 import { useState, useRef, useEffect } from "react";
-import axios from "axios";
 
-interface FaqProps {
-  hideBreadcrumb?: boolean; // ✅ Tambahan props untuk sembunyikan breadcrumb
+interface FaqItem {
+  id: number;
+  q_id: string;
+  a_id: string;
+  q_en: string;
+  a_en: string;
 }
 
 export default function Faq() {
   const { lang } = useLang();
-  const hideBreadcrumb = false
+  const hideBreadcrumb = false;
 
   return (
     <>
       {/* Spacer header */}
       {!hideBreadcrumb && <div className="h-[100px] bg-white" />}
 
-      {/* === Breadcrumbs (hilang jika hideBreadcrumb true) === */}
+      {/* === Breadcrumbs === */}
       {!hideBreadcrumb && (
         <section className="w-full py-4 bg-white">
           <div className="container mx-auto px-4">
@@ -45,7 +48,7 @@ export default function Faq() {
       {/* === Section FAQ === */}
       <FAQSection />
 
-      {/* === Gambar Gedung (juga bisa di-hide kalau mau nanti) === */}
+      {/* === Gambar Gedung === */}
       {!hideBreadcrumb && (
         <section className="relative w-full bg-white overflow-hidden">
           <img
@@ -66,23 +69,26 @@ export default function Faq() {
 function FAQSection() {
   const { lang } = useLang();
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const [faq, setFaq] = useState<any[]>([]);
+  const [faq, setFaq] = useState<FaqItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const API_BASE_URL = "http://api.smkprestasiprima.sch.id/api";
 
   useEffect(() => {
     const fetchFaq = async () => {
       try {
-        const res = await axios.get(`${API_BASE_URL}/faq/list`);
-        setFaq(res.data.data);
+        const res = await fetch("/api/portal/faq/public", { cache: "no-store" });
+        const json = await res.json();
+        if (json.success) setFaq(json.data);
       } catch (err) {
-        console.error("Gagal memuat FAQ:", err);
+        console.error("❌ Gagal memuat FAQ publik:", err);
+      } finally {
+        setLoading(false);
       }
     };
     fetchFaq();
   }, []);
 
-  // Tutup jika klik luar atau tekan Escape
+  // Tutup panel FAQ saat klik luar atau tekan ESC
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent | TouchEvent) => {
       if (
@@ -117,50 +123,56 @@ function FAQSection() {
             : "We’ve prepared a list of frequently asked questions for prospective students and parents."}
         </p>
 
-        <div className="space-y-4" ref={containerRef}>
-          {faq.length > 0 ? (
-            faq.map((item, i) => {
-              const isOpen = openIndex === i;
-              return (
-                <div
-                  key={i}
-                  className="border rounded-lg shadow-sm overflow-hidden transition-all duration-500 ease-in-out"
-                >
-                  <button
-                    aria-expanded={isOpen}
-                    aria-controls={`faq-content-${i}`}
-                    id={`faq-btn-${i}`}
-                    className="w-full flex justify-between items-center p-4 font-medium text-[#243771] hover:text-[#FE4D01] transition-colors"
-                    onClick={() => setOpenIndex(isOpen ? null : i)}
+        {loading ? (
+          <p className="text-center text-gray-400 italic">Memuat FAQ...</p>
+        ) : (
+          <div className="space-y-4" ref={containerRef}>
+            {faq.length > 0 ? (
+              faq.map((item, i) => {
+                const isOpen = openIndex === i;
+                return (
+                  <div
+                    key={i}
+                    className="border rounded-lg shadow-sm overflow-hidden transition-all duration-500 ease-in-out"
                   >
-                    <span>{lang === "id" ? item.q_id : item.q_en}</span>
-                    <span
-                      className={`text-lg ml-4 transform transition-transform duration-300 ${
-                        isOpen ? "rotate-45 text-[#FE4D01]" : ""
+                    <button
+                      aria-expanded={isOpen}
+                      aria-controls={`faq-content-${i}`}
+                      id={`faq-btn-${i}`}
+                      className="w-full flex justify-between items-center p-4 font-medium text-[#243771] hover:text-[#FE4D01] transition-colors"
+                      onClick={() => setOpenIndex(isOpen ? null : i)}
+                    >
+                      <span>{lang === "id" ? item.q_id : item.q_en}</span>
+                      <span
+                        className={`text-lg ml-4 transform transition-transform duration-300 ${
+                          isOpen ? "rotate-45 text-[#FE4D01]" : ""
+                        }`}
+                      >
+                        +
+                      </span>
+                    </button>
+                    <div
+                      id={`faq-content-${i}`}
+                      role="region"
+                      aria-labelledby={`faq-btn-${i}`}
+                      className={`overflow-hidden transition-[max-height] duration-500 ease-in-out ${
+                        isOpen ? "max-h-40" : "max-h-0"
                       }`}
                     >
-                      +
-                    </span>
-                  </button>
-                  <div
-                    id={`faq-content-${i}`}
-                    role="region"
-                    aria-labelledby={`faq-btn-${i}`}
-                    className={`overflow-hidden transition-[max-height] duration-500 ease-in-out ${
-                      isOpen ? "max-h-40" : "max-h-0"
-                    }`}
-                  >
-                    <div className="p-4 pt-0 text-gray-600">
-                      {lang === "id" ? item.a_id : item.a_en}
+                      <div className="p-4 pt-0 text-gray-600">
+                        {lang === "id" ? item.a_id : item.a_en}
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })
-          ) : (
-            <p className="text-center text-gray-500 italic">Tidak ada FAQ.</p>
-          )}
-        </div>
+                );
+              })
+            ) : (
+              <p className="text-center text-gray-500 italic">
+                {lang === "id" ? "Belum ada FAQ." : "No FAQs yet."}
+              </p>
+            )}
+          </div>
+        )}
       </div>
     </section>
   );

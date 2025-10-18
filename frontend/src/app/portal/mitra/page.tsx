@@ -13,9 +13,9 @@ interface Partner {
   img_en: string;
 }
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
-const BASE_URL = API_BASE_URL.replace("/api", ""); // 👉 base Laravel tanpa /api
+const BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL?.replace("/api", "") ||
+  "http://localhost:8000";
 
 export default function MitraPage() {
   const [partners, setPartners] = useState<Partner[]>([]);
@@ -23,11 +23,13 @@ export default function MitraPage() {
   const [editId, setEditId] = useState<number | null>(null);
   const [isModalOpen, setModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [fileID, setFileID] = useState<File | null>(null);
+  const [fileEN, setFileEN] = useState<File | null>(null);
 
-  // === Ambil Data dari API ===
+  // === Ambil Data ===
   const fetchData = async () => {
     try {
-      const res = await axios.get(`${API_BASE_URL}/mitra`);
+      const res = await axios.get("/api/portal/mitra");
       if (res.data.success) setPartners(res.data.data);
     } catch (err) {
       console.error("Gagal mengambil data mitra:", err);
@@ -39,10 +41,6 @@ export default function MitraPage() {
   useEffect(() => {
     fetchData();
   }, []);
-
-  // === Upload file handler ===
-  const [fileID, setFileID] = useState<File | null>(null);
-  const [fileEN, setFileEN] = useState<File | null>(null);
 
   // === Simpan (Tambah / Edit) ===
   const handleSave = async () => {
@@ -58,14 +56,10 @@ export default function MitraPage() {
 
     try {
       if (editId) {
-        await axios.post(`${API_BASE_URL}/mitra/${editId}?_method=PUT`, formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+        await axios.put(`/api/portal/mitra/${editId}`, formData);
         Swal.fire("Berhasil", "Data mitra berhasil diperbarui.", "success");
       } else {
-        await axios.post(`${API_BASE_URL}/mitra`, formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+        await axios.post(`/api/portal/mitra`, formData);
         Swal.fire("Berhasil", "Data mitra berhasil ditambahkan.", "success");
       }
 
@@ -81,14 +75,14 @@ export default function MitraPage() {
     }
   };
 
-  // === Edit Data ===
+  // === Edit ===
   const handleEdit = (partner: Partner) => {
     setForm({ name: partner.name });
     setEditId(partner.id);
     setModalOpen(true);
   };
 
-  // === Hapus Data ===
+  // === Hapus ===
   const handleDelete = async (id: number) => {
     Swal.fire({
       title: "Hapus Mitra?",
@@ -102,7 +96,7 @@ export default function MitraPage() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axios.delete(`${API_BASE_URL}/mitra/${id}`);
+          await axios.delete(`/api/portal/mitra/${id}`);
           Swal.fire("Terhapus!", "Data mitra berhasil dihapus.", "success");
           fetchData();
         } catch {
@@ -198,10 +192,7 @@ export default function MitraPage() {
               ))
             ) : (
               <tr>
-                <td
-                  colSpan={5}
-                  className="text-center py-6 text-gray-500 italic"
-                >
+                <td colSpan={5} className="text-center py-6 text-gray-500 italic">
                   Belum ada data mitra.
                 </td>
               </tr>
@@ -229,7 +220,7 @@ export default function MitraPage() {
 
               <div>
                 <label className="block text-sm text-gray-600 mb-1">
-                  Logo Bahasa Indonesia 
+                  Logo Bahasa Indonesia
                 </label>
                 <input
                   type="file"

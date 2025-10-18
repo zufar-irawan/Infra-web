@@ -10,17 +10,15 @@ type PrestasiItem = {
   poster: string;
 };
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL;
-
 export default function Prestasi() {
   const { lang } = useLang();
   const [items, setItems] = useState<PrestasiItem[]>([]);
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement | null>(null);
 
-  // === Ambil data dari API ===
+  // === Ambil data dari route API internal ===
   useEffect(() => {
-    fetch(`${API_BASE}/achievements`, { cache: "no-store" })
+    fetch("/api/portal/prestasi/public", { cache: "no-store" })
       .then((r) => r.json())
       .then((j) => {
         const data = j?.data ?? [];
@@ -92,7 +90,7 @@ export default function Prestasi() {
                         src={
                           img.poster.startsWith("http")
                             ? img.poster
-                            : `http://api.smkprestasiprima.sch.id/storage/${img.poster}`
+                            : `/storage/${img.poster}`
                         }
                         alt={`Prestasi ${img.id}`}
                         width={295}
@@ -110,10 +108,10 @@ export default function Prestasi() {
                 )}
               </div>
 
-              {/* Tombol Selengkapnya — muncul di bawah card kanan */}
+              {/* Tombol Selengkapnya */}
               <div className="mt-8 w-full flex justify-center md:justify-end">
                 <a
-                  href="/kegiatan-siswa/prestasi"
+                  href="/kehidupan-siswa/prestasi"
                   className="inline-block px-8 py-3 md:px-10 md:py-3.5 rounded-lg bg-[#243771] text-white text-sm md:text-base font-semibold shadow-[0_4px_10px_rgba(0,0,0,0.2)] hover:shadow-[0_6px_14px_rgba(0,0,0,0.25)] hover:bg-[#1a2a5c] transition-all duration-300 text-center"
                 >
                   {lang === "id" ? "Selengkapnya" : "More"}
@@ -140,31 +138,23 @@ export default function Prestasi() {
             className="object-contain md:object-cover object-center"
           />
 
-          {/* Kotak Biru Layer Atas */}
           <div className="absolute inset-0 flex items-center justify-center z-20 p-4 sm:p-6">
             <div className="bg-[#243771]/95 rounded-[20px] sm:rounded-[25px] flex flex-col items-center justify-center text-center px-6 sm:px-10 py-10 sm:py-12 w-full max-w-[1000px] min-h-[300px] sm:min-h-[380px] md:min-h-[444px]">
-              {/* Logo */}
               <img
                 src="/webp/smk.webp"
                 alt="SMK Prestasi Prima Logo"
                 className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 mb-4 sm:mb-5 object-contain"
               />
-
-              {/* Heading Utama */}
               <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2 sm:mb-3">
                 {lang === "id"
                   ? "Mulai Pengalaman Virtual"
                   : "Start Your Virtual Experience"}
               </h2>
-
-              {/* Subheading */}
               <p className="text-white/90 text-xs sm:text-sm md:text-base max-w-[700px] leading-relaxed mb-5 sm:mb-6 px-2">
                 {lang === "id"
                   ? "Ikuti tur virtual kami untuk melihat SMK Prestasi Prima kapan saja dan di mana saja."
                   : "Join our virtual tour to explore SMK Prestasi Prima anytime and anywhere."}
               </p>
-
-              {/* Tombol */}
               <a
                 href="/virtual-tour"
                 className="inline-block px-5 sm:px-6 py-2.5 sm:py-3 rounded-[8px] sm:rounded-[10px] bg-white text-[#243771] font-semibold text-xs sm:text-sm md:text-base shadow-[0_4px_10px_rgba(0,0,0,0.15)] hover:shadow-[0_6px_14px_rgba(254,77,1,0.3)] transition"

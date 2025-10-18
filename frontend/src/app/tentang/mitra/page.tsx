@@ -12,26 +12,20 @@ interface Mitra {
   img_en: string;
 }
 
-// base URL dari env (.env.local)
-const API_BASE_URL = "http://api.smkprestasiprima.sch.id/api";
-const BASE_URL = API_BASE_URL.replace("/api", "");
-
 export default function MitraIndustri() {
   const { lang } = useLang();
   const [partners, setPartners] = useState<Mitra[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // ambil data dari API Laravel
   useEffect(() => {
     axios
-      .get(`${API_BASE_URL}/mitra/public`)
+      .get("/api/portal/mitra/public")
       .then((res) => {
-        if (res.data.success) {
-          setPartners(res.data.data);
-        } else {
-          console.error("Gagal ambil data mitra:", res.data.message);
-        }
+        if (res.data.success) setPartners(res.data.data);
+        else console.error("Gagal ambil data mitra:", res.data.message);
       })
-      .catch((err) => console.error("Gagal memuat data mitra:", err));
+      .catch((err) => console.error("Gagal memuat data mitra:", err))
+      .finally(() => setLoading(false));
   }, []);
 
   return (
@@ -66,26 +60,29 @@ export default function MitraIndustri() {
               {lang === "id" ? "Mitra Industri" : "Industry Partners"}
             </h2>
 
-            {/* Grid mitra */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 justify-items-center">
-              {partners.length > 0 ? (
-                partners.map((p) => (
-                  <div
-                    key={p.id}
-                    className="w-[280px] sm:w-[320px] lg:w-[370px] h-[180px] bg-white border border-gray-100 rounded-tr-[70px] rounded-bl-[70px] flex items-center justify-center transition-transform duration-500 hover:scale-[1.04] shadow-md"
-                  >
-                    <img
-                      src={`${BASE_URL}${lang === "id" ? p.img_id : p.img_en}`}
-                      alt={p.name}
-                      loading="lazy"
-                      className="max-h-[70%] max-w-[70%] object-contain"
-                    />
-                  </div>
-                ))
-              ) : (
-                <p className="text-gray-500 italic">Memuat data mitra...</p>
-              )}
-            </div>
+            {loading ? (
+              <p className="text-center text-gray-500 italic">Memuat data mitra...</p>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 justify-items-center">
+                {partners.length > 0 ? (
+                  partners.map((p) => (
+                    <div
+                      key={p.id}
+                      className="w-[280px] sm:w-[320px] lg:w-[370px] h-[180px] bg-white border border-gray-100 rounded-tr-[70px] rounded-bl-[70px] flex items-center justify-center transition-transform duration-500 hover:scale-[1.04] shadow-md"
+                    >
+                      <img
+                        src={lang === "id" ? p.img_id : p.img_en}
+                        alt={p.name}
+                        loading="lazy"
+                        className="max-h-[70%] max-w-[70%] object-contain"
+                      />
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500 italic">Belum ada data mitra.</p>
+                )}
+              </div>
+            )}
           </div>
         </section>
 
