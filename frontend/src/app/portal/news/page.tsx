@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Swal from "sweetalert2";
 import axios from "axios";
-import { Pencil, Trash2, Plus, X } from "lucide-react";
+import { Plus, Pencil, Trash2, X } from "lucide-react";
 
 interface News {
   id: number;
@@ -12,25 +12,26 @@ interface News {
   title_en: string;
   desc_id: string;
   desc_en: string;
-  image: string;
   date: string;
+  image: string;
 }
 
 export default function AdminNewsPage() {
   const [news, setNews] = useState<News[]>([]);
-  const [form, setForm] = useState<Partial<News> & { imageFile?: File | null }>({});
+  const [form, setForm] = useState<
+    Partial<News> & { imageFile?: File | null }
+  >({});
   const [editId, setEditId] = useState<number | null>(null);
   const [isModalOpen, setModalOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
 
-  // === Ambil data dari API Next.js (proxy ke Laravel)
+  // === Fetch data ===
   const fetchNews = async () => {
     try {
       const res = await axios.get("/api/portal/berita");
       if (res.data.success) setNews(res.data.data);
     } catch (err) {
-      console.error("Gagal memuat berita:", err);
+      console.error("❌ Gagal memuat berita:", err);
       Swal.fire("Gagal", "Tidak bisa memuat berita.", "error");
     }
   };
@@ -43,17 +44,15 @@ export default function AdminNewsPage() {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     const allowed = [".webp", ".jpg", ".jpeg", ".png"];
     if (!allowed.some((ext) => file.name.toLowerCase().endsWith(ext))) {
       Swal.fire("Format Salah", "Gunakan gambar .webp, .jpg, atau .png", "warning");
       return;
     }
-
     setForm((prev) => ({ ...prev, imageFile: file }));
   };
 
-  // === Simpan data (Tambah / Edit) ===
+  // === Save (create or update) ===
   const handleSave = async () => {
     if (!form.title_id || !form.title_en || !form.desc_id || !form.desc_en || !form.date) {
       Swal.fire("Lengkapi Data", "Semua field wajib diisi!", "warning");
@@ -69,45 +68,35 @@ export default function AdminNewsPage() {
     if (form.imageFile) formData.append("image", form.imageFile);
 
     try {
-      setLoading(true);
       const url = editId ? `/api/portal/berita/${editId}` : `/api/portal/berita`;
-      const method = editId ? "put" : "post";
 
-      await axios({
-        method,
-        url,
-        data: formData,
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      if (editId) {
+        await axios.put(url, formData, { headers: { "Content-Type": "multipart/form-data" } });
+      } else {
+        await axios.post(url, formData, { headers: { "Content-Type": "multipart/form-data" } });
+      }
 
-      Swal.fire(
-        "Berhasil!",
-        editId ? "Berita berhasil diperbarui." : "Berita berhasil ditambahkan.",
-        "success"
-      );
-
+      Swal.fire("Berhasil!", editId ? "Berita diperbarui." : "Berita ditambahkan.", "success");
       setModalOpen(false);
       setForm({});
       setEditId(null);
       fetchNews();
     } catch (err: any) {
-      console.error("❌ Gagal menyimpan berita:", err);
+      console.error("❌ Gagal menyimpan:", err);
       Swal.fire("Gagal", err.response?.data?.message || "Upload gagal", "error");
-    } finally {
-      setLoading(false);
     }
   };
 
-  // === Hapus data ===
+  // === Delete ===
   const handleDelete = async (id: number) => {
     const result = await Swal.fire({
       title: "Hapus Berita?",
-      text: "Data yang dihapus tidak dapat dikembalikan.",
+      text: "Data yang dihapus tidak bisa dikembalikan.",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#FE4D01",
       cancelButtonColor: "#243771",
-      confirmButtonText: "Ya, Hapus",
+      confirmButtonText: "Ya, hapus",
       cancelButtonText: "Batal",
     });
 
@@ -122,7 +111,7 @@ export default function AdminNewsPage() {
     }
   };
 
-  // === Edit data ===
+  // === Edit ===
   const handleEdit = (n: News) => {
     setEditId(n.id);
     setForm({
@@ -137,10 +126,12 @@ export default function AdminNewsPage() {
     setModalOpen(true);
   };
 
-  // === Tutup modal di luar atau ESC ===
+  // === Close modal ===
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (modalRef.current && !modalRef.current.contains(e.target as Node)) setModalOpen(false);
+      if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
+        setModalOpen(false);
+      }
     };
     const handleEsc = (e: KeyboardEvent) => e.key === "Escape" && setModalOpen(false);
     if (isModalOpen) {
@@ -154,115 +145,117 @@ export default function AdminNewsPage() {
   }, [isModalOpen]);
 
   return (
-    <div className="space-y-8 animate-fadeIn p-8 max-w-6xl mx-auto">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-[#243771]">📰 Manajemen Berita</h1>
-        <button
-          onClick={() => {
-            setForm({});
-            setEditId(null);
-            setModalOpen(true);
-          }}
-          className="flex items-center gap-2 bg-[#FE4D01] text-white px-4 py-2 rounded-lg hover:bg-[#fe5d20] transition"
-        >
-          <Plus size={18} /> Tambah Berita
-        </button>
-      </div>
+    <main className="min-h-screen bg-gradient-to-br from-[#f5f7ff] via-[#fffdfb] to-[#fff5f0] px-4 py-10 md:px-10">
+      <div className="max-w-6xl mx-auto bg-white rounded-md shadow-md border border-gray-100 p-5 sm:p-8 relative z-10">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-[#243771]">📰 Manajemen Berita</h1>
+            <p className="text-gray-500 text-sm mt-1">Kelola seluruh berita sekolah</p>
+          </div>
+          <button
+            onClick={() => {
+              setForm({});
+              setEditId(null);
+              setModalOpen(true);
+            }}
+            className="flex items-center gap-2 bg-gradient-to-r from-[#FE4D01] to-[#ff7433] text-white px-4 py-2 rounded-md font-medium shadow-sm hover:shadow-md transition w-full sm:w-auto justify-center"
+          >
+            <Plus size={18} /> Tambah Berita
+          </button>
+        </div>
 
-      {/* Table */}
-      <div className="bg-white rounded-2xl shadow-md overflow-x-auto">
-        <table className="min-w-full text-sm">
-          <thead className="bg-[#243771] text-white text-left">
-            <tr>
-              <th className="p-3">#</th>
-              <th className="p-3">Judul (ID)</th>
-              <th className="p-3">Tanggal</th>
-              <th className="p-3 text-center">Gambar</th>
-              <th className="p-3 text-center">Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            {news.length > 0 ? (
-              news.map((n, i) => (
-                <tr
-                  key={n.id}
-                  className="border-b border-gray-100 hover:bg-gray-50 transition"
-                >
-                  <td className="p-3">{i + 1}</td>
-                  <td className="p-3 font-semibold">{n.title_id}</td>
-                  <td className="p-3">{new Date(n.date).toLocaleDateString("id-ID")}</td>
-                  <td className="p-3 text-center">
-                    {n.image ? (
-                      <Image
-                        src={n.image}
-                        alt={n.title_id}
-                        width={100}
-                        height={70}
-                        className="rounded border object-cover mx-auto"
-                      />
-                    ) : (
-                      <span className="text-gray-400 italic">Tidak ada</span>
-                    )}
-                  </td>
-                  <td className="p-3 flex justify-center gap-2">
-                    <button
-                      onClick={() => handleEdit(n)}
-                      className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
-                    >
-                      <Pencil size={16} />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(n.id)}
-                      className="p-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
-                    >
-                      <Trash2 size={16} />
-                    </button>
+        {/* Table */}
+        <div className="overflow-x-auto border border-gray-200 rounded-md">
+          <table className="min-w-full text-sm">
+            <thead className="bg-gradient-to-r from-[#243771] to-[#3b5bb1] text-white">
+              <tr>
+                <th className="p-3 text-center w-[50px]">#</th>
+                <th className="p-3">Judul (ID)</th>
+                <th className="p-3 text-center">Tanggal</th>
+                <th className="p-3 text-center">Gambar</th>
+                <th className="p-3 text-center">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {news.length > 0 ? (
+                news.map((n, i) => (
+                  <tr key={n.id} className="border-b hover:bg-[#f9fafc] transition">
+                    <td className="p-3 text-center font-medium text-[#243771]">{i + 1}</td>
+                    <td className="p-3 text-gray-700">{n.title_id}</td>
+                    <td className="p-3 text-center text-gray-600">
+                      {new Date(n.date).toLocaleDateString("id-ID")}
+                    </td>
+                    <td className="p-3 text-center">
+                      {n.image ? (
+                        <Image
+                          src={n.image}
+                          alt={n.title_id}
+                          width={100}
+                          height={70}
+                          className="rounded-sm border border-gray-200 object-cover mx-auto"
+                        />
+                      ) : (
+                        <span className="text-gray-400 italic">Tidak ada</span>
+                      )}
+                    </td>
+                    <td className="p-3 flex justify-center gap-2 flex-wrap">
+                      <button
+                        onClick={() => handleEdit(n)}
+                        className="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-sm transition w-[42px]"
+                      >
+                        <Pencil size={16} />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(n.id)}
+                        className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-sm transition w-[42px]"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={5} className="text-center py-6 text-gray-500 italic">
+                    Belum ada berita.
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={5} className="text-center py-6 text-gray-500 italic">
-                  Belum ada berita.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      {/* Modal Tambah/Edit */}
+      {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 px-4">
           <div
             ref={modalRef}
-            className="bg-white rounded-2xl p-6 w-[95%] max-w-2xl shadow-xl relative"
+            className="bg-white rounded-md w-full max-w-2xl shadow-2xl border border-gray-200 animate-fadeIn relative z-50"
           >
-            <button
-              onClick={() => setModalOpen(false)}
-              className="absolute top-3 right-3 text-gray-400 hover:text-[#FE4D01]"
-            >
-              <X size={20} />
-            </button>
+            {/* Header */}
+            <div className="flex justify-between items-center px-5 py-4 border-b border-gray-200 bg-gradient-to-r from-[#243771]/90 to-[#FE4D01]/80 text-white rounded-t-md">
+              <h2 className="font-semibold text-lg">{editId ? "Edit Berita" : "Tambah Berita"}</h2>
+              <button onClick={() => setModalOpen(false)}>
+                <X size={20} className="opacity-80 hover:opacity-100" />
+              </button>
+            </div>
 
-            <h2 className="text-xl font-bold text-[#243771] mb-4">
-              {editId ? "Edit Berita" : "Tambah Berita"}
-            </h2>
-
-            <div className="space-y-4">
+            {/* Body */}
+            <div className="p-6 space-y-4">
               <div className="grid md:grid-cols-2 gap-4">
                 <input
                   type="text"
                   placeholder="Judul (Indonesia)"
-                  className="border p-2 rounded"
+                  className="border border-gray-300 p-2 rounded-md focus:ring-2 focus:ring-[#FE4D01] focus:outline-none"
                   value={form.title_id || ""}
                   onChange={(e) => setForm({ ...form, title_id: e.target.value })}
                 />
                 <input
                   type="text"
                   placeholder="Judul (English)"
-                  className="border p-2 rounded"
+                  className="border border-gray-300 p-2 rounded-md focus:ring-2 focus:ring-[#FE4D01] focus:outline-none"
                   value={form.title_en || ""}
                   onChange={(e) => setForm({ ...form, title_en: e.target.value })}
                 />
@@ -270,14 +263,14 @@ export default function AdminNewsPage() {
 
               <textarea
                 placeholder="Deskripsi (Indonesia)"
-                className="border p-2 w-full rounded"
+                className="border border-gray-300 p-2 w-full rounded-md focus:ring-2 focus:ring-[#243771]"
                 rows={3}
                 value={form.desc_id || ""}
                 onChange={(e) => setForm({ ...form, desc_id: e.target.value })}
               />
               <textarea
                 placeholder="Deskripsi (English)"
-                className="border p-2 w-full rounded"
+                className="border border-gray-300 p-2 w-full rounded-md focus:ring-2 focus:ring-[#243771]"
                 rows={3}
                 value={form.desc_en || ""}
                 onChange={(e) => setForm({ ...form, desc_en: e.target.value })}
@@ -286,20 +279,20 @@ export default function AdminNewsPage() {
               <div className="grid md:grid-cols-2 gap-4">
                 <input
                   type="date"
-                  className="border p-2 rounded"
+                  className="border border-gray-300 p-2 rounded-md focus:ring-2 focus:ring-[#FE4D01]"
                   value={form.date || ""}
                   onChange={(e) => setForm({ ...form, date: e.target.value })}
                 />
                 <input
                   type="file"
                   accept=".webp,.jpg,.jpeg,.png"
-                  className="border p-2 rounded"
+                  className="border border-gray-300 p-2 rounded-md focus:ring-2 focus:ring-[#243771]"
                   onChange={handleImageUpload}
                 />
               </div>
 
               {(form.image || form.imageFile) && (
-                <div className="mt-2 text-center">
+                <div className="text-center mt-2">
                   <Image
                     src={
                       form.imageFile
@@ -309,30 +302,30 @@ export default function AdminNewsPage() {
                     alt="Preview"
                     width={300}
                     height={160}
-                    className="rounded border object-cover mx-auto"
+                    className="rounded-sm border border-gray-200 object-cover mx-auto"
                   />
                 </div>
               )}
             </div>
 
-            <div className="mt-6 flex justify-end gap-3">
+            {/* Footer */}
+            <div className="flex flex-col sm:flex-row sm:justify-end gap-3 px-5 py-4 border-t border-gray-200 bg-gray-50 rounded-b-md">
               <button
                 onClick={() => setModalOpen(false)}
-                className="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-100"
+                className="px-4 py-2 border border-gray-300 rounded-sm text-gray-600 hover:bg-gray-100 transition"
               >
                 Batal
               </button>
               <button
                 onClick={handleSave}
-                disabled={loading}
-                className="px-4 py-2 bg-[#FE4D01] text-white rounded-lg hover:bg-[#fe5d20] transition flex items-center gap-2"
+                className="px-4 py-2 bg-gradient-to-r from-[#FE4D01] to-[#ff7433] text-white rounded-sm hover:scale-[1.03] transition"
               >
-                {loading ? "Menyimpan..." : "Simpan"}
+                Simpan
               </button>
             </div>
           </div>
         </div>
       )}
-    </div>
+    </main>
   );
 }

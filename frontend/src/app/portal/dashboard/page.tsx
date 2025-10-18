@@ -15,12 +15,10 @@ export default function AdminDashboard() {
   useEffect(() => {
     const fetchAdmin = async () => {
       try {
-        // 🧠 Jalankan check-token dan dashboard secara paralel
         const [check, res] = await Promise.all([
           axios.get("/api/portal/check-token"),
           axios.get("/api/portal/dashboard"),
         ]);
-
         if (check.data.success && res.data.success) {
           setAdmin({
             name: res.data.message?.replace("Selamat datang, ", "") || "Admin",
@@ -30,7 +28,6 @@ export default function AdminDashboard() {
           await autoLogout("Token Tidak Valid", "Silakan login ulang.", "warning");
         }
       } catch (err: any) {
-        console.error("Dashboard Error:", err);
         await autoLogout(
           "Sesi Berakhir",
           err.response?.data?.message || "Server tidak merespons atau token tidak valid.",
@@ -60,61 +57,68 @@ export default function AdminDashboard() {
     }
   };
 
-  const autoLogout = async (
-    title: string,
-    message: string,
-    icon: "error" | "warning"
-  ) => {
-    try {
-      await fetch("/api/portal/logout", { method: "GET" });
-      await MySwal.fire({
-        icon,
-        title,
-        text: message,
-        confirmButtonColor: "#FE4D01",
-      });
-      window.location.href = "/portal";
-    } catch {
-      window.location.href = "/portal";
-    }
+  const autoLogout = async (title: string, message: string, icon: "error" | "warning") => {
+    await fetch("/api/portal/logout", { method: "GET" });
+    await MySwal.fire({ icon, title, text: message, confirmButtonColor: "#FE4D01" });
+    window.location.href = "/portal";
   };
 
-  if (loading) {
+  if (loading)
     return (
-      <main className="min-h-screen flex flex-col items-center justify-center bg-[#f9fafb] text-[#243771]">
+      <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#f5f7ff] via-[#fffdfb] to-[#fef6f0] text-[#243771]">
         <Loader2 className="animate-spin mb-3" size={32} />
-        <p className="font-medium animate-pulse">Memuat dashboard...</p>
+        <p className="font-medium animate-pulse text-[#555]">Memuat dashboard...</p>
       </main>
     );
-  }
 
   return (
-    <main className="min-h-screen bg-[#f9fafb] p-8 transition-all">
-      <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-        <div className="flex justify-between items-center mb-4">
-          <div>
-            <h1 className="text-3xl font-bold text-[#243771]">Dashboard Admin</h1>
-            <p className="text-gray-600">
-              Selamat datang,{" "}
-              <span className="text-[#FE4D01] font-semibold">{admin?.name || "Admin"}</span>
-              <br />
-              <span className="text-gray-400 text-sm">{admin?.email}</span>
+    <main className="min-h-screen bg-gradient-to-br from-[#f5f7ff] via-[#fffdfb] to-[#fff5f0] px-3 sm:px-6 md:px-10 py-8 sm:py-12">
+      <div className="w-full max-w-5xl mx-auto bg-white rounded-md shadow-md border border-gray-100 p-5 sm:p-8">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+          <div className="text-center sm:text-left">
+            <h1 className="text-2xl md:text-3xl font-bold text-[#243771] leading-tight">
+              🎯 Dashboard Admin
+            </h1>
+            <p className="text-gray-500 text-sm mt-1">
+              Selamat datang kembali di Portal Admin
             </p>
           </div>
 
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 px-4 py-2 bg-[#FE4D01] text-white rounded-lg hover:bg-[#e14400] transition"
-          >
-            <LogOut size={18} /> Keluar
-          </button>
+          <div className="flex justify-center sm:justify-end">
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 bg-gradient-to-r from-[#FE4D01] to-[#ff7433] text-white px-5 py-2.5 rounded-md font-medium shadow-sm hover:shadow-md active:scale-[0.98] transition text-sm sm:text-base"
+            >
+              <LogOut size={18} /> Keluar
+            </button>
+          </div>
         </div>
 
-        <div className="border-t border-gray-200 my-4"></div>
-
-        <section className="text-center text-gray-600">
-          <p>🎉 Portal siap digunakan. Tambahkan konten admin di sini.</p>
+        {/* Content */}
+        <section className="text-center border-t border-gray-200 pt-6">
+          <h2 className="text-[1.6rem] sm:text-[1.9rem] font-bold text-[#243771] mb-1 leading-tight">
+            Halo,&nbsp;
+            <span className="text-[#FE4D01]">{admin?.name || "Admin"}</span>
+          </h2>
+          <p className="text-gray-500 text-sm sm:text-base break-all">{admin?.email}</p>
         </section>
+
+        <div className="mt-10">
+          <div className="bg-[#fff8f4] border border-[#ffd6ba] rounded-md shadow-inner px-5 py-5 sm:px-8 sm:py-6 max-w-2xl mx-auto text-center">
+            <p className="text-gray-800 font-medium text-lg mb-1">
+              🎉 Portal siap digunakan!
+            </p>
+            <p className="text-gray-600 text-sm leading-relaxed">
+              Anda bisa menambahkan atau mengatur konten admin dari menu sebelah kiri.
+            </p>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="text-center text-gray-400 text-sm border-t border-gray-200 pt-6 mt-10">
+          © {new Date().getFullYear()} Portal Admin — SMK Prestasi Prima
+        </div>
       </div>
     </main>
   );

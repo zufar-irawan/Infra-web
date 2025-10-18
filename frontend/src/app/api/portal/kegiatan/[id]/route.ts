@@ -10,14 +10,27 @@ export async function PUT(req: Request, context: { params: Promise<{ id: string 
     const cookieStore = await cookies();
     const token = cookieStore.get("portal-auth-token")?.value;
 
-    const res = await api.put(`/kegiatan/${id}`, body, {
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    // Convert ke FormData biar Laravel bisa baca
+    const formData = new FormData();
+    for (const key in body) {
+      formData.append(key, body[key as keyof typeof body]);
+    }
+
+    // Laravel butuh _method spoofing agar bisa diterima sebagai PUT
+    const res = await api.post(`/kegiatan/${id}?_method=PUT`, formData, {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : "",
+        "Content-Type": "multipart/form-data",
+      },
     });
 
     return NextResponse.json(res.data);
   } catch (err: any) {
     console.error("❌ UPDATE KEGIATAN ERROR:", err.response?.data || err.message);
-    return NextResponse.json({ success: false, message: "Gagal memperbarui kegiatan." }, { status: 500 });
+    return NextResponse.json(
+      { success: false, message: "Gagal memperbarui kegiatan." },
+      { status: err.response?.status || 500 }
+    );
   }
 }
 
@@ -35,6 +48,9 @@ export async function DELETE(_: Request, context: { params: Promise<{ id: string
     return NextResponse.json(res.data);
   } catch (err: any) {
     console.error("❌ DELETE KEGIATAN ERROR:", err.response?.data || err.message);
-    return NextResponse.json({ success: false, message: "Gagal menghapus kegiatan." }, { status: 500 });
+    return NextResponse.json(
+      { success: false, message: "Gagal menghapus kegiatan." },
+      { status: err.response?.status || 500 }
+    );
   }
 }

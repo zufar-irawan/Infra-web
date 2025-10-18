@@ -16,7 +16,6 @@ export default function ClientLayout({
     pathname === "/portal" || pathname.startsWith("/portal/verify");
   const [isMobile, setIsMobile] = useState(false);
 
-  // 🔹 Deteksi lebar layar saja (layout logic)
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 1024);
     handleResize();
@@ -24,22 +23,19 @@ export default function ClientLayout({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // 🔹 Halaman login/verify jangan render sidebar
   if (isAuthPage) return <>{children}</>;
 
-  // 🔹 Hilangkan semua redirect & tampilan “mengalihkan”
-  // Middleware sudah mengurus login protection
-
-  // Layout admin tampil penuh
   return (
-    <div className="flex min-h-screen bg-[#f4f6fb] text-gray-800">
+    <div className="flex min-h-screen bg-[#f4f6fb] text-gray-800 overflow-hidden">
       <Sidebar isMobile={isMobile} />
+
       <main
         className={`flex-1 min-h-screen transition-all duration-300 ${
-          !isMobile ? "lg:ml-64" : ""
+          isMobile ? "" : "lg:ml-64"
         }`}
       >
-        <div className="p-8">{children}</div>
+        {/* 🩶 ganti padding besar jadi kecil supaya ga dobel */}
+        <div className="p-3 sm:p-6 md:p-8">{children}</div>
       </main>
     </div>
   );

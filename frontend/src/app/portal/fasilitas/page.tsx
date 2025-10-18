@@ -3,8 +3,8 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Swal from "sweetalert2";
-import axios from "axios";
-import { Plus, Pencil, Trash2, X } from "lucide-react";
+import api from "../../lib/api"; // ← PENTING: pakai instance axios-mu
+import { Plus, Pencil, Trash2, X, CheckSquare, Square } from "lucide-react";
 
 interface Facility {
   id: number;
@@ -15,6 +15,7 @@ interface Facility {
 
 export default function FasilitasPage() {
   const [facilities, setFacilities] = useState<Facility[]>([]);
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [form, setForm] = useState<{ img_id: File | null; img_en: File | null; category: string }>({
     img_id: null,
     img_en: null,
@@ -31,13 +32,13 @@ export default function FasilitasPage() {
     "Fasilitas Umum",
   ];
 
-  // === Ambil data fasilitas dari Next.js API ===
+  // === Ambil data ===
   const fetchFacilities = async () => {
     try {
-      const res = await axios.get("/api/portal/facilities");
+      const res = await api.get("/facilities");
       if (res.data.success) setFacilities(res.data.data);
     } catch (err) {
-      console.error("❌ Gagal memuat data fasilitas:", err);
+      console.error("❌ Gagal memuat fasilitas:", err);
       Swal.fire("Gagal", "Tidak bisa memuat data fasilitas", "error");
     }
   };
@@ -46,26 +47,21 @@ export default function FasilitasPage() {
     fetchFacilities();
   }, []);
 
-  // === Upload handler ===
+  // === Upload gambar ===
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, type: "id" | "en") => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     if (!file.name.endsWith(".webp")) {
       Swal.fire("Format Salah", "Gunakan gambar berformat .webp", "warning");
       return;
     }
-
-    setForm((prev) => ({
-      ...prev,
-      [type === "id" ? "img_id" : "img_en"]: file,
-    }));
+    setForm((prev) => ({ ...prev, [type === "id" ? "img_id" : "img_en"]: file }));
   };
 
-  // === Simpan data (tambah / edit) ===
+  // === Tambah / Update ===
   const handleSave = async () => {
     if (!form.category) {
-      Swal.fire("Lengkapi Data", "Semua field harus diisi.", "warning");
+      Swal.fire("Lengkapi Data", "Kategori wajib diisi.", "warning");
       return;
     }
 
@@ -75,26 +71,25 @@ export default function FasilitasPage() {
     if (form.img_en) formData.append("img_en", form.img_en);
 
     try {
-      const url = editId
-        ? `/api/portal/facilities/${editId}`
-        : `/api/portal/facilities`;
-
-      await axios.post(url, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-
-      Swal.fire(
-        "Berhasil!",
-        editId ? "Data fasilitas diperbarui." : "Data fasilitas ditambahkan.",
-        "success"
-      );
+      if (editId) {
+        // ✅ Update pakai POST karena Laravel pakai POST /facilities/{id}
+        await api.post(`/facilities/${editId}`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        Swal.fire("Berhasil!", "Data fasilitas diperbarui.", "success");
+      } else {
+        await api.post(`/facilities`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        Swal.fire("Berhasil!", "Data fasilitas ditambahkan.", "success");
+      }
 
       setModalOpen(false);
       setForm({ img_id: null, img_en: null, category: "" });
       setEditId(null);
       fetchFacilities();
     } catch (err: any) {
-      console.error("❌ Gagal menyimpan data:", err);
+      console.error("❌ Gagal menyimpan:", err);
       Swal.fire("Gagal", err.response?.data?.message || "Upload gagal", "error");
     }
   };
@@ -102,19 +97,27 @@ export default function FasilitasPage() {
   // === Edit ===
   const handleEdit = (facility: Facility) => {
     setEditId(facility.id);
-    setForm({
-      img_id: null,
-      img_en: null,
-      category: facility.category,
-    });
+    setForm({ img_id: null, img_en: null, category: facility.category });
     setModalOpen(true);
   };
 
+  // === Pilih ===
+  const toggleSelect = (id: number) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
+  };
+
   // === Hapus ===
-  const handleDelete = async (id: number) => {
+  const handleDeleteSelected = async () => {
+    if (selectedIds.length === 0) {
+      Swal.fire("Tidak ada yang dipilih", "Pilih minimal satu data.", "info");
+      return;
+    }
+
     const result = await Swal.fire({
       title: "Hapus Data?",
-      text: "Data tidak dapat dikembalikan setelah dihapus!",
+      text: `${selectedIds.length} fasilitas akan dihapus.`,
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#FE4D01",
@@ -126,15 +129,16 @@ export default function FasilitasPage() {
     if (!result.isConfirmed) return;
 
     try {
-      await axios.delete(`/api/portal/facilities/${id}`);
+      await Promise.all(selectedIds.map((id) => api.delete(`/facilities/${id}`)));
       Swal.fire("Terhapus!", "Data fasilitas telah dihapus.", "success");
+      setSelectedIds([]);
       fetchFacilities();
-    } catch (err) {
+    } catch {
       Swal.fire("Gagal", "Tidak dapat menghapus fasilitas.", "error");
     }
   };
 
-  // === Tutup modal di luar / ESC ===
+  // === Tutup modal ===
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (modalRef.current && !modalRef.current.contains(e.target as Node)) setModalOpen(false);
@@ -150,167 +154,165 @@ export default function FasilitasPage() {
     };
   }, [isModalOpen]);
 
+  // === UI ===
   return (
-    <div className="space-y-8 animate-fadeIn">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-[#243771]">🏫 Manajemen Fasilitas</h1>
-        <button
-          onClick={() => {
-            setForm({ img_id: null, img_en: null, category: "" });
-            setEditId(null);
-            setModalOpen(true);
-          }}
-          className="flex items-center gap-2 bg-[#FE4D01] text-white px-4 py-2 rounded-lg hover:bg-[#fe5d20] transition"
-        >
-          <Plus size={18} /> Tambah Fasilitas
-        </button>
-      </div>
+    <main className="min-h-screen bg-gradient-to-br from-[#f5f7ff] via-[#fffdfb] to-[#fef6f0] px-4 py-10 md:px-10">
+      <div className="max-w-6xl mx-auto bg-white rounded-md shadow-md border border-gray-100 p-5 sm:p-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-[#243771]">🏫 Manajemen Fasilitas</h1>
+            <p className="text-gray-500 text-sm mt-1">Kelola seluruh fasilitas sekolah</p>
+          </div>
 
-      {/* Tabel */}
-      <div className="bg-white rounded-2xl shadow-md overflow-x-auto">
-        <table className="min-w-full text-sm">
-          <thead className="bg-[#243771] text-white text-left">
-            <tr>
-              <th className="p-3">#</th>
-              <th className="p-3">Gambar (ID)</th>
-              <th className="p-3">Gambar (EN)</th>
-              <th className="p-3">Kategori</th>
-              <th className="p-3 text-center">Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            {facilities.length > 0 ? (
-              facilities.map((f, i) => (
-                <tr key={f.id} className="border-b hover:bg-gray-50 transition">
-                  <td className="p-3 font-medium">{i + 1}</td>
-                  <td className="p-3 text-center">
-                    <Image
-                      src={f.img_id}
-                      alt="Gambar ID"
-                      width={80}
-                      height={80}
-                      className="rounded-md border object-cover mx-auto"
-                    />
-                  </td>
-                  <td className="p-3 text-center">
-                    <Image
-                      src={f.img_en}
-                      alt="Gambar EN"
-                      width={80}
-                      height={80}
-                      className="rounded-md border object-cover mx-auto"
-                    />
-                  </td>
-                  <td className="p-3">{f.category}</td>
-                  <td className="p-3 flex justify-center gap-2">
-                    <button
-                      onClick={() => handleEdit(f)}
-                      className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
-                    >
-                      <Pencil size={16} />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(f.id)}
-                      className="p-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
-                    >
-                      <Trash2 size={16} />
-                    </button>
+          <div className="flex flex-wrap gap-3">
+            {selectedIds.length > 0 && (
+              <button
+                onClick={handleDeleteSelected}
+                className="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition"
+              >
+                <Trash2 size={18} /> Hapus Terpilih
+              </button>
+            )}
+            <button
+              onClick={() => {
+                setForm({ img_id: null, img_en: null, category: "" });
+                setEditId(null);
+                setModalOpen(true);
+              }}
+              className="flex items-center gap-2 bg-gradient-to-r from-[#FE4D01] to-[#ff7433] text-white px-4 py-2 rounded-md font-medium shadow-sm hover:shadow-md transition"
+            >
+              <Plus size={18} /> Tambah Fasilitas
+            </button>
+          </div>
+        </div>
+
+        {/* Table */}
+        <div className="overflow-x-auto border border-gray-200 rounded-md">
+          <table className="min-w-full text-sm">
+            <thead className="bg-gradient-to-r from-[#243771] to-[#3b5bb1] text-white">
+              <tr>
+                <th className="p-3 w-[40px] text-center"></th>
+                <th className="p-3 text-center">ID</th>
+                <th className="p-3 text-center">Gambar (ID)</th>
+                <th className="p-3 text-center">Gambar (EN)</th>
+                <th className="p-3">Kategori</th>
+                <th className="p-3 text-center">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {facilities.length > 0 ? (
+                facilities.map((f) => (
+                  <tr
+                    key={f.id}
+                    className={`border-b ${selectedIds.includes(f.id) ? "bg-[#fff0e6]" : "hover:bg-[#f9fafc]"} transition`}
+                  >
+                    <td className="p-3 text-center cursor-pointer" onClick={() => toggleSelect(f.id)}>
+                      {selectedIds.includes(f.id) ? (
+                        <CheckSquare size={18} className="text-[#FE4D01]" />
+                      ) : (
+                        <Square size={18} className="text-gray-400" />
+                      )}
+                    </td>
+                    <td className="p-3 text-center font-medium text-[#243771]">{f.id}</td>
+                    <td className="p-3 text-center">
+                      <Image
+                        src={f.img_id}
+                        alt="Gambar ID"
+                        width={60}
+                        height={60}
+                        className="rounded-sm border border-gray-200 object-cover mx-auto"
+                      />
+                    </td>
+                    <td className="p-3 text-center">
+                      <Image
+                        src={f.img_en}
+                        alt="Gambar EN"
+                        width={60}
+                        height={60}
+                        className="rounded-sm border border-gray-200 object-cover mx-auto"
+                      />
+                    </td>
+                    <td className="p-3 text-gray-700">{f.category}</td>
+                    <td className="p-3 flex justify-center gap-2 flex-wrap">
+                      <button
+                        onClick={() => handleEdit(f)}
+                        className="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-sm transition"
+                      >
+                        <Pencil size={16} />
+                      </button>
+                      <button
+                        onClick={() => toggleSelect(f.id)}
+                        className={`p-2 ${
+                          selectedIds.includes(f.id)
+                            ? "bg-gray-300"
+                            : "bg-gray-100 hover:bg-gray-200"
+                        } rounded-sm text-[#243771] transition`}
+                      >
+                        {selectedIds.includes(f.id) ? "✓" : "Pilih"}
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={6} className="text-center py-6 text-gray-500 italic">
+                    Belum ada data fasilitas.
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={5} className="text-center py-6 text-gray-500 italic">
-                  Belum ada data fasilitas.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      {/* Modal Tambah/Edit */}
+      {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
-          <div
-            ref={modalRef}
-            className="bg-white rounded-2xl p-6 w-[95%] max-w-md shadow-xl relative"
-          >
-            <button
-              onClick={() => setModalOpen(false)}
-              className="absolute top-3 right-3 text-gray-400 hover:text-[#FE4D01]"
-            >
-              <X size={20} />
-            </button>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
+          <div ref={modalRef} className="bg-white rounded-md w-full max-w-md shadow-2xl border border-gray-200">
+            <div className="flex justify-between items-center px-5 py-4 bg-gradient-to-r from-[#243771]/90 to-[#FE4D01]/80 text-white">
+              <h2 className="font-semibold text-lg">{editId ? "Edit Fasilitas" : "Tambah Fasilitas"}</h2>
+              <button onClick={() => setModalOpen(false)}>
+                <X size={20} />
+              </button>
+            </div>
 
-            <h2 className="text-xl font-bold text-[#243771] mb-4 text-center">
-              {editId ? "Edit Fasilitas" : "Tambah Fasilitas"}
-            </h2>
-
-            {/* Form Inputs */}
-            <div className="space-y-4">
+            <div className="p-6 space-y-4">
               <div>
-                <label className="text-sm font-medium text-gray-600 mb-1 block">
-                  Kategori
-                </label>
+                <label className="block text-sm font-semibold mb-1">Kategori</label>
                 <select
                   value={form.category}
                   onChange={(e) => setForm({ ...form, category: e.target.value })}
-                  className="w-full border rounded-lg p-2"
+                  className="w-full border p-2 rounded"
                 >
                   <option value="">-- Pilih Kategori --</option>
-                  {categories.map((cat, idx) => (
-                    <option key={idx} value={cat}>
+                  {categories.map((cat, i) => (
+                    <option key={i} value={cat}>
                       {cat}
                     </option>
                   ))}
                 </select>
               </div>
-
               <div>
-                <label className="text-sm font-medium text-gray-600 mb-1 block">
-                  Gambar Bahasa Indonesia (.webp)
-                </label>
-                <input
-                  type="file"
-                  accept=".webp"
-                  onChange={(e) => handleImageUpload(e, "id")}
-                  className="w-full border rounded-lg p-2"
-                />
+                <label className="block text-sm font-semibold mb-1">Gambar Bahasa Indonesia (.webp)</label>
+                <input type="file" accept=".webp" onChange={(e) => handleImageUpload(e, "id")} className="w-full border p-2 rounded" />
               </div>
-
               <div>
-                <label className="text-sm font-medium text-gray-600 mb-1 block">
-                  Gambar Bahasa Inggris (.webp)
-                </label>
-                <input
-                  type="file"
-                  accept=".webp"
-                  onChange={(e) => handleImageUpload(e, "en")}
-                  className="w-full border rounded-lg p-2"
-                />
+                <label className="block text-sm font-semibold mb-1">Gambar Bahasa Inggris (.webp)</label>
+                <input type="file" accept=".webp" onChange={(e) => handleImageUpload(e, "en")} className="w-full border p-2 rounded" />
               </div>
             </div>
 
-            {/* Tombol Aksi */}
-            <div className="mt-6 flex justify-end gap-3">
-              <button
-                onClick={() => setModalOpen(false)}
-                className="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-100"
-              >
+            <div className="flex justify-end gap-3 px-5 py-4 bg-gray-50 border-t">
+              <button onClick={() => setModalOpen(false)} className="px-4 py-2 border rounded">
                 Batal
               </button>
-              <button
-                onClick={handleSave}
-                className="px-4 py-2 bg-[#FE4D01] text-white rounded-lg hover:bg-[#fe5d20]"
-              >
+              <button onClick={handleSave} className="px-4 py-2 bg-gradient-to-r from-[#FE4D01] to-[#ff7433] text-white rounded">
                 Simpan
               </button>
             </div>
           </div>
         </div>
       )}
-    </div>
+    </main>
   );
 }

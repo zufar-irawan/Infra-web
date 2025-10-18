@@ -1,13 +1,19 @@
 import { NextResponse } from "next/server";
 import api from "@/app/lib/api";
 
+/**
+ * GET /api/portal/mitra/public → Ambil mitra publik
+ * Auto-format path gambar jadi URL penuh (tanpa bug CORS)
+ */
 export async function GET() {
   try {
     const res = await api.get("/mitra/public");
     const mitra = res.data?.data || [];
 
-    // Ubah path /storage/... jadi URL penuh, biar <img src> di FE langsung jalan
+    // Ambil base domain dari api.defaults.baseURL
     const base = (api.defaults.baseURL || "").replace(/\/api\/?$/, "");
+
+    // Ubah semua path /storage/... jadi absolute URL
     const data = mitra.map((m: any) => ({
       ...m,
       img_id: m.img_id?.startsWith("/storage")
