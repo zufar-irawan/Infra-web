@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import api from "@/app/lib/api"; // axios instance ke Laravel API
 
 export async function GET() {
-  const token = (await cookies()).get("secure-auth-token")?.value;
+  const token = (await cookies()).get("auth-token")?.value;
   if (!token)
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 

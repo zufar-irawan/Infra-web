@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 
 export async function GET(req: Request) {
   const cookieStore = await cookies();
-  const token = cookieStore.get('secure-auth-token')?.value;
+  const token = cookieStore.get('auth-token')?.value;
 
   try {
     const res = await api.get('/lms/schedules', {
@@ -26,7 +26,7 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
     const cookieStore = cookies();
     // @ts-ignore
-    const token = cookieStore.get('secure-auth-token')?.value;
+    const token = cookieStore.get('auth-token')?.value;
 
     try {
         const body = await req.json();

@@ -1,14 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
-// This API proxies multipart uploads to the Laravel backend
-// Expected incoming form fields:
-// - assignment_id (or alias: assignmet_id)
-// - student_id
-// - files[]
-// - grade (default "0")
-// - feedback (default "")
-// - submitted_at (example: "2025-09-25 20:00:00")
 export async function POST(req: NextRequest) {
   try {
     const incoming = await req.formData();
@@ -42,10 +34,10 @@ export async function POST(req: NextRequest) {
     const incomingAuth = req.headers.get("authorization");
     const cookieStore = cookies();
     // @ts-ignore
-    const cookieToken = cookieStore.get("secure-auth-token")?.value;
+    const cookieToken = cookieStore.get("auth-token")?.value;
     const authHeader = incomingAuth || (cookieToken ? `Bearer ${cookieToken}` : undefined);
 
-    const upstream = await fetch("http://localhost:8000/api/lms/assignment-submissions", {
+    const upstream = await fetch("http://api.smkprestasiprima.sch.id/api/lms/assignment-submissions", {
       method: "POST",
       headers: {
         ...(authHeader ? { Authorization: authHeader } : {}),

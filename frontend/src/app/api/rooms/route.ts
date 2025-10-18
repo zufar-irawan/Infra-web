@@ -3,8 +3,9 @@ import api from "@/app/lib/api";
 import {NextResponse} from "next/server";
 
 export async function GET() {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('secure-auth-token')?.value;
+    const cookieStore = cookies();
+    // @ts-ignore
+    const token = cookieStore.get('auth-token')?.value;
 
     try {
         const res = await api.get('/lms/rooms', {

@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import api from "@/app/lib/api";
 
 async function getToken() {
-  return (await cookies()).get("secure-auth-token")?.value;
+  return (await cookies()).get("auth-token")?.value;
 }
 
 function buildErrorResponse(error: any) {

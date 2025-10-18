@@ -32,7 +32,7 @@ export async function GET(req: Request) {
     );
   }
 
-  const token = (await cookies()).get("secure-auth-token")?.value || null;
+  const token = (await cookies()).get("auth-token")?.value || null;
   if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {

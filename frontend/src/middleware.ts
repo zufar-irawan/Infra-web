@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export function middleware(request: NextRequest) {
-  const tokenEdu = request.cookies.get("secure-auth-token")?.value;
+  const tokenEdu = request.cookies.get("auth-token")?.value;
   const tokenPortal = request.cookies.get("portal-auth-token")?.value;
   const { pathname } = request.nextUrl;
 

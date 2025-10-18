@@ -10,7 +10,7 @@ interface Achievement {
   poster: string; // contoh: "storage/achievements/namafile.webp"
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://api.smkprestasiprima.sch.id/api";
 const BASE_URL = API_BASE_URL.replace(/\/api$/, "");
 
 export default function PrestasiPage() {

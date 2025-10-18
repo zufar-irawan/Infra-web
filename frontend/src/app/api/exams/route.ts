@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import api from "@/app/lib/api";
 
 export async function GET() {
-  const token = (await cookies()).get("secure-auth-token")?.value;
+  const token = (await cookies()).get("auth-token")?.value;
   if (!token) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
@@ -20,7 +20,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const token = (await cookies()).get("secure-auth-token")?.value;
+  const token = (await cookies()).get("auth-token")?.value;
   if (!token) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }

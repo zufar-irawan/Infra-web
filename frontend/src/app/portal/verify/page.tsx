@@ -6,7 +6,7 @@ import Swal from "sweetalert2";
 import Cookies from "js-cookie";
 import { Loader2, Lock, ChevronLeft } from "lucide-react";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://api.smkprestasiprima.sch.id/api";
 
 export default function VerifyCodePage() {
   const router = useRouter();

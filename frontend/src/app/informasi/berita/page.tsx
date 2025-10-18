@@ -15,7 +15,7 @@ interface BeritaItem {
   image: string;
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+const API_BASE_URL = "http://api.smkprestasiprima.sch.id/api";
 
 export default function Berita() {
   const { lang } = useLang();

@@ -55,12 +55,12 @@ export default function Header() {
 
   // === Header Menu ===
   const headerMenus: HeaderMenuItem[] = [
-    {
-      id: "beranda",
-      name_id: "Beranda",
-      name_en: "Home",
-      href: "/",
-    },
+    // {
+    //   id: "beranda",
+    //   name_id: "Beranda",
+    //   name_en: "Home",
+    //   href: "/",
+    // },
     {
       id: "tentang",
       name_id: "Tentang Kami",
@@ -97,8 +97,8 @@ export default function Header() {
     },
   ];
 
-  const flagUrl =
-    lang === "id" ? "https://flagcdn.com/w20/id.png" : "https://flagcdn.com/w20/us.png";
+  // Use a simple language label instead of flag images
+  const flagLabel = lang === "id" ? "ID" : "EN";
 
   return (
     <header className="fixed top-0 w-full z-50 select-none">
@@ -186,8 +186,8 @@ export default function Header() {
                   onClick={() => setLang(lang === "id" ? "en" : "id")}
                   className="px-3 py-2 rounded bg-white/30 hover:bg-white/20 flex items-center gap-2 transition"
                 >
-                  <Image src={flagUrl} alt="flag" width={20} height={15} className="rounded-sm" />
-                  <span>{lang === "id" ? "ID" : "EN"}</span>
+                  {/* show simple language label instead of flag image */}
+                  <span className="font-semibold">{flagLabel}</span>
                 </button>
               </div>
             </nav>
@@ -233,8 +233,8 @@ export default function Header() {
             onClick={() => setLang(lang === "id" ? "en" : "id")}
             className="px-3 py-2 rounded bg-white/10 hover:bg-white/20 flex items-center gap-2"
           >
-            <Image src={flagUrl} alt="flag" width={20} height={15} className="rounded-sm" />
-            <span>{lang === "id" ? "ID" : "EN"}</span>
+            {/* show simple language label instead of flag image */}
+            <span className="font-semibold">{flagLabel}</span>
           </button>
         </div>
 

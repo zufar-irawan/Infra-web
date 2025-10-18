@@ -8,7 +8,7 @@ import withReactContent from "sweetalert2-react-content";
 import axios from "axios";
 
 const MySwal = withReactContent(Swal);
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://api.smkprestasiprima.sch.id/api";
 
 export default function PortalLoginPage() {
   const [email, setEmail] = useState("");

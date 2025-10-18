@@ -56,10 +56,10 @@ function basename(p: string) {
 }
 
 function buildFileUrl(path: string) {
-  // If backend gives "storage/...", serve from Laravel at http://localhost:8000/
+  // If backend gives "storage/...", serve from Laravel at http://api.smkprestasiprima.sch.id/
   // Keep the path as-is; don't try to fix potential typos like "asssignments".
   const clean = path.replace(/^\/+/, "");
-  return `http://localhost:8000/${clean}`;
+  return `http://api.smkprestasiprima.sch.id/${clean}`;
 }
 
 export default function AssignmentDetailPage() {

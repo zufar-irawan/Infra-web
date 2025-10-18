@@ -5,7 +5,8 @@ const nextConfig: NextConfig = {
 };
 module.exports = {
   images: {
-    domains: ["flagcdn.com"],
+    // no external flag CDN required; we use simple ID/EN labels instead
+    domains: [],
     remotePatterns: [
       {
         protocol: "http",

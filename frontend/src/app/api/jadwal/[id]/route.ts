@@ -8,7 +8,7 @@ export async function DELETE(
     const { id } = await context.params
     const cookieStore = cookies()
     // @ts-ignore
-    const token = cookieStore.get('secure-auth-token')?.value
+    const token = cookieStore.get('auth-token')?.value
 
     try {
         const res = await api.delete(`/lms/schedules/${id}`, {
@@ -31,7 +31,7 @@ export async function DELETE(
 export async function PUT(req: Request){
     const cookieStore = cookies()
     // @ts-ignore
-    const token = cookieStore.get('secure-auth-token')?.value
+    const token = cookieStore.get('auth-token')?.value
     const body = await req.json()
 
     try {

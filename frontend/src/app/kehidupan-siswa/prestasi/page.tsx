@@ -10,7 +10,7 @@ type PrestasiItem = {
   poster: string; // backend kirim "poster", bukan "poster_url"
 };
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+const API_BASE = "http://api.smkprestasiprima.sch.id/api";
 
 export default function Prestasi() {
   const { lang } = useLang();
@@ -89,7 +89,7 @@ export default function Prestasi() {
                 <Image
                   src={img.poster.startsWith("http")
                     ? img.poster
-                    : `http://localhost:8000/storage/${img.poster}`}
+                    : `http://api.smkprestasiprima.sch.id/storage/${img.poster}`}
                   alt={`Prestasi ${img.id}`}
                   width={295}
                   height={368}

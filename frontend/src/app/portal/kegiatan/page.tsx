@@ -17,7 +17,7 @@ interface Kegiatan {
 }
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+  process.env.NEXT_PUBLIC_API_URL || "http://api.smkprestasiprima.sch.id/api";
 
 export default function AdminKegiatanPage() {
   const [kegiatan, setKegiatan] = useState<Kegiatan[]>([]);

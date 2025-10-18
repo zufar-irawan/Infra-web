@@ -92,7 +92,7 @@ export default function Prestasi() {
                         src={
                           img.poster.startsWith("http")
                             ? img.poster
-                            : `http://localhost:8000/storage/${img.poster}`
+                            : `http://api.smkprestasiprima.sch.id/storage/${img.poster}`
                         }
                         alt={`Prestasi ${img.id}`}
                         width={295}

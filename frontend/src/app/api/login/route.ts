@@ -15,7 +15,7 @@ export async function POST(req: Request){
 
             if (token) {
                 // @ts-ignore
-                cookieStore.set("secure-auth-token", token, {
+                cookieStore.set("auth-token", token, {
                     httpOnly: true,
                     path: "/",
                     secure: process.env.NODE_ENV === "production",

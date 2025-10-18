@@ -5,7 +5,7 @@ import api from "@/app/lib/api";
 export async function GET(){
     const cookieStore = cookies()
     // @ts-ignore
-    const token = cookieStore.get('secure-auth-token')?.value
+    const token = cookieStore.get('auth-token')?.value
 
     if(!token) return NextResponse.json({error: 'Unauthorized'}, {status: 401})
 

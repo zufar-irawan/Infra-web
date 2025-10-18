@@ -40,19 +40,11 @@ export default function Sekilas() {
             }`}
           >
             <Image
-              src={
-                lang === "id"
-                  ? "/atas-id.png"
-                  : "/atas-eng.png"
-              }
+              src="/svg/sirHendryGaris.svg"
               alt={lang === "id" ? "Kepala Sekolah" : "Principal"}
               width={500}
-              height={650}
-              className={`relative z-10 w-auto h-auto max-w-full ${
-                lang === "en"
-                  ? "object-cover object-top md:h-[650px] md:w-auto" // 👉 samain proporsinya di Englishtes
-                  : ""
-              }`}
+              height={500}
+              className={`relative z-10 w-auto h-auto max-w-full`}
               priority
             />
           </div>

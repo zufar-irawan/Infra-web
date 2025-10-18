@@ -15,7 +15,7 @@ interface NewsItem {
   image: string;
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+const API_BASE_URL = "http://api.smkprestasiprima.sch.id/api";
 
 export default function Berita() {
   const { lang } = useLang();
@@ -100,7 +100,7 @@ export default function Berita() {
                         src={
                           item.image?.startsWith("http")
                             ? item.image
-                            : `http://localhost:8000/storage/${item.image}`
+                            : `http://api.smkprestasiprima.sch.id/storage/${item.image}`
                         }
                         alt={lang === "id" ? item.title_id : item.title_en}
                         className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"

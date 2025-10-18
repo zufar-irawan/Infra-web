@@ -11,7 +11,7 @@ export async function GET(
 
   const cookieStore = cookies();
   // @ts-ignore
-  const token = cookieStore.get("secure-auth-token")?.value;
+  const token = cookieStore.get("auth-token")?.value;
 
   if (!token) return NextResponse.json({ error: "Token tidak ada!" }, { status: 401 });
   if (!id) return NextResponse.json({ error: "ID tugas tidak valid" }, { status: 400 });
@@ -38,7 +38,7 @@ export async function PUT(
   try {
     const cookieStore = cookies();
     // @ts-ignore
-    const token = cookieStore.get("secure-auth-token")?.value;
+    const token = cookieStore.get("auth-token")?.value;
     if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const body = await req.json().catch(() => ({} as any));

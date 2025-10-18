@@ -9,8 +9,9 @@ interface FaqProps {
   hideBreadcrumb?: boolean; // ✅ Tambahan props untuk sembunyikan breadcrumb
 }
 
-export default function Faq({ hideBreadcrumb = false }: FaqProps) {
+export default function Faq() {
   const { lang } = useLang();
+  const hideBreadcrumb = false
 
   return (
     <>
@@ -67,8 +68,7 @@ function FAQSection() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [faq, setFaq] = useState<any[]>([]);
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const API_BASE_URL =
-    process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+  const API_BASE_URL = "http://api.smkprestasiprima.sch.id/api";
 
   useEffect(() => {
     const fetchFaq = async () => {

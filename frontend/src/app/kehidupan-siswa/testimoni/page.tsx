@@ -43,7 +43,7 @@ export default function TestiPage() {
       <Pesan />
 
       {/* === Section FAQ (Re-use dari /informasi/faq/page.tsx) === */}
-      <Faq hideBreadcrumb/>
+      <Faq />
 
       {/* === Section Gedung === */}
       <main className="flex-1 w-full bg-white">
