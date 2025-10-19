@@ -2,7 +2,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 
 const api = axios.create({
-  baseURL: "http://api.smkprestasiprima.sch.id/api",
+  baseURL: "https://api.smkprestasiprima.sch.id/api",
   headers: { "Content-Type": "application/json" },
 });
 

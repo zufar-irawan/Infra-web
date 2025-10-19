@@ -15,7 +15,7 @@ export async function POST(req: Request) {
       });
 
       response.cookies.set("portal-auth-token", data.token, {
-  httpOnly: true,
+  httpOnly: false,
   secure: process.env.NODE_ENV === "production", // true nanti kalau HTTPS
   sameSite: "lax",
   path: "/",
