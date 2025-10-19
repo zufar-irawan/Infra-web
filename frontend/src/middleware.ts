@@ -5,13 +5,14 @@ export function middleware(request: NextRequest) {
   const tokenPortal = request.cookies.get("portal-auth-token")?.value;
   const { pathname } = request.nextUrl;
 
-  // ========================
-  // === EDU SECTION (tidak diubah) ===
-  // ========================
+  // ==============================
+  // === EDU SECTION (tetap sama)
+  // ==============================
   if (pathname.startsWith("/edu")) {
     if (tokenEdu) {
-      if (pathname === "/edu/login" || pathname === "/edu")
+      if (pathname === "/edu/login" || pathname === "/edu") {
         return NextResponse.redirect(new URL("/edu/dashboard", request.url));
+      }
       return NextResponse.next();
     }
 
@@ -22,40 +23,26 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // ========================
-  // === PORTAL SECTION (diperbaiki) ===
-  // ========================
+  // ==============================
+  // === PORTAL SECTION (aktif server-side)
+  // ==============================
   if (pathname.startsWith("/portal")) {
     const isLoginPage =
       pathname === "/portal" || pathname.startsWith("/portal/verify");
 
-    // ✅ Skip middleware saat proses verifikasi kode
-    // agar cookie sempat tersimpan sebelum dicek
-    if (pathname.startsWith("/api/portal/verify-code")) {
-      return NextResponse.next();
-    }
+    // 🚫 Skip API internal Next.js supaya gak infinite redirect
+    if (pathname.startsWith("/api/portal")) return NextResponse.next();
 
-    // ✅ Skip sekali jika user baru datang dari halaman verify
-    // (referer berisi /portal/verify)
-    const referer = request.headers.get("referer") || "";
-    if (
-      pathname === "/portal/dashboard" &&
-      referer.includes("/portal/verify")
-    ) {
-      return NextResponse.next();
-    }
-
-    // === Jika sudah login ===
+    // === Kalau sudah login ===
     if (tokenPortal) {
-      // Kalau sudah login tapi buka halaman login → arahkan ke dashboard
+      // Kalau buka halaman login padahal sudah login → redirect ke dashboard
       if (isLoginPage) {
         return NextResponse.redirect(new URL("/portal/dashboard", request.url));
       }
       return NextResponse.next();
     }
 
-    // === Jika belum login ===
-    // Hanya izinkan halaman login & verify
+    // === Kalau belum login ===
     if (!isLoginPage) {
       return NextResponse.redirect(new URL("/portal", request.url));
     }

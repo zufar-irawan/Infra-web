@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { useLang } from "../components/LangContext";
-import { useState, useEffect } from "react";
-import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { useEffect, useState, useRef } from "react";
+import { motion } from "framer-motion";
 
-interface NewsItem {
+interface BeritaItem {
   id: number;
   title_id: string;
   title_en: string;
@@ -15,147 +15,157 @@ interface NewsItem {
   image: string;
 }
 
-export default function Berita() {
+export default function BeritaSection() {
   const { lang } = useLang();
-  const [news, setNews] = useState<NewsItem[]>([]);
-  const [current, setCurrent] = useState(0);
+  const [beritaList, setBeritaList] = useState<BeritaItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef<HTMLDivElement | null>(null);
 
-  // === Ambil data dari API internal Next.js ===
+  const API_BASE = "http://api.smkprestasiprima.sch.id"; // masih HTTP
+  const fallbackImages = [
+    "/berita/expo.webp",
+    "/berita/ppdb.webp",
+    "/berita/kokurikuler.webp",
+  ];
+
+  // === Ambil berita terbaru dari API ===
   useEffect(() => {
-    const fetchNews = async () => {
+    async function loadBerita() {
       try {
         const res = await fetch("/api/portal/berita/public", { cache: "no-store" });
-        const json = await res.json();
-        console.log("📦 Data berita:", json);
+        const j = await res.json();
 
-        if (json.success && Array.isArray(json.data)) {
-          setNews(json.data);
+        if (j.success && Array.isArray(j.data) && j.data.length > 0) {
+          // hanya ambil 3 berita terbaru
+          const fixed = j.data.slice(0, 3).map((b: BeritaItem, i: number) => ({
+            ...b,
+            image:
+              b.image?.startsWith("http") && !b.image.includes("https://")
+                ? b.image.replace("https://", "http://")
+                : `${API_BASE}${b.image}`,
+          }));
+          setBeritaList(fixed);
         } else {
-          console.warn("⚠️ Format berita tidak sesuai, tampilkan kosong");
-          setNews([]);
+          // fallback dummy
+          setBeritaList(
+            fallbackImages.map((img, i) => ({
+              id: i + 1,
+              title_id: "Berita Sekolah",
+              title_en: "School News",
+              desc_id:
+                "Berita sementara ditampilkan karena server API tidak dapat dijangkau.",
+              desc_en: "Temporary news shown because API is unreachable.",
+              date: "2025-10-19",
+              image: img,
+            }))
+          );
         }
-      } catch (error) {
-        console.error("❌ Gagal ambil berita publik:", error);
+      } catch (err) {
+        console.error("❌ Gagal ambil berita section:", err);
+        // fallback jika total gagal
+        setBeritaList(
+          fallbackImages.map((img, i) => ({
+            id: i + 1,
+            title_id: "Berita Sekolah",
+            title_en: "School News",
+            desc_id:
+              "Berita sementara ditampilkan karena server API tidak dapat dijangkau.",
+            desc_en: "Temporary news shown because API is unreachable.",
+            date: "2025-10-19",
+            image: img,
+          }))
+        );
+      } finally {
+        setLoading(false);
       }
-    };
+    }
 
-    fetchNews();
+    loadBerita();
   }, []);
 
-  // === Navigasi Carousel ===
-  const nextSlide = () => setCurrent((prev) => (prev + 1) % news.length);
-  const prevSlide = () => setCurrent((prev) => (prev - 1 + news.length) % news.length);
+  // === Animasi saat muncul ===
+  useEffect(() => {
+    const obs = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((entry) => entry.isIntersecting && setIsVisible(true)),
+      { threshold: 0.2 }
+    );
+    if (sectionRef.current) obs.observe(sectionRef.current);
+    return () => obs.disconnect();
+  }, []);
 
-  // === Posisi Card ===
-  const getPositionClass = (index: number) => {
-    const diff = (index - current + news.length) % news.length;
-    switch (diff) {
-      case 0:
-        return "z-30 scale-100 opacity-100 translate-x-0";
-      case 1:
-        return "z-20 scale-90 opacity-80 translate-x-[270px] sm:translate-x-[500px]";
-      case news.length - 1:
-        return "z-20 scale-90 opacity-80 -translate-x-[270px] sm:-translate-x-[500px]";
-      default:
-        return "opacity-0 scale-75 pointer-events-none";
-    }
+  // === Fallback runtime kalau gambar gagal load ===
+  const handleImageError = (
+    e: React.SyntheticEvent<HTMLImageElement>,
+    idx: number
+  ) => {
+    e.currentTarget.src = fallbackImages[idx % fallbackImages.length];
   };
 
   return (
-    <section id="berita" className="py-20 bg-white relative overflow-hidden">
-      <div className="container mx-auto px-6 md:px-12 lg:px-20 text-center">
-        {/* === Title === */}
-        <h2 className="text-3xl md:text-4xl font-bold mb-4 text-[#FE4D01]">
-          {lang === "id" ? "Berita Terkini" : "Latest News"}
+    <section
+      ref={sectionRef}
+      className="relative w-full bg-white py-20 overflow-hidden"
+    >
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        animate={isVisible ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="container mx-auto px-6"
+      >
+        <h2 className="text-3xl md:text-4xl font-bold text-center text-[#243771] mb-10">
+          {lang === "id" ? "Berita Terbaru" : "Latest News"}
         </h2>
-        <p className="text-[#243771] mb-12 text-sm md:text-base">
-          {lang === "id"
-            ? "Ikuti perkembangan berita terbaru dari SMK Prestasi Prima"
-            : "Stay updated with the latest news from SMK Prestasi Prima"}
-        </p>
 
-        {/* === Carousel Container === */}
-        <div className="relative flex flex-col items-center justify-center">
-          <div className="relative flex items-center justify-center w-full h-[460px]">
-            {news.length === 0 ? (
-              <p className="text-gray-500">
-                {lang === "id" ? "Memuat berita..." : "Loading news..."}
-              </p>
-            ) : (
-              news.map((item, index) => (
-                <div
-                  key={item.id}
-                  className={`absolute transition-all duration-700 ease-[cubic-bezier(0.68,-0.55,0.27,1.55)] ${getPositionClass(index)}`}
-                >
-                  <div className="bg-white rounded-[12px] shadow-xl border border-gray-100 overflow-hidden w-[280px] sm:w-[340px] md:w-[420px] h-[440px] flex flex-col mx-auto">
-                    <div className="h-[200px] w-full overflow-hidden">
-                      <img
-                        src={item.image?.startsWith("http")
-                          ? item.image
-                          : `http://api.smkprestasiprima.sch.id/storage/${item.image}`}
-                        alt={lang === "id" ? item.title_id : item.title_en}
-                        className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
-                      />
-                    </div>
-                    <div className="p-4 text-left flex flex-col justify-between flex-1">
-                      <p className="text-sm text-[#FE4D01] font-medium">
-                        {new Date(item.date).toLocaleDateString(
-                          lang === "id" ? "id-ID" : "en-US",
-                          { day: "numeric", month: "long", year: "numeric" }
-                        )}
-                      </p>
-                      <h3 className="font-bold text-md mb-2 line-clamp-2">
-                        {lang === "id" ? item.title_id : item.title_en}
-                      </h3>
-                      <p className="text-sm text-gray-600 mb-3 line-clamp-3">
-                        {lang === "id" ? item.desc_id : item.desc_en}
-                      </p>
-                      <Link
-                        href={`/informasi/berita/${item.id}`}
-                        className="text-sm font-semibold text-[#FE4D01] hover:underline mt-auto"
-                      >
-                        {lang === "id"
-                          ? "Baca Selengkapnya..."
-                          : "Read More..."}
-                      </Link>
-                    </div>
-                  </div>
+        {loading ? (
+          <p className="text-center text-gray-500 italic">
+            {lang === "id" ? "Memuat berita..." : "Loading news..."}
+          </p>
+        ) : (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {beritaList.map((b, i) => (
+              <article
+                key={b.id}
+                className="bg-white rounded-2xl border border-gray-200 shadow-[0_10px_24px_rgba(17,24,32,0.06)] hover:shadow-[0_14px_32px_rgba(17,24,32,0.12)] transition-all duration-300 overflow-hidden"
+              >
+                <div className="relative w-full h-48 md:h-52">
+                  <img
+                    src={b.image}
+                    alt={lang === "id" ? b.title_id : b.title_en}
+                    onError={(e) => handleImageError(e, i)}
+                    className="object-cover w-full h-full"
+                    loading="lazy"
+                  />
                 </div>
-              ))
-            )}
+
+                <div className="p-4 md:p-5">
+                  <p className="text-xs md:text-sm font-semibold text-[#FE4D01] mb-2">
+                    {new Date(b.date).toLocaleDateString(
+                      lang === "id" ? "id-ID" : "en-US"
+                    )}
+                  </p>
+
+                  <h3 className="text-[15px] md:text-lg font-semibold text-[#111820] leading-snug mb-2">
+                    {lang === "id" ? b.title_id : b.title_en}
+                  </h3>
+
+                  <p className="text-gray-600 text-sm md:text-[15px] leading-relaxed mb-3 line-clamp-3">
+                    {lang === "id" ? b.desc_id : b.desc_en}
+                  </p>
+
+                  <Link
+                    href={`/informasi/berita/${b.id}`}
+                    className="inline-block text-[13px] md:text-sm font-semibold text-[#FE4D01] hover:underline"
+                  >
+                    {lang === "id" ? "Baca Selengkapnya..." : "Read More..."}
+                  </Link>
+                </div>
+              </article>
+            ))}
           </div>
-
-          {/* === Navigation + Button === */}
-          {news.length > 0 && (
-            <div className="flex justify-center gap-6 mt-8 items-center">
-              <button
-                onClick={prevSlide}
-                className="p-3 md:p-4 bg-white rounded-[10px] shadow-[0_4px_10px_rgba(0,0,0,0.15)] hover:shadow-[0_6px_14px_rgba(254,77,1,0.3)] transition"
-              >
-                <FiChevronLeft className="w-6 h-6 text-[#FE4D01]" />
-              </button>
-
-              <button
-                onClick={nextSlide}
-                className="p-3 md:p-4 bg-white rounded-[10px] shadow-[0_4px_10px_rgba(0,0,0,0.15)] hover:shadow-[0_6px_14px_rgba(254,77,1,0.3)] transition"
-              >
-                <FiChevronRight className="w-6 h-6 text-[#FE4D01]" />
-              </button>
-
-              <Link
-                href="/informasi/berita"
-                className="p-3 md:p-4 bg-white rounded-[10px] shadow-[0_4px_10px_rgba(0,0,0,0.15)] hover:shadow-[0_6px_14px_rgba(254,77,1,0.3)] transition font-semibold text-[#FE4D01] text-sm"
-              >
-                {lang === "id" ? "Selengkapnya" : "View All"}
-              </Link>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* === Ornamen Oranye === */}
-      <div className="absolute bottom-0 right-0 w-[50px] h-[50px] bg-[#FE4D01]" />
-      <div className="absolute bottom-0 right-25 w-[50px] h-[50px] bg-[#FE4D01]" />
+        )}
+      </motion.div>
     </section>
   );
 }

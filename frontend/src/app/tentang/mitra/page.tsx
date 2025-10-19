@@ -17,16 +17,45 @@ export default function MitraIndustri() {
   const [partners, setPartners] = useState<Mitra[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const API_BASE = "https://api.smkprestasiprima.sch.id";
+
+  // === Resolver URL Gambar ===
+  const resolveImageUrl = (path?: string) => {
+    if (!path) return "";
+    if (path.startsWith("http")) return path;
+    return `${API_BASE}${path}`;
+  };
+
+  // === Fallback SVG lokal (urutan tetap) ===
+  const fallbackImages = [
+    "/svg/jatelindo.svg",
+    "/svg/kemhan.svg",
+    "/svg/kemenkop.svg",
+    "/svg/Komatsu.svg",
+    "/svg/Panasonic.svg",
+    "/svg/transvision.svg",
+    "/svg/starvision.svg",
+    "/svg/wika.svg",
+    "/svg/antam.svg",
+  ];
+
+  // === Fetch data mitra ===
   useEffect(() => {
     axios
       .get("/api/portal/mitra/public")
       .then((res) => {
         if (res.data.success) setPartners(res.data.data);
-        else console.error("Gagal ambil data mitra:", res.data.message);
+        else console.error("⚠️ Gagal ambil data mitra:", res.data.message);
       })
-      .catch((err) => console.error("Gagal memuat data mitra:", err))
+      .catch((err) => console.error("❌ Gagal memuat data mitra:", err))
       .finally(() => setLoading(false));
   }, []);
+
+  // === Ganti gambar jika error ===
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>, idx: number) => {
+    const fallback = fallbackImages[idx % fallbackImages.length];
+    e.currentTarget.src = fallback;
+  };
 
   return (
     <>
@@ -65,16 +94,17 @@ export default function MitraIndustri() {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 justify-items-center">
                 {partners.length > 0 ? (
-                  partners.map((p) => (
+                  partners.map((p, i) => (
                     <div
                       key={p.id}
                       className="w-[280px] sm:w-[320px] lg:w-[370px] h-[180px] bg-white border border-gray-100 rounded-tr-[70px] rounded-bl-[70px] flex items-center justify-center transition-transform duration-500 hover:scale-[1.04] shadow-md"
                     >
                       <img
-                        src={lang === "id" ? p.img_id : p.img_en}
+                        src={resolveImageUrl(lang === "id" ? p.img_id : p.img_en)}
                         alt={p.name}
                         loading="lazy"
                         className="max-h-[70%] max-w-[70%] object-contain"
+                        onError={(e) => handleImageError(e, i)}
                       />
                     </div>
                   ))

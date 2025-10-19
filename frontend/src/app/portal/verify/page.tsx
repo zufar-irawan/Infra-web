@@ -4,7 +4,8 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import axios from "axios";
+import api from "@/app/lib/api";
+import Cookies from "js-cookie";
 import { Loader2, Lock, ChevronLeft } from "lucide-react";
 
 const MySwal = withReactContent(Swal);
@@ -43,26 +44,32 @@ export default function VerifyCodePage() {
 
     setLoading(true);
     try {
-      // 🔥 Kirim ke backend (hybrid verify-code route)
-      const res = await axios.post("/api/portal/verify-code", {
-        email,
-        code: fullCode,
-      });
+      // 🔥 Kirim langsung ke backend Laravel
+      const res = await api.post("/auth/verify-code", { email, code: fullCode });
 
-      if (res.data.success) {
-        // ✅ Cookie sudah tersimpan di response yang sama
-        MySwal.fire({
+      if (res.data.success && res.data.token) {
+        // ✅ Simpan token ke cookie (biar dashboard bisa akses)
+        Cookies.set("portal-auth-token", res.data.token, {
+          path: "/",
+          secure: false, // true nanti kalau HTTPS aktif
+          sameSite: "lax",
+        });
+
+        // ✅ Tampilkan pesan sukses
+        await MySwal.fire({
           icon: "success",
           title: "Verifikasi Berhasil!",
           text: "Selamat datang di Portal Admin.",
           showConfirmButton: false,
-          timer: 1400,
+          timer: 1300,
           background: "#1e2b63",
           color: "#fff",
         });
 
-        // ⏩ Langsung redirect ke dashboard (tanpa delay)
-        router.push("/portal/dashboard");
+        // ✅ Delay sedikit biar cookie sempat terset sebelum redirect
+        setTimeout(() => {
+          router.replace("/portal/dashboard");
+        }, 300);
       } else {
         MySwal.fire({
           icon: "error",

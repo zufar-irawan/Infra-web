@@ -13,8 +13,29 @@ interface Mitra {
 export default function Mitra() {
   const { lang } = useLang();
   const [partners, setPartners] = useState<Mitra[]>([]);
+  const API_BASE = "https://api.smkprestasiprima.sch.id";
 
-  // Ambil data mitra dari API proxy Next.js
+  // === Resolver URL Gambar ===
+  const resolveImageUrl = (path?: string) => {
+    if (!path) return "";
+    if (path.startsWith("http")) return path;
+    return `${API_BASE}${path}`;
+  };
+
+  // === Fallback SVG lokal (urutan tetap) ===
+  const fallbackImages = [
+    "/svg/jatelindo.svg",
+    "/svg/kemhan.svg",
+    "/svg/kemenkop.svg",
+    "/svg/Komatsu.svg",
+    "/svg/Panasonic.svg",
+    "/svg/transvision.svg",
+    "/svg/starvision.svg",
+    "/svg/wika.svg",
+    "/svg/antam.svg",
+  ];
+
+  // === Ambil data mitra dari API ===
   useEffect(() => {
     fetch("/api/portal/mitra/public", { cache: "no-store" })
       .then((r) => r.json())
@@ -24,11 +45,14 @@ export default function Mitra() {
       .catch((err) => console.error("❌ Gagal memuat data mitra:", err));
   }, []);
 
+  // === Ganti gambar jika gagal load ===
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>, idx: number) => {
+    const fallback = fallbackImages[idx % fallbackImages.length];
+    e.currentTarget.src = fallback;
+  };
+
   return (
-    <section
-      id="mitra"
-      className="relative bg-white overflow-hidden py-32 md:py-40"
-    >
+    <section id="mitra" className="relative bg-white overflow-hidden py-32 md:py-40">
       {/* Dekorasi atas */}
       <div className="absolute top-0 left-0 w-full z-0">
         {Array.from({ length: 30 }, (_, i) => i * 6.4).map((pos, idx) => (
@@ -59,31 +83,26 @@ export default function Mitra() {
           </span>
         </h2>
 
-        {/* Carousel Mitra */}
         <div className="overflow-hidden w-full relative max-w-7xl mx-auto select-none">
           <div className="absolute left-0 top-0 h-full w-20 z-20 bg-gradient-to-r from-white to-transparent" />
-          <div
-            className="marquee-inner flex will-change-transform min-w-[200%]"
-            style={{ animationDuration: "25s" }}
-          >
+
+          <div className="marquee-inner flex will-change-transform min-w-[200%]" style={{ animationDuration: "25s" }}>
             <div className="flex items-center">
               {[...partners, ...partners].map((p, i) => (
-                <div
-                  key={`${p.id}-${i}`}
-                  className="flex items-center justify-center mx-10"
-                  style={{ minWidth: "160px" }}
-                >
+                <div key={`${p.id}-${i}`} className="flex items-center justify-center mx-10" style={{ minWidth: "160px" }}>
                   <img
-                    src={lang === "id" ? p.img_id : p.img_en}
+                    src={resolveImageUrl(lang === "id" ? p.img_id : p.img_en)}
                     alt={p.name}
                     loading="lazy"
                     className="h-28 w-auto object-contain"
                     draggable={false}
+                    onError={(e) => handleImageError(e, i)}
                   />
                 </div>
               ))}
             </div>
           </div>
+
           <div className="absolute right-0 top-0 h-full w-20 md:w-40 z-20 bg-gradient-to-l from-white to-transparent" />
         </div>
       </div>

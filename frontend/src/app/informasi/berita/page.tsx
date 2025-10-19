@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useLang } from "../../components/LangContext";
 import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
@@ -23,18 +22,32 @@ export default function Berita() {
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement | null>(null);
 
-  // === Ambil data dari API internal (route.ts) ===
+  // urutan gambar fix
+  const fixedImages = [
+    "/berita/expo.webp",
+    "/berita/ppdb.webp",
+    "/berita/kokurikuler.webp",
+  ];
+
+  // === Ambil data dari API ===
   useEffect(() => {
     fetch("/api/portal/berita/public", { cache: "no-store" })
       .then((r) => r.json())
       .then((j) => {
-        if (j.success) setBeritaList(j.data);
+        if (j.success && Array.isArray(j.data)) {
+          // ambil 3 teratas, dan ganti gambar sesuai urutan tetap
+          const top3 = j.data.slice(0, 3).map((b: any, i: number) => ({
+            ...b,
+            image: fixedImages[i % fixedImages.length],
+          }));
+          setBeritaList(top3);
+        }
       })
-      .catch((e) => console.error("❌ Gagal ambil berita publik:", e))
+      .catch((e) => console.error("❌ Gagal ambil berita:", e))
       .finally(() => setLoading(false));
   }, []);
 
-  // === Animasi muncul saat di-scroll ===
+  // animasi muncul
   useEffect(() => {
     const obs = new IntersectionObserver(
       (entries) =>
@@ -50,56 +63,29 @@ export default function Berita() {
       <div className="h-[100px] bg-white" />
 
       {/* === Breadcrumbs === */}
-      <section className="w-full py-4 bg-white">
-        <div className="container mx-auto px-4">
-          <nav className="flex items-center text-sm font-medium space-x-2">
-            <Link href="/" className="text-[#FE4D01] hover:underline">
-              {lang === "id" ? "Beranda" : "Home"}
-            </Link>
-            <span className="text-[#FE4D01]">{">"}</span>
-            <Link href="/informasi/berita" className="text-[#FE4D01] hover:underline">
-              {lang === "id" ? "Informasi" : "Information"}
-            </Link>
-            <span className="text-[#243771]">{">"}</span>
-            <span className="text-[#243771]">
-              {lang === "id" ? "Berita" : "News"}
-            </span>
-          </nav>
-        </div>
-      </section>
-
-      {/* === Section Intro === */}
-      <section className="relative w-full bg-white">
-        <div className="max-w-6xl mx-auto px-4 pt-16 pb-24">
-          <h2 className="text-3xl sm:text-4xl font-semibold text-[#243771] text-center mb-12">
-            {lang === "id" ? "Berita" : "News"}
-          </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-            <div>
-              <img
-                src="/avif/ppdb.avif"
-                alt="SMK Prestasi Prima"
-                className="rounded-xl w-full h-auto object-cover aspect-[4/3] hover:scale-[1.03] hover:shadow-xl transition-transform duration-500"
-              />
-            </div>
-
-            <div>
-              <p className="text-gray-700 leading-relaxed text-justify text-base sm:text-lg mb-6">
-                {lang === "id"
-                  ? "Telusuri berita terbaru untuk mendapatkan informasi terkini tentang kegiatan, prestasi, dan inovasi di SMK Prestasi Prima."
-                  : "Explore the latest news to stay updated on SMK Prestasi Prima’s activities, achievements, and innovations."}
-              </p>
-            </div>
+        <section className="w-full py-4 bg-white">
+          <div className="container mx-auto px-4">
+            <nav className="flex items-center text-sm font-medium flex-wrap gap-1">
+              <Link href="/" className="text-[#FE4D01] hover:underline">
+                {lang === "id" ? "Beranda" : "Home"}
+              </Link>
+              <span className="text-[#FE4D01]">{">"}</span>
+              <Link
+                href="/informasi-sekolah/tentang-kami"
+                className="text-[#FE4D01] hover:underline"
+              >
+                {lang === "id" ? "Informasi" : "Information"}
+              </Link>
+              <span className="text-[#243771]">{">"}</span>
+              <span className="text-[#243771]">
+                {lang === "id" ? "Berita" : "News"}
+              </span>
+            </nav>
           </div>
-        </div>
-      </section>
+        </section>
 
       {/* === Section Berita === */}
-      <section
-        ref={sectionRef}
-        className="w-full bg-white py-10 sm:py-16 overflow-hidden"
-      >
+      <section ref={sectionRef} className="w-full bg-white py-16 overflow-hidden">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={isVisible ? { opacity: 1, y: 0 } : {}}
@@ -120,19 +106,17 @@ export default function Berita() {
             </p>
           ) : (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {beritaList.map((b) => (
+              {beritaList.map((b, i) => (
                 <article
                   key={b.id}
                   className="bg-white rounded-2xl border border-gray-200 shadow-[0_10px_24px_rgba(17,24,32,0.06)] hover:shadow-[0_14px_32px_rgba(17,24,32,0.12)] transition-all duration-300 overflow-hidden"
                 >
-                  <div className="relative w-full h-48 md:h-52">
-                    <Image
+                  <div className="relative w-full aspect-[4/3]">
+                    <img
                       src={b.image}
                       alt={lang === "id" ? b.title_id : b.title_en}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                      unoptimized
+                      className="object-cover w-full h-full"
+                      loading="lazy"
                     />
                   </div>
 
@@ -152,7 +136,10 @@ export default function Berita() {
                     </p>
 
                     <Link
-                      href={`/informasi/berita/${b.id}`}
+                      href={{
+                        pathname: `/informasi/berita/${b.id}`,
+                        query: { img: b.image },
+                      }}
                       className="inline-block text-[13px] md:text-sm font-semibold text-[#FE4D01] hover:underline"
                     >
                       {lang === "id" ? "Baca Selengkapnya..." : "Read More..."}
@@ -163,15 +150,6 @@ export default function Berita() {
             </div>
           )}
         </motion.div>
-      </section>
-
-      {/* === Section Gedung === */}
-      <section className="relative w-full bg-white overflow-hidden">
-        <img
-          src="/avif/gedung.avif"
-          alt={lang === "id" ? "Gedung SMK Prestasi Prima" : "Prestasi Prima Building"}
-          className="w-full h-[40vh] sm:h-[55vh] lg:h-screen object-cover object-center hover:scale-[1.02] transition-transform duration-700"
-        />
       </section>
     </>
   );

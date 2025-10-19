@@ -5,7 +5,7 @@ import { Mail, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import axios from "axios";
+import api from "../lib/api";
 
 const MySwal = withReactContent(Swal);
 
@@ -31,7 +31,7 @@ export default function PortalLoginPage() {
 
     setLoading(true);
     try {
-      const res = await axios.post("/api/portal/request-code", { email });
+      const res = await api.post("/auth/request-code", { email });
 
       if (res.data.success) {
         MySwal.fire({

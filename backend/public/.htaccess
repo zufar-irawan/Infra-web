@@ -1,3 +1,27 @@
+# =====================================================
+# ✅ FIX UNTUK AKSES FILE STORAGE DAN CORS
+# =====================================================
+
+<IfModule mod_headers.c>
+  Header set Access-Control-Allow-Origin "*"
+</IfModule>
+
+# Izinkan akses file di storage publik Laravel
+<Directory "/var/www/webroot/ROOT/web/storage/app/public">
+    Options +Indexes
+    AllowOverride All
+    Require all granted
+</Directory>
+
+# Izinkan file gambar, svg, pdf, dll diakses publik
+<FilesMatch "\.(jpg|jpeg|png|gif|webp|svg|pdf)$">
+    Require all granted
+    Header set Access-Control-Allow-Origin "*"
+</FilesMatch>
+
+# =====================================================
+# 🔹 ATURAN DEFAULT LARAVEL (JANGAN DIHAPUS)
+# =====================================================
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes

@@ -24,14 +24,21 @@ export default function AdminFaqPage() {
   const [loading, setLoading] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
 
-  // === Ambil Data FAQ dari API Proxy ===
+  /**
+   * ==========================================
+   * 🔹 Ambil data FAQ via API Route Next.js
+   * ==========================================
+   */
   const fetchFaqs = async () => {
     setLoading(true);
     try {
       const res = await axios.get("/api/portal/faq");
-      setFaqList(res.data.data?.data || res.data.data || []);
+      const data = res.data?.data || res.data;
+      if (Array.isArray(data)) setFaqList(data);
+      else if (data?.data) setFaqList(data.data);
+      else setFaqList([]);
     } catch (err) {
-      console.error(err);
+      console.error("❌ Gagal memuat FAQ:", err);
       MySwal.fire("Gagal", "Tidak bisa memuat data FAQ.", "error");
     } finally {
       setLoading(false);
@@ -42,7 +49,11 @@ export default function AdminFaqPage() {
     fetchFaqs();
   }, []);
 
-  // === Simpan FAQ (Create / Update) ===
+  /**
+   * ==========================================
+   * 🔹 Tambah / Update FAQ
+   * ==========================================
+   */
   const handleSave = async () => {
     if (!form.q_id || !form.a_id || !form.q_en || !form.a_en) {
       MySwal.fire("Lengkapi Data", "Semua field wajib diisi!", "warning");
@@ -51,10 +62,12 @@ export default function AdminFaqPage() {
 
     try {
       if (editId) {
+        // Update FAQ → PUT ke route proxy Next.js
         await axios.put(`/api/portal/faq/${editId}`, form);
         MySwal.fire("Berhasil", "FAQ berhasil diperbarui.", "success");
       } else {
-        await axios.post(`/api/portal/faq`, form);
+        // Tambah FAQ → POST ke route proxy Next.js
+        await axios.post("/api/portal/faq", form);
         MySwal.fire("Berhasil", "FAQ berhasil ditambahkan.", "success");
       }
 
@@ -62,15 +75,23 @@ export default function AdminFaqPage() {
       setEditId(null);
       setModalOpen(false);
       fetchFaqs();
-    } catch (err) {
-      console.error(err);
-      MySwal.fire("Gagal", "Terjadi kesalahan saat menyimpan data.", "error");
+    } catch (err: any) {
+      console.error("❌ Gagal menyimpan FAQ:", err);
+      MySwal.fire(
+        "Gagal",
+        err.response?.data?.message || "Terjadi kesalahan saat menyimpan data.",
+        "error"
+      );
     }
   };
 
-  // === Hapus FAQ ===
+  /**
+   * ==========================================
+   * 🔹 Hapus FAQ
+   * ==========================================
+   */
   const handleDelete = async (id: number) => {
-    MySwal.fire({
+    const confirm = await MySwal.fire({
       title: "Hapus FAQ?",
       text: "Data yang dihapus tidak dapat dikembalikan.",
       icon: "warning",
@@ -79,33 +100,49 @@ export default function AdminFaqPage() {
       cancelButtonColor: "#243771",
       confirmButtonText: "Ya, Hapus",
       cancelButtonText: "Batal",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          await axios.delete(`/api/portal/faq/${id}`);
-          MySwal.fire("Terhapus!", "FAQ berhasil dihapus.", "success");
-          fetchFaqs();
-        } catch (err) {
-          console.error(err);
-          MySwal.fire("Gagal", "Tidak bisa menghapus FAQ.", "error");
-        }
-      }
     });
+
+    if (!confirm.isConfirmed) return;
+
+    try {
+      await axios.delete(`/api/portal/faq/${id}`);
+      MySwal.fire("Terhapus!", "FAQ berhasil dihapus.", "success");
+      fetchFaqs();
+    } catch (err: any) {
+      console.error("❌ Gagal menghapus FAQ:", err);
+      MySwal.fire(
+        "Gagal",
+        err.response?.data?.message || "Tidak dapat menghapus FAQ.",
+        "error"
+      );
+    }
   };
 
-  // === Edit FAQ ===
+  /**
+   * ==========================================
+   * 🔹 Edit FAQ
+   * ==========================================
+   */
   const handleEdit = (f: FaqItem) => {
     setForm(f);
     setEditId(f.id);
     setModalOpen(true);
   };
 
-  // === Tutup modal klik luar / ESC ===
+  /**
+   * ==========================================
+   * 🔹 Tutup modal klik luar / ESC
+   * ==========================================
+   */
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (modalRef.current && !modalRef.current.contains(e.target as Node)) setModalOpen(false);
+      if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
+        setModalOpen(false);
+      }
     };
-    const handleEsc = (e: KeyboardEvent) => e.key === "Escape" && setModalOpen(false);
+    const handleEsc = (e: KeyboardEvent) =>
+      e.key === "Escape" && setModalOpen(false);
+
     if (isModalOpen) {
       document.addEventListener("mousedown", handleClickOutside);
       document.addEventListener("keydown", handleEsc);
@@ -116,13 +153,20 @@ export default function AdminFaqPage() {
     };
   }, [isModalOpen]);
 
+  /**
+   * ==========================================
+   * 🔹 UI
+   * ==========================================
+   */
   return (
     <main className="min-h-screen bg-gradient-to-br from-[#f5f7ff] via-[#fffdfb] to-[#fff5f0] px-4 py-10 md:px-10">
       <div className="max-w-6xl mx-auto bg-white rounded-md shadow-md border border-gray-100 p-5 sm:p-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-[#243771]">❓ Manajemen FAQ</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-[#243771]">
+              ❓ Manajemen FAQ
+            </h1>
             <p className="text-gray-500 text-sm mt-1">
               Kelola daftar pertanyaan umum untuk portal
             </p>
@@ -143,7 +187,9 @@ export default function AdminFaqPage() {
         {/* Table */}
         <div className="overflow-x-auto border border-gray-200 rounded-md">
           {loading ? (
-            <div className="text-center py-10 text-gray-500">Memuat data...</div>
+            <div className="text-center py-10 text-gray-500">
+              Memuat data...
+            </div>
           ) : (
             <table className="min-w-full text-sm">
               <thead className="bg-gradient-to-r from-[#243771] to-[#3b5bb1] text-white">
@@ -157,10 +203,19 @@ export default function AdminFaqPage() {
               <tbody>
                 {faqList.length > 0 ? (
                   faqList.map((f, i) => (
-                    <tr key={f.id} className="border-b hover:bg-[#f9fafc] transition">
-                      <td className="p-3 text-center font-medium text-[#243771]">{i + 1}</td>
-                      <td className="p-3 font-medium text-gray-700">{f.q_id}</td>
-                      <td className="p-3 text-gray-600 truncate max-w-[300px]">{f.a_id}</td>
+                    <tr
+                      key={f.id}
+                      className="border-b hover:bg-[#f9fafc] transition"
+                    >
+                      <td className="p-3 text-center font-medium text-[#243771]">
+                        {i + 1}
+                      </td>
+                      <td className="p-3 font-medium text-gray-700">
+                        {f.q_id}
+                      </td>
+                      <td className="p-3 text-gray-600 truncate max-w-[300px]">
+                        {f.a_id}
+                      </td>
                       <td className="p-3 flex justify-center gap-2 flex-wrap">
                         <button
                           onClick={() => handleEdit(f)}
@@ -179,7 +234,10 @@ export default function AdminFaqPage() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={4} className="text-center py-6 text-gray-500 italic">
+                    <td
+                      colSpan={4}
+                      className="text-center py-6 text-gray-500 italic"
+                    >
                       Belum ada FAQ.
                     </td>
                   </tr>

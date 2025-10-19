@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from "react";
 import Swal from "sweetalert2";
-import api from "../../lib/api";
 import { Plus, Pencil, Trash2, X } from "lucide-react";
 
 interface Achievement {
@@ -17,11 +16,14 @@ export default function PrestasiPage() {
   const [isModalOpen, setModalOpen] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
 
-  // === Ambil data ===
+  // === Ambil data dari API Next.js Proxy ===
   const fetchAchievements = async () => {
     try {
-      const res = await api.get("/achievements");
-      if (res.data.success) setAchievements(res.data.data);
+      const res = await fetch("/api/portal/prestasi", { cache: "no-store" });
+      const json = await res.json();
+
+      if (json.success) setAchievements(json.data);
+      else throw new Error(json.message);
     } catch (err) {
       console.error("❌ Gagal memuat data prestasi:", err);
       Swal.fire("Gagal", "Tidak bisa memuat data prestasi", "error");
@@ -54,26 +56,39 @@ export default function PrestasiPage() {
     formData.append("poster", file);
 
     try {
+      let res;
       if (editId) {
-        // ✅ spoofing _method=PUT agar cocok dengan apiResource
-        await api.post(`/achievements/${editId}?_method=PUT`, formData, {
-          headers: { "Content-Type": "multipart/form-data" },
+        // UPDATE pakai spoof _method=PUT
+        formData.append("_method", "PUT");
+        res = await fetch(`/api/portal/prestasi/${editId}`, {
+          method: "POST",
+          body: formData,
         });
-        Swal.fire("Berhasil!", "Data prestasi diperbarui.", "success");
       } else {
-        await api.post(`/achievements`, formData, {
-          headers: { "Content-Type": "multipart/form-data" },
+        // CREATE baru
+        res = await fetch(`/api/portal/prestasi`, {
+          method: "POST",
+          body: formData,
         });
-        Swal.fire("Berhasil!", "Data prestasi ditambahkan.", "success");
       }
 
-      setModalOpen(false);
-      setFile(null);
-      setEditId(null);
-      fetchAchievements();
+      const json = await res.json();
+      if (json.success) {
+        Swal.fire(
+          "Berhasil!",
+          editId ? "Data prestasi diperbarui." : "Data prestasi ditambahkan.",
+          "success"
+        );
+        setModalOpen(false);
+        setFile(null);
+        setEditId(null);
+        fetchAchievements();
+      } else {
+        throw new Error(json.message);
+      }
     } catch (err: any) {
       console.error("❌ Gagal menyimpan data:", err);
-      Swal.fire("Gagal", err.response?.data?.message || "Upload gagal", "error");
+      Swal.fire("Gagal", err.message || "Upload gagal", "error");
     }
   };
 
@@ -99,10 +114,16 @@ export default function PrestasiPage() {
     if (!result.isConfirmed) return;
 
     try {
-      await api.delete(`/achievements/${id}`);
-      Swal.fire("Terhapus!", "Data prestasi telah dihapus.", "success");
-      fetchAchievements();
-    } catch {
+      const res = await fetch(`/api/portal/prestasi/${id}`, { method: "DELETE" });
+      const json = await res.json();
+
+      if (json.success) {
+        Swal.fire("Terhapus!", "Data prestasi telah dihapus.", "success");
+        fetchAchievements();
+      } else {
+        throw new Error(json.message);
+      }
+    } catch (err) {
       Swal.fire("Gagal", "Tidak dapat menghapus prestasi.", "error");
     }
   };

@@ -1,13 +1,20 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  reactStrictMode : false
-};
-module.exports = {
+  reactStrictMode: false,
   images: {
-    // no external flag CDN required; we use simple ID/EN labels instead
-    domains: [],
+    domains: ["api.smkprestasiprima.sch.id"],
     remotePatterns: [
+      {
+        protocol: "http",
+        hostname: "api.smkprestasiprima.sch.id",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "api.smkprestasiprima.sch.id",
+        pathname: "/**",
+      },
       {
         protocol: "http",
         hostname: "localhost",

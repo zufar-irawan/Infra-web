@@ -16,15 +16,44 @@ export default function Prestasi() {
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement | null>(null);
 
+  // === Data fallback manual ===
+  const fallbackItems: PrestasiItem[] = [
+    { id: 1, poster: "/prestasi/p1.webp" },
+    { id: 2, poster: "/prestasi/p2.webp" },
+    { id: 3, poster: "/prestasi/p3.webp" },
+    { id: 4, poster: "/prestasi/p4.webp" },
+    { id: 5, poster: "/prestasi/p5.webp" },
+    { id: 6, poster: "/prestasi/p6.webp" },
+    { id: 7, poster: "/prestasi/p7.webp" },
+    { id: 8, poster: "/prestasi/p8.webp" },
+    { id: 9, poster: "/prestasi/p9.webp" },
+    { id: 10, poster: "/prestasi/p10.webp" },
+  ];
+
   // === Ambil data dari route API internal ===
   useEffect(() => {
     fetch("/api/portal/prestasi/public", { cache: "no-store" })
       .then((r) => r.json())
       .then((j) => {
-        const data = j?.data ?? [];
-        setItems(data.slice(0, 2)); // ambil 2 teratas
+        if (j.success && Array.isArray(j.data) && j.data.length > 0) {
+          // validasi: ubah gambar http → fallback statis
+          const safeData = j.data.map((item: PrestasiItem, i: number) => {
+            const isHttp = item.poster?.startsWith("http:");
+            const isEmpty = !item.poster;
+            return {
+              ...item,
+              poster:
+                isHttp || isEmpty
+                  ? fallbackItems[i % fallbackItems.length].poster
+                  : item.poster,
+            };
+          });
+          setItems(safeData.slice(0, 2)); // ambil 2 teratas
+        } else {
+          setItems(fallbackItems.slice(0, 2));
+        }
       })
-      .catch((e) => console.error("Gagal memuat data prestasi:", e));
+      .catch(() => setItems(fallbackItems.slice(0, 2)));
   }, []);
 
   // === Animasi muncul saat scroll ===
@@ -72,7 +101,7 @@ export default function Prestasi() {
               </p>
             </motion.div>
 
-            {/* === Kanan: card dari API (tanpa carousel) + tombol di bawahnya === */}
+            {/* === Kanan: 2 kartu prestasi + tombol === */}
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               animate={isVisible ? { opacity: 1, x: 0 } : {}}
@@ -81,21 +110,21 @@ export default function Prestasi() {
             >
               <div className="flex flex-wrap gap-6 items-center justify-center md:justify-end">
                 {items.length > 0 ? (
-                  items.map((img) => (
+                  items.map((img, i) => (
                     <div
                       key={img.id}
                       className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition w-[260px] h-[340px] sm:w-[280px] sm:h-[360px] md:w-[295px] md:h-[369px]"
                     >
                       <Image
-                        src={
-                          img.poster.startsWith("http")
-                            ? img.poster
-                            : `/storage/${img.poster}`
-                        }
+                        src={img.poster}
                         alt={`Prestasi ${img.id}`}
                         width={295}
                         height={369}
                         className="object-cover w-full h-full"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src =
+                            fallbackItems[i % fallbackItems.length].poster;
+                        }}
                       />
                     </div>
                   ))

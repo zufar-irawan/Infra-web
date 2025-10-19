@@ -20,23 +20,19 @@ export default function Sidebar({ isMobile }: { isMobile: boolean }) {
     { name: "FAQ", href: "/portal/faq" },
   ];
 
-  /**
-   * ===============================
-   *  HANDLE LOGOUT (via API server)
-   * ===============================
-   */
   const handleLogout = async () => {
     try {
-      // 🧠 Hapus cookie HttpOnly via API route server
-      await fetch("/api/portal/logout", { method: "GET" });
+      await fetch("/api/portal/logout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
 
-      // Bersihkan data session di browser
+      if (typeof document !== "undefined") {
+        document.body.classList.add("opacity-50");
+      }
+
       sessionStorage.clear();
 
-      // Efek visual kecil
-      document.body.classList.add("opacity-50");
-
-      // Redirect ke halaman login portal
       setTimeout(() => {
         window.location.href = "/portal";
       }, 300);
@@ -60,6 +56,13 @@ export default function Sidebar({ isMobile }: { isMobile: boolean }) {
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [open, isMobile]);
+
+  // Lock scroll saat sidebar mobile terbuka
+  useEffect(() => {
+    if (isMobile) {
+      document.body.style.overflow = open ? "hidden" : "auto";
+    }
   }, [open, isMobile]);
 
   return (
@@ -100,7 +103,7 @@ export default function Sidebar({ isMobile }: { isMobile: boolean }) {
           {/* Menu list */}
           <nav className="flex-1 overflow-y-auto px-3 py-5 space-y-1">
             {menus.map((menu) => {
-              const active = pathname === menu.href;
+              const active = pathname.startsWith(menu.href);
               return (
                 <Link
                   key={menu.href}
@@ -129,14 +132,19 @@ export default function Sidebar({ isMobile }: { isMobile: boolean }) {
               Logout
             </button>
             <p className="text-xs text-gray-400 text-center mt-4">
-              © 2025 SMK Prestasi Prima
+              © {new Date().getFullYear()} SMK Prestasi Prima
             </p>
           </div>
         </div>
       </aside>
 
       {/* Overlay mobile */}
-      {isMobile && open && <div className="fixed inset-0 bg-black/50 z-30" />}
+      {isMobile && open && (
+        <div
+          className="fixed inset-0 bg-black/50 z-30"
+          onClick={() => setOpen(false)}
+        />
+      )}
     </>
   );
 }

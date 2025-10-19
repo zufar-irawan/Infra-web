@@ -3,8 +3,8 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Swal from "sweetalert2";
-import axios from "axios";
 import { Plus, Pencil, Trash2, X } from "lucide-react";
+import api from "@/app/lib/api"; // ✅ langsung pakai API global (bukan route proxy)
 
 interface News {
   id: number;
@@ -18,21 +18,23 @@ interface News {
 
 export default function AdminNewsPage() {
   const [news, setNews] = useState<News[]>([]);
-  const [form, setForm] = useState<
-    Partial<News> & { imageFile?: File | null }
-  >({});
+  const [form, setForm] = useState<Partial<News> & { imageFile?: File | null }>({});
   const [editId, setEditId] = useState<number | null>(null);
   const [isModalOpen, setModalOpen] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
 
-  // === Fetch data ===
+  // === Fetch data dari API Laravel ===
   const fetchNews = async () => {
     try {
-      const res = await axios.get("/api/portal/berita");
-      if (res.data.success) setNews(res.data.data);
+      const res = await api.get("/news");
+      if (res.data.success || Array.isArray(res.data.data)) {
+        setNews(res.data.data || res.data);
+      } else {
+        console.warn("⚠️ Format data berita tidak sesuai:", res.data);
+      }
     } catch (err) {
       console.error("❌ Gagal memuat berita:", err);
-      Swal.fire("Gagal", "Tidak bisa memuat berita.", "error");
+      Swal.fire("Gagal", "Tidak bisa memuat berita dari server.", "error");
     }
   };
 
@@ -52,7 +54,7 @@ export default function AdminNewsPage() {
     setForm((prev) => ({ ...prev, imageFile: file }));
   };
 
-  // === Save (create or update) ===
+  // === Save (Create / Update langsung ke API Laravel) ===
   const handleSave = async () => {
     if (!form.title_id || !form.title_en || !form.desc_id || !form.desc_en || !form.date) {
       Swal.fire("Lengkapi Data", "Semua field wajib diisi!", "warning");
@@ -68,12 +70,16 @@ export default function AdminNewsPage() {
     if (form.imageFile) formData.append("image", form.imageFile);
 
     try {
-      const url = editId ? `/api/portal/berita/${editId}` : `/api/portal/berita`;
-
       if (editId) {
-        await axios.put(url, formData, { headers: { "Content-Type": "multipart/form-data" } });
+        // Laravel biasanya pakai spoof _method=PUT
+        formData.append("_method", "PUT");
+        await api.post(`/news/${editId}`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
       } else {
-        await axios.post(url, formData, { headers: { "Content-Type": "multipart/form-data" } });
+        await api.post("/news", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
       }
 
       Swal.fire("Berhasil!", editId ? "Berita diperbarui." : "Berita ditambahkan.", "success");
@@ -89,7 +95,7 @@ export default function AdminNewsPage() {
 
   // === Delete ===
   const handleDelete = async (id: number) => {
-    const result = await Swal.fire({
+    const confirm = await Swal.fire({
       title: "Hapus Berita?",
       text: "Data yang dihapus tidak bisa dikembalikan.",
       icon: "warning",
@@ -99,15 +105,15 @@ export default function AdminNewsPage() {
       confirmButtonText: "Ya, hapus",
       cancelButtonText: "Batal",
     });
-
-    if (!result.isConfirmed) return;
+    if (!confirm.isConfirmed) return;
 
     try {
-      await axios.delete(`/api/portal/berita/${id}`);
+      await api.delete(`/news/${id}`);
       Swal.fire("Terhapus!", "Berita berhasil dihapus.", "success");
       fetchNews();
-    } catch {
-      Swal.fire("Gagal", "Tidak dapat menghapus berita.", "error");
+    } catch (err: any) {
+      console.error("❌ Gagal menghapus:", err);
+      Swal.fire("Gagal", err.response?.data?.message || "Tidak dapat menghapus berita.", "error");
     }
   };
 
@@ -126,7 +132,7 @@ export default function AdminNewsPage() {
     setModalOpen(true);
   };
 
-  // === Close modal ===
+  // === Close modal if click outside / Esc ===
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
@@ -144,6 +150,7 @@ export default function AdminNewsPage() {
     };
   }, [isModalOpen]);
 
+  // === UI ===
   return (
     <main className="min-h-screen bg-gradient-to-br from-[#f5f7ff] via-[#fffdfb] to-[#fff5f0] px-4 py-10 md:px-10">
       <div className="max-w-6xl mx-auto bg-white rounded-md shadow-md border border-gray-100 p-5 sm:p-8 relative z-10">
@@ -189,7 +196,11 @@ export default function AdminNewsPage() {
                     <td className="p-3 text-center">
                       {n.image ? (
                         <Image
-                          src={n.image}
+                          src={
+                            n.image.startsWith("http")
+                              ? n.image
+                              : `https://api.smkprestasiprima.sch.id${n.image}`
+                          }
                           alt={n.title_id}
                           width={100}
                           height={70}
@@ -227,7 +238,7 @@ export default function AdminNewsPage() {
         </div>
       </div>
 
-      {/* Modal */}
+      {/* Modal Input */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 px-4">
           <div
@@ -248,14 +259,14 @@ export default function AdminNewsPage() {
                 <input
                   type="text"
                   placeholder="Judul (Indonesia)"
-                  className="border border-gray-300 p-2 rounded-md focus:ring-2 focus:ring-[#FE4D01] focus:outline-none"
+                  className="border border-gray-300 p-2 rounded-md focus:ring-2 focus:ring-[#FE4D01]"
                   value={form.title_id || ""}
                   onChange={(e) => setForm({ ...form, title_id: e.target.value })}
                 />
                 <input
                   type="text"
                   placeholder="Judul (English)"
-                  className="border border-gray-300 p-2 rounded-md focus:ring-2 focus:ring-[#FE4D01] focus:outline-none"
+                  className="border border-gray-300 p-2 rounded-md focus:ring-2 focus:ring-[#FE4D01]"
                   value={form.title_en || ""}
                   onChange={(e) => setForm({ ...form, title_en: e.target.value })}
                 />
@@ -297,7 +308,9 @@ export default function AdminNewsPage() {
                     src={
                       form.imageFile
                         ? URL.createObjectURL(form.imageFile)
-                        : (form.image as string)
+                        : form.image?.startsWith("http")
+                        ? form.image
+                        : `https://api.smkprestasiprima.sch.id${form.image}`
                     }
                     alt="Preview"
                     width={300}

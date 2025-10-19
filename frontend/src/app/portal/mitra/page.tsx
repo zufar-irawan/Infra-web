@@ -22,11 +22,15 @@ export default function AdminMitraPage() {
   const [loading, setLoading] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
 
+  const API_BASE = "https://api.smkprestasiprima.sch.id";
+
   // === Ambil data ===
   const fetchMitra = async () => {
     try {
-      const res = await axios.get("/api/portal/mitra/public");
-      if (res.data.success) setPartners(res.data.data);
+      const res = await axios.get("/api/portal/mitra");
+      if (res.data.success || res.data.data) {
+        setPartners(res.data.data || res.data);
+      }
     } catch (err) {
       console.error("❌ Gagal memuat mitra:", err);
       Swal.fire("Gagal", "Tidak bisa memuat data mitra.", "error");
@@ -153,6 +157,12 @@ export default function AdminMitraPage() {
     };
   }, [isModalOpen]);
 
+  const resolveImageUrl = (path?: string) => {
+    if (!path) return "";
+    if (path.startsWith("http")) return path;
+    return `${API_BASE}${path}`;
+  };
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-[#f5f7ff] via-[#fffdfb] to-[#fff5f0] px-4 py-10 md:px-10">
       <div className="relative z-10 max-w-6xl mx-auto bg-white rounded-md shadow-md border border-gray-100 p-5 sm:p-8">
@@ -194,18 +204,13 @@ export default function AdminMitraPage() {
             <tbody>
               {partners.length > 0 ? (
                 partners.map((p, i) => (
-                  <tr
-                    key={p.id}
-                    className="border-b hover:bg-[#f9fafc] transition"
-                  >
-                    <td className="p-3 text-center font-medium text-[#243771]">
-                      {i + 1}
-                    </td>
+                  <tr key={p.id} className="border-b hover:bg-[#f9fafc] transition">
+                    <td className="p-3 text-center font-medium text-[#243771]">{i + 1}</td>
                     <td className="p-3 text-gray-700">{p.name}</td>
                     <td className="p-3 text-center">
                       {p.img_id ? (
                         <img
-                          src={p.img_id}
+                          src={resolveImageUrl(p.img_id)}
                           alt="Logo ID"
                           className="h-20 w-auto object-contain mx-auto border border-gray-200 rounded-md"
                         />
@@ -216,7 +221,7 @@ export default function AdminMitraPage() {
                     <td className="p-3 text-center">
                       {p.img_en ? (
                         <img
-                          src={p.img_en}
+                          src={resolveImageUrl(p.img_en)}
                           alt="Logo EN"
                           className="h-20 w-auto object-contain mx-auto border border-gray-200 rounded-md"
                         />
@@ -242,10 +247,7 @@ export default function AdminMitraPage() {
                 ))
               ) : (
                 <tr>
-                  <td
-                    colSpan={5}
-                    className="text-center py-6 text-gray-500 italic"
-                  >
+                  <td colSpan={5} className="text-center py-6 text-gray-500 italic">
                     Belum ada mitra.
                   </td>
                 </tr>
@@ -255,14 +257,13 @@ export default function AdminMitraPage() {
         </div>
       </div>
 
-      {/* Modal */}
+      {/* Modal tambah/edit */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 px-4">
           <div
             ref={modalRef}
             className="bg-white rounded-md w-full max-w-md shadow-2xl border border-gray-200 animate-fadeIn relative z-50"
           >
-            {/* Header */}
             <div className="flex justify-between items-center px-5 py-4 border-b border-gray-200 bg-gradient-to-r from-[#243771]/90 to-[#FE4D01]/80 text-white rounded-t-md">
               <h2 className="font-semibold text-lg">
                 {editId ? "Edit Mitra" : "Tambah Mitra"}
@@ -272,7 +273,6 @@ export default function AdminMitraPage() {
               </button>
             </div>
 
-            {/* Body */}
             <div className="p-6 space-y-4">
               <input
                 type="text"
@@ -294,15 +294,15 @@ export default function AdminMitraPage() {
                     onChange={(e) => handleImageUpload(e, "id")}
                   />
                   {(form.imgIdFile || form.img_id) && (
-                    <img
-                      src={
-                        form.imgIdFile
-                          ? URL.createObjectURL(form.imgIdFile)
-                          : form.img_id || ""
-                      }
-                      alt="Preview ID"
-                      className="mt-2 rounded-md border border-gray-200 w-full h-24 object-contain"
-                    />
+                        <img
+                          src={
+                            form.imgIdFile
+                              ? URL.createObjectURL(form.imgIdFile)
+                              : resolveImageUrl(form.img_id)
+                          }
+                          alt="Preview ID"
+                          className="mt-2 rounded-md border border-gray-200 w-full h-24 object-contain"
+                        />
                   )}
                 </div>
 
@@ -317,21 +317,20 @@ export default function AdminMitraPage() {
                     onChange={(e) => handleImageUpload(e, "en")}
                   />
                   {(form.imgEnFile || form.img_en) && (
-                    <img
-                      src={
-                        form.imgEnFile
-                          ? URL.createObjectURL(form.imgEnFile)
-                          : form.img_en || ""
-                      }
-                      alt="Preview EN"
-                      className="mt-2 rounded-md border border-gray-200 w-full h-24 object-contain"
-                    />
+                        <img
+                          src={
+                            form.imgEnFile
+                              ? URL.createObjectURL(form.imgEnFile)
+                              : resolveImageUrl(form.img_en)
+                          }
+                          alt="Preview EN"
+                          className="mt-2 rounded-md border border-gray-200 w-full h-24 object-contain"
+                        />
                   )}
                 </div>
               </div>
             </div>
 
-            {/* Footer */}
             <div className="flex justify-end gap-3 px-5 py-4 border-t border-gray-200 bg-gray-50 rounded-b-md">
               <button
                 onClick={() => setModalOpen(false)}

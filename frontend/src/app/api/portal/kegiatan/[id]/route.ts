@@ -10,14 +10,12 @@ export async function PUT(req: Request, context: { params: Promise<{ id: string 
     const cookieStore = await cookies();
     const token = cookieStore.get("portal-auth-token")?.value;
 
-    // Convert ke FormData biar Laravel bisa baca
+    // ✅ Laravel biasa butuh _method spoofing agar diterima
     const formData = new FormData();
-    for (const key in body) {
-      formData.append(key, body[key as keyof typeof body]);
-    }
+    Object.entries(body).forEach(([key, val]) => formData.append(key, val as string));
+    formData.append("_method", "PUT");
 
-    // Laravel butuh _method spoofing agar bisa diterima sebagai PUT
-    const res = await api.post(`/kegiatan/${id}?_method=PUT`, formData, {
+    const res = await api.post(`/kegiatan/${id}`, formData, {
       headers: {
         Authorization: token ? `Bearer ${token}` : "",
         "Content-Type": "multipart/form-data",
@@ -35,7 +33,7 @@ export async function PUT(req: Request, context: { params: Promise<{ id: string 
 }
 
 // DELETE /api/portal/kegiatan/[id]
-export async function DELETE(_: Request, context: { params: Promise<{ id: string }> }) {
+export async function DELETE(_req: Request, context: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await context.params;
     const cookieStore = await cookies();

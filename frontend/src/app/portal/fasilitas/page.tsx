@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Swal from "sweetalert2";
-import api from "../../lib/api"; // ← PENTING: pakai instance axios-mu
 import { Plus, Pencil, Trash2, X, CheckSquare, Square } from "lucide-react";
 
 interface Facility {
@@ -32,11 +31,13 @@ export default function FasilitasPage() {
     "Fasilitas Umum",
   ];
 
-  // === Ambil data ===
+  // === Ambil data lewat proxy API ===
   const fetchFacilities = async () => {
     try {
-      const res = await api.get("/facilities");
-      if (res.data.success) setFacilities(res.data.data);
+      const res = await fetch("/api/portal/facilities", { cache: "no-store" });
+      const json = await res.json();
+      if (json.success) setFacilities(json.data);
+      else throw new Error(json.message);
     } catch (err) {
       console.error("❌ Gagal memuat fasilitas:", err);
       Swal.fire("Gagal", "Tidak bisa memuat data fasilitas", "error");
@@ -71,26 +72,23 @@ export default function FasilitasPage() {
     if (form.img_en) formData.append("img_en", form.img_en);
 
     try {
-      if (editId) {
-        // ✅ Update pakai POST karena Laravel pakai POST /facilities/{id}
-        await api.post(`/facilities/${editId}`, formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-        Swal.fire("Berhasil!", "Data fasilitas diperbarui.", "success");
-      } else {
-        await api.post(`/facilities`, formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-        Swal.fire("Berhasil!", "Data fasilitas ditambahkan.", "success");
-      }
+      const url = editId ? `/api/portal/facilities/${editId}` : `/api/portal/facilities`;
+      const res = await fetch(url, {
+        method: "POST",
+        body: formData,
+      });
 
+      const json = await res.json();
+      if (!json.success) throw new Error(json.message);
+
+      Swal.fire("Berhasil!", editId ? "Data fasilitas diperbarui." : "Data fasilitas ditambahkan.", "success");
       setModalOpen(false);
       setForm({ img_id: null, img_en: null, category: "" });
       setEditId(null);
       fetchFacilities();
     } catch (err: any) {
       console.error("❌ Gagal menyimpan:", err);
-      Swal.fire("Gagal", err.response?.data?.message || "Upload gagal", "error");
+      Swal.fire("Gagal", err.message || "Upload gagal", "error");
     }
   };
 
@@ -129,7 +127,11 @@ export default function FasilitasPage() {
     if (!result.isConfirmed) return;
 
     try {
-      await Promise.all(selectedIds.map((id) => api.delete(`/facilities/${id}`)));
+      await Promise.all(
+        selectedIds.map((id) =>
+          fetch(`/api/portal/facilities/${id}`, { method: "DELETE" })
+        )
+      );
       Swal.fire("Terhapus!", "Data fasilitas telah dihapus.", "success");
       setSelectedIds([]);
       fetchFacilities();
@@ -158,6 +160,7 @@ export default function FasilitasPage() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-[#f5f7ff] via-[#fffdfb] to-[#fef6f0] px-4 py-10 md:px-10">
       <div className="max-w-6xl mx-auto bg-white rounded-md shadow-md border border-gray-100 p-5 sm:p-8">
+        {/* HEADER */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-[#243771]">🏫 Manajemen Fasilitas</h1>
@@ -186,7 +189,7 @@ export default function FasilitasPage() {
           </div>
         </div>
 
-        {/* Table */}
+        {/* TABLE */}
         <div className="overflow-x-auto border border-gray-200 rounded-md">
           <table className="min-w-full text-sm">
             <thead className="bg-gradient-to-r from-[#243771] to-[#3b5bb1] text-white">
@@ -204,7 +207,9 @@ export default function FasilitasPage() {
                 facilities.map((f) => (
                   <tr
                     key={f.id}
-                    className={`border-b ${selectedIds.includes(f.id) ? "bg-[#fff0e6]" : "hover:bg-[#f9fafc]"} transition`}
+                    className={`border-b ${
+                      selectedIds.includes(f.id) ? "bg-[#fff0e6]" : "hover:bg-[#f9fafc]"
+                    } transition`}
                   >
                     <td className="p-3 text-center cursor-pointer" onClick={() => toggleSelect(f.id)}>
                       {selectedIds.includes(f.id) ? (
@@ -265,7 +270,7 @@ export default function FasilitasPage() {
         </div>
       </div>
 
-      {/* Modal */}
+      {/* MODAL */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
           <div ref={modalRef} className="bg-white rounded-md w-full max-w-md shadow-2xl border border-gray-200">
