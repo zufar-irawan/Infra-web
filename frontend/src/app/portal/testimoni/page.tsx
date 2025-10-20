@@ -16,7 +16,7 @@ interface TestimoniItem {
     photo_en: string;
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://api.smkprestasiprima.sch.id/api";
+const API_BASE_URL = "https://api.smkprestasiprima.sch.id/api";
 
 export default function TestimoniAdminPage() {
     const [testimoni, setTestimoni] = useState<TestimoniItem[]>([]);

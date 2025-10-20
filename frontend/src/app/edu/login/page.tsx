@@ -11,7 +11,8 @@ export default function LoginRegisterPage() {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
+    // Keep error as an unknown value internally, but always render it as a safe string
+    const [error, setError] = useState<unknown>("");
     const [loading, setLoading] = useState(false);
     const [activeTab] = useState("masuk");
 
@@ -20,6 +21,21 @@ export default function LoginRegisterPage() {
     const [isPasswordFocused, setIsPasswordFocused] = useState(false);
     const [hasEmailValue, setHasEmailValue] = useState(false);
     const [hasPasswordValue, setHasPasswordValue] = useState(false);
+
+    // Safely convert any error value into a string for rendering
+    const renderError = (err: unknown): string => {
+        if (err == null) return '';
+        if (typeof err === 'string') return err;
+        if (typeof err === 'number' || typeof err === 'boolean') return String(err);
+        if (typeof err === 'object') {
+            // Prefer common shapes like { message: string }
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const anyErr = err as any;
+            if (anyErr?.message && typeof anyErr.message === 'string') return anyErr.message;
+            try { return JSON.stringify(err); } catch (e) { return String(err); }
+        }
+        return String(err);
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -54,16 +70,24 @@ export default function LoginRegisterPage() {
 
                     router.push("/edu/dashboard")
                 } else {
-                    setError(res.data.message)
+                    // Ensure we set a string (avoid storing objects returned by the API)
+                    setError(String(res.data?.message ?? 'Terjadi kesalahan'))
                 }
             }
 
         } catch (error: any) {
-            if(error.response?.status === 401 || error.response?.status === 400) {
-                setError(error.response.data.message)
+            // Handle specific backend errors first
+            if (error.response?.status === 502) {
+                // Backend gateway error or backend service down
+                setError('Backend belum jalan')
+            } else if (error.response?.status === 401 || error.response?.status === 400) {
+                // Authentication / validation errors
+                setError(String(error.response?.data?.message ?? error.message ?? 'Autentikasi gagal'))
             } else {
+                // Log the full error and show a friendly message. Also keep `error` state as a string.
                 console.error(error.response?.data?.message || error)
-                alert(error.response?.data?.message || "Login gagal, coba lagi.")
+                setError(String(error.response?.data?.message ?? error.message ?? 'Login gagal, coba lagi.'))
+                alert(String(error.response?.data?.message ?? error.message ?? "Login gagal, coba lagi."))
             }
         } finally {
             setLoading(false);
@@ -313,7 +337,7 @@ export default function LoginRegisterPage() {
                                     placeholder="nama@example.com"
                                     className={`w-full px-4 py-3 bg-gray-50 border rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300 transform text-sm lg:text-base ${
                                         isEmailFocused ? 'scale-105 shadow-lg' : 'scale-100'
-                                    } ${error ? "border-red-600" : "border-gray-200"}`}
+                                    } ${Boolean(error) ? "border-red-600" : "border-gray-200"}`}
                                 />
                                 {hasEmailValue && (
                                     <div className="absolute right-3 top-11 text-green-500">
@@ -338,7 +362,7 @@ export default function LoginRegisterPage() {
                                     placeholder="Masukkan password"
                                     className={`w-full px-4 py-3 bg-gray-50 border rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300 transform text-sm lg:text-base ${
                                         isPasswordFocused ? 'scale-105 shadow-lg' : 'scale-100'
-                                    } ${error ? "border-red-600" : "border-gray-200"}`}
+                                    } ${Boolean(error) ? "border-red-600" : "border-gray-200"}`}
                                 />
                                 {hasPasswordValue && (
                                     <div className="absolute right-3 top-11 text-green-500">
@@ -349,9 +373,10 @@ export default function LoginRegisterPage() {
                                 )}
                             </div>
 
-                            {error && (
+                            {Boolean(error) && (
                                 <div className="px-4 w-full py-3 rounded-lg border bg-red-50 border-red-200 animate-shake">
-                                    <p className="text-red-600 text-sm lg:text-base">{error}</p>
+                                    {/* Render error safely: use renderError to guarantee a string child */}
+                                    <p className="text-red-600 text-sm lg:text-base">{renderError(error)}</p>
                                 </div>
                             )}
 
