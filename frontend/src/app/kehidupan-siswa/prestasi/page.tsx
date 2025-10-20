@@ -16,6 +16,8 @@ export default function Prestasi() {
   const sectionRef = useRef<HTMLDivElement | null>(null);
   const [isVisible, setIsVisible] = useState(false);
 
+  const API_BASE = "https://api.smkprestasiprima.sch.id";
+
   // === Gambar fallback lokal ===
   const fallbackItems: string[] = [
     "/prestasi/p1.webp",
@@ -30,19 +32,22 @@ export default function Prestasi() {
     "/prestasi/p10.webp",
   ];
 
-  // === Ambil data dari backend Laravel ===
+  // === Ambil data prestasi dari backend Laravel via proxy ===
   useEffect(() => {
     fetch("/api/portal/prestasi/public", { cache: "no-store" })
       .then((r) => r.json())
       .then((j) => {
         if (j.success && Array.isArray(j.data) && j.data.length > 0) {
           const mapped = j.data.map((item: any, i: number) => {
-            // pastikan path gambar valid dan pakai https
-            const baseUrl = "https://api.smkprestasiprima.sch.id";
             let img = item.poster || "";
-            if (img && !img.startsWith("https")) {
-              img = `${baseUrl}${img.startsWith("/") ? "" : "/"}${img}`;
+
+            // 🔒 FIX: pastikan URL gambar 100% valid HTTPS
+            if (img.startsWith("http://") || img.startsWith("https://")) {
+              img = img.replace("http://", "https://");
+            } else if (img.trim() !== "") {
+              img = `${API_BASE}${img.startsWith("/") ? "" : "/"}${img}`;
             }
+
             return {
               id: item.id,
               poster: img || fallbackItems[i % fallbackItems.length],
@@ -50,15 +55,11 @@ export default function Prestasi() {
           });
           setItems(mapped);
         } else {
-          setItems(
-            fallbackItems.map((f, i) => ({ id: i + 1, poster: f }))
-          );
+          setItems(fallbackItems.map((f, i) => ({ id: i + 1, poster: f })));
         }
       })
       .catch(() => {
-        setItems(
-          fallbackItems.map((f, i) => ({ id: i + 1, poster: f }))
-        );
+        setItems(fallbackItems.map((f, i) => ({ id: i + 1, poster: f })));
       })
       .finally(() => setLoading(false));
   }, []);
