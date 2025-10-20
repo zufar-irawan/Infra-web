@@ -1,24 +1,23 @@
 import { NextResponse } from "next/server";
-import api from "@/app/lib/api";
 
-// === GET berita untuk halaman publik ===
 export async function GET() {
   try {
-    const res = await api.get("/news");
-    const news = res.data?.data || [];
+    // 🔒 Ambil dari API Laravel pakai HTTPS langsung
+    const res = await fetch("https://api.smkprestasiprima.sch.id/api/news", {
+      cache: "no-store",
+    });
 
-    // Sama gaya seperti route lain — tanpa hardcode URL/env
-    const data = news.map((n: any) => ({
-      ...n,
-      image: n.image?.startsWith("/storage") ? n.image : n.image,
-    }));
+    if (!res.ok) {
+      throw new Error(`Status ${res.status}`);
+    }
 
-    return NextResponse.json({ success: true, data });
+    const data = await res.json();
+    return NextResponse.json(data, { status: 200 });
   } catch (err: any) {
-    console.error("❌ PUBLIC /berita error:", err.response?.data || err.message);
+    console.error("❌ Proxy berita error:", err);
     return NextResponse.json(
-      { success: false, message: "Gagal memuat berita publik." },
-      { status: err.response?.status || 500 }
+      { success: false, message: "Gagal ambil data berita" },
+      { status: 500 }
     );
   }
 }

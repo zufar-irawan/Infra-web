@@ -6,7 +6,7 @@ import { useEffect, useState, useRef } from "react";
 
 interface PrestasiItem {
   id: number;
-  poster: string;
+  poster: string | null;
 }
 
 export default function Prestasi() {
@@ -16,46 +16,54 @@ export default function Prestasi() {
   const sectionRef = useRef<HTMLDivElement | null>(null);
   const [isVisible, setIsVisible] = useState(false);
 
-  // === Data fallback manual ===
-  const fallbackItems: PrestasiItem[] = [
-    { id: 1, poster: "/prestasi/p1.webp" },
-    { id: 2, poster: "/prestasi/p2.webp" },
-    { id: 3, poster: "/prestasi/p3.webp" },
-    { id: 4, poster: "/prestasi/p4.webp" },
-    { id: 5, poster: "/prestasi/p5.webp" },
-    { id: 6, poster: "/prestasi/p6.webp" },
-    { id: 7, poster: "/prestasi/p7.webp" },
-    { id: 8, poster: "/prestasi/p8.webp" },
-    { id: 9, poster: "/prestasi/p9.webp" },
-    { id: 10, poster: "/prestasi/p10.webp" },
+  // === Gambar fallback lokal ===
+  const fallbackItems: string[] = [
+    "/prestasi/p1.webp",
+    "/prestasi/p2.webp",
+    "/prestasi/p3.webp",
+    "/prestasi/p4.webp",
+    "/prestasi/p5.webp",
+    "/prestasi/p6.webp",
+    "/prestasi/p7.webp",
+    "/prestasi/p8.webp",
+    "/prestasi/p9.webp",
+    "/prestasi/p10.webp",
   ];
 
+  // === Ambil data dari backend Laravel ===
   useEffect(() => {
     fetch("/api/portal/prestasi/public", { cache: "no-store" })
       .then((r) => r.json())
       .then((j) => {
         if (j.success && Array.isArray(j.data) && j.data.length > 0) {
-          // Filter supaya kalau URL-nya http (tidak aman), diganti fallback sesuai id
-          const safeData = j.data.map((item: PrestasiItem, i: number) => {
-            const isHttp = item.poster?.startsWith("http:");
-            const isEmpty = !item.poster;
+          const mapped = j.data.map((item: any, i: number) => {
+            // pastikan path gambar valid dan pakai https
+            const baseUrl = "https://api.smkprestasiprima.sch.id";
+            let img = item.poster || "";
+            if (img && !img.startsWith("https")) {
+              img = `${baseUrl}${img.startsWith("/") ? "" : "/"}${img}`;
+            }
             return {
-              ...item,
-              poster:
-                isHttp || isEmpty
-                  ? fallbackItems[i % fallbackItems.length].poster
-                  : item.poster,
+              id: item.id,
+              poster: img || fallbackItems[i % fallbackItems.length],
             };
           });
-          setItems(safeData);
+          setItems(mapped);
         } else {
-          setItems(fallbackItems);
+          setItems(
+            fallbackItems.map((f, i) => ({ id: i + 1, poster: f }))
+          );
         }
       })
-      .catch(() => setItems(fallbackItems))
+      .catch(() => {
+        setItems(
+          fallbackItems.map((f, i) => ({ id: i + 1, poster: f }))
+        );
+      })
       .finally(() => setLoading(false));
   }, []);
 
+  // === Animasi muncul ===
   useEffect(() => {
     const obs = new IntersectionObserver(
       (entries) =>
@@ -79,7 +87,7 @@ export default function Prestasi() {
             </Link>
             <span className="text-[#FE4D01]">{">"}</span>
             <Link
-              href="/kegiatan-siswa/prestasi"
+              href="/kehidupan-siswa/prestasi"
               className="text-[#FE4D01] hover:underline"
             >
               {lang === "id" ? "Kehidupan Siswa" : "Student Life"}
@@ -123,13 +131,13 @@ export default function Prestasi() {
                   className="w-full max-w-[295px] mx-auto bg-white rounded-md overflow-hidden shadow-[0_4px_4px_rgba(0,0,0,0.25)] hover:scale-[1.02] transition-transform duration-300"
                 >
                   <img
-                    src={img.poster}
+                    src={img.poster ?? fallbackItems[i % fallbackItems.length]}
                     alt={`Prestasi ${img.id}`}
                     className="w-full h-auto object-cover"
                     loading="lazy"
                     onError={(e) => {
                       e.currentTarget.src =
-                        fallbackItems[i % fallbackItems.length].poster;
+                        fallbackItems[i % fallbackItems.length];
                     }}
                   />
                 </div>

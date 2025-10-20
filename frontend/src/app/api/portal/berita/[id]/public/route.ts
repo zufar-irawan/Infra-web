@@ -1,43 +1,30 @@
 import { NextResponse } from "next/server";
-import api from "@/app/lib/api";
 
-/**
- * GET /api/portal/berita/[id]/public
- * Ambil detail satu berita untuk halaman publik
- */
-export async function GET(
-  _req: Request,
-  context: { params: Promise<{ id: string }> }
-) {
+export async function GET(req: Request, context: Promise<{ params: { id: string } }>) {
   try {
-    const { id } = await context.params;
+    const { params } = await context;
+    const { id } = params;
 
-    // Ambil data dari Laravel API
-    const res = await api.get(`/news/${id}`);
-    const n = res.data?.data;
+    // 🔒 Ambil data dari Laravel HTTPS
+    const res = await fetch(`https://api.smkprestasiprima.sch.id/api/news/${id}`, {
+      cache: "no-store",
+    });
 
-    if (!n) {
+    if (!res.ok) {
+      console.error(`❌ Gagal ambil detail berita: ${res.status}`);
       return NextResponse.json(
-        { success: false, message: "Berita tidak ditemukan." },
-        { status: 404 }
+        { success: false, message: "Data berita tidak ditemukan" },
+        { status: res.status }
       );
     }
 
-    // Normalisasi gambar tanpa embel-embel URL/env
-    const berita = {
-      ...n,
-      image: n.image?.startsWith("/storage") ? n.image : n.image,
-    };
-
-    return NextResponse.json({ success: true, data: berita });
+    const data = await res.json();
+    return NextResponse.json(data, { status: 200 });
   } catch (err: any) {
-    console.error(
-      "❌ PUBLIC DETAIL NEWS ERROR:",
-      err.response?.data || err.message
-    );
+    console.error("❌ Proxy detail berita error:", err);
     return NextResponse.json(
-      { success: false, message: "Gagal memuat detail berita." },
-      { status: err.response?.status || 500 }
+      { success: false, message: "Gagal mengambil detail berita" },
+      { status: 500 }
     );
   }
 }

@@ -1,58 +1,28 @@
 import { NextResponse } from "next/server";
-import api from "@/app/lib/api";
-import { cookies } from "next/headers";
 
-/**
- * UPDATE & DELETE /api/portal/berita/[id]
- */
-
-// === UPDATE BERITA ===
-export async function PUT(req: Request, context: any) {
-  try {
-    const id = context.params?.id;
-    const formData = await req.formData();
-    const cookieStore = await cookies();
-    const token = cookieStore.get("portal-auth-token")?.value;
-
-    // Laravel butuh spoof _method
-    formData.append("_method", "PUT");
-
-    const res = await api.post(`/news/${id}`, formData, {
-      headers: {
-        Authorization: token ? `Bearer ${token}` : "",
-        "Content-Type": "multipart/form-data",
-      },
-    });
-
-    return NextResponse.json(res.data);
-  } catch (err: any) {
-    console.error("❌ NEWS UPDATE ERROR:", err.response?.data || err.message);
-    return NextResponse.json(
-      { success: false, message: "Gagal memperbarui berita." },
-      { status: err.response?.status || 500 }
-    );
-  }
+interface Params {
+  params: { id: string };
 }
 
-// === HAPUS BERITA ===
-export async function DELETE(_req: Request, context: any) {
+/**
+ * Proxy route untuk ambil detail berita berdasarkan ID dari API Laravel.
+ * Supaya aman HTTPS dan tidak kena CORS.
+ */
+export async function GET(req: Request, { params }: Params) {
   try {
-    const id = context.params?.id;
-    const cookieStore = await cookies();
-    const token = cookieStore.get("portal-auth-token")?.value;
-
-    const res = await api.delete(`/news/${id}`, {
-      headers: {
-        Authorization: token ? `Bearer ${token}` : "",
-      },
+    const { id } = params;
+    const res = await fetch(`https://api.smkprestasiprima.sch.id/api/kegiatan/${id}/public`, {
+      cache: "no-store",
     });
 
-    return NextResponse.json(res.data);
-  } catch (err: any) {
-    console.error("❌ NEWS DELETE ERROR:", err.response?.data || err.message);
-    return NextResponse.json(
-      { success: false, message: "Gagal menghapus berita." },
-      { status: err.response?.status || 500 }
-    );
+    if (!res.ok) {
+      return NextResponse.json({ success: false, message: "Gagal memuat detail berita" }, { status: res.status });
+    }
+
+    const data = await res.json();
+    return NextResponse.json(data);
+  } catch (err) {
+    console.error("❌ Gagal fetch detail berita:", err);
+    return NextResponse.json({ success: false, message: "Server proxy error" }, { status: 500 });
   }
 }

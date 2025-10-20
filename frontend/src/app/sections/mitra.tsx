@@ -18,11 +18,12 @@ export default function Mitra() {
   // === Resolver URL Gambar ===
   const resolveImageUrl = (path?: string) => {
     if (!path) return "";
-    if (path.startsWith("http")) return path;
-    return `${API_BASE}${path}`;
+    if (path.startsWith("http://")) return path.replace("http://", "https://");
+    if (path.startsWith("https://")) return path;
+    return `${API_BASE}${path.startsWith("/") ? "" : "/"}${path}`;
   };
 
-  // === Fallback SVG lokal (urutan tetap) ===
+  // === Fallback SVG lokal ===
   const fallbackImages = [
     "/svg/jatelindo.svg",
     "/svg/kemhan.svg",
@@ -35,14 +36,21 @@ export default function Mitra() {
     "/svg/antam.svg",
   ];
 
-  // === Ambil data mitra dari API ===
+  // === Ambil data mitra dari proxy HTTPS ===
   useEffect(() => {
     fetch("/api/portal/mitra/public", { cache: "no-store" })
       .then((r) => r.json())
       .then((j) => {
-        if (j.success) setPartners(j.data);
+        if (j.success && Array.isArray(j.data)) {
+          setPartners(j.data);
+        } else {
+          setPartners([]);
+        }
       })
-      .catch((err) => console.error("❌ Gagal memuat data mitra:", err));
+      .catch((err) => {
+        console.error("❌ Gagal memuat data mitra:", err);
+        setPartners([]);
+      });
   }, []);
 
   // === Ganti gambar jika gagal load ===
@@ -86,10 +94,17 @@ export default function Mitra() {
         <div className="overflow-hidden w-full relative max-w-7xl mx-auto select-none">
           <div className="absolute left-0 top-0 h-full w-20 z-20 bg-gradient-to-r from-white to-transparent" />
 
-          <div className="marquee-inner flex will-change-transform min-w-[200%]" style={{ animationDuration: "25s" }}>
+          <div
+            className="marquee-inner flex will-change-transform min-w-[200%]"
+            style={{ animationDuration: "25s" }}
+          >
             <div className="flex items-center">
               {[...partners, ...partners].map((p, i) => (
-                <div key={`${p.id}-${i}`} className="flex items-center justify-center mx-10" style={{ minWidth: "160px" }}>
+                <div
+                  key={`${p.id}-${i}`}
+                  className="flex items-center justify-center mx-10"
+                  style={{ minWidth: "160px" }}
+                >
                   <img
                     src={resolveImageUrl(lang === "id" ? p.img_id : p.img_en)}
                     alt={p.name}

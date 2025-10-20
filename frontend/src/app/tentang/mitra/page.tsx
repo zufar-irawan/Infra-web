@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useLang } from "../../components/LangContext";
 import { useEffect, useState } from "react";
-import axios from "axios";
 
 interface Mitra {
   id: number;
@@ -22,8 +21,9 @@ export default function MitraIndustri() {
   // === Resolver URL Gambar ===
   const resolveImageUrl = (path?: string) => {
     if (!path) return "";
-    if (path.startsWith("http")) return path;
-    return `${API_BASE}${path}`;
+    if (path.startsWith("http://")) return path.replace("http://", "https://");
+    if (path.startsWith("https://")) return path;
+    return `${API_BASE}${path.startsWith("/") ? "" : "/"}${path}`;
   };
 
   // === Fallback SVG lokal (urutan tetap) ===
@@ -39,13 +39,13 @@ export default function MitraIndustri() {
     "/svg/antam.svg",
   ];
 
-  // === Fetch data mitra ===
+  // === Ambil data mitra dari proxy HTTPS ===
   useEffect(() => {
-    axios
-      .get("/api/portal/mitra/public")
-      .then((res) => {
-        if (res.data.success) setPartners(res.data.data);
-        else console.error("⚠️ Gagal ambil data mitra:", res.data.message);
+    fetch("/api/portal/mitra/public", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((j) => {
+        if (j.success && Array.isArray(j.data)) setPartners(j.data);
+        else console.warn("⚠️ Format data mitra tidak sesuai:", j);
       })
       .catch((err) => console.error("❌ Gagal memuat data mitra:", err))
       .finally(() => setLoading(false));
@@ -70,8 +70,8 @@ export default function MitraIndustri() {
               {lang === "id" ? "Beranda" : "Home"}
             </Link>
             <span className="text-[#FE4D01]">{">"}</span>
-            <Link href="/tentang/mitra" className="text-[#FE4D01] hover:underline">
-              {lang === "id" ? "Tentang Kami" : "About Us"}
+            <Link href="/informasi/mitra" className="text-[#FE4D01] hover:underline">
+              {lang === "id" ? "Informasi" : "Information"}
             </Link>
             <span className="text-[#243771]">{">"}</span>
             <span className="text-[#243771]">
@@ -90,7 +90,9 @@ export default function MitraIndustri() {
             </h2>
 
             {loading ? (
-              <p className="text-center text-gray-500 italic">Memuat data mitra...</p>
+              <p className="text-center text-gray-500 italic">
+                {lang === "id" ? "Memuat data mitra..." : "Loading partners..."}
+              </p>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 justify-items-center">
                 {partners.length > 0 ? (
@@ -109,7 +111,9 @@ export default function MitraIndustri() {
                     </div>
                   ))
                 ) : (
-                  <p className="text-gray-500 italic">Belum ada data mitra.</p>
+                  <p className="text-gray-500 italic">
+                    {lang === "id" ? "Belum ada data mitra." : "No partners available."}
+                  </p>
                 )}
               </div>
             )}

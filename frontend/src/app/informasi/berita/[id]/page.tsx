@@ -12,6 +12,7 @@ interface BeritaItem {
   title_en: string;
   desc_id: string;
   desc_en: string;
+  image?: string;
 }
 
 export default function DetailBerita() {
@@ -22,36 +23,44 @@ export default function DetailBerita() {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [image, setImage] = useState<string | null>(null);
+  const API_BASE = "https://api.smkprestasiprima.sch.id";
 
-  // gambar fix untuk urutan 1-3
-  const fixedImages = [
-    "/berita/expo.webp",
-    "/berita/ppdb.webp",
-    "/berita/kokurikuler.webp",
-  ];
-
-  // === ambil dari query (jika klik dari list) ===
+  // === Ambil gambar dari query ===
   useEffect(() => {
     const imgQuery = query.get("img");
     if (imgQuery) {
-      setImage(imgQuery);
-    } else {
-      const index = (Number(id) - 1) % fixedImages.length;
-      setImage(fixedImages[index]);
+      let img = imgQuery;
+      if (img.startsWith("http://")) img = img.replace("http://", "https://");
+      else if (!img.startsWith("https://"))
+        img = `${API_BASE}${img.startsWith("/") ? "" : "/"}${img}`;
+      setImage(img);
     }
-  }, [id, query]);
+  }, [query]);
 
-  // === ambil konten dari API ===
+  // === Ambil detail berita dari API ===
   useEffect(() => {
     if (!id) return;
     const fetchDetail = async () => {
       try {
-        const res = await fetch(`/api/portal/berita/${id}/public`, {
-          cache: "no-store",
-        });
+        const res = await fetch(`/api/portal/berita/${id}/public`, { cache: "no-store" });
         const json = await res.json();
+
         if (json.success && json.data) {
-          setBerita(json.data);
+          const data = json.data;
+          let img = data.image || "";
+          if (img.startsWith("http://")) img = img.replace("http://", "https://");
+          else if (!img.startsWith("https://"))
+            img = `${API_BASE}${img.startsWith("/") ? "" : "/"}${img}`;
+          setImage(img || null);
+
+          setBerita({
+            id: data.id,
+            date: data.date,
+            title_id: data.title_id,
+            title_en: data.title_en,
+            desc_id: data.desc_id,
+            desc_en: data.desc_en,
+          });
           setNotFound(false);
         } else setNotFound(true);
       } catch (error) {
@@ -79,7 +88,10 @@ export default function DetailBerita() {
         <h1 className="text-3xl font-bold text-[#243771] mb-4">
           {lang === "id" ? "Berita tidak ditemukan" : "News not found"}
         </h1>
-        <Link href="/informasi/berita" className="text-[#FE4D01] font-semibold hover:underline">
+        <Link
+          href="/informasi/berita"
+          className="text-[#FE4D01] font-semibold hover:underline"
+        >
           ← {lang === "id" ? "Kembali ke Berita" : "Back to News"}
         </Link>
       </div>
@@ -88,41 +100,43 @@ export default function DetailBerita() {
   return (
     <>
       <div className="h-[100px] bg-white" />
-
-      {/* === Breadcrumbs === */}
       <section className="w-full py-4 bg-white">
-        <div className="container mx-auto px-4">
-          <nav className="flex items-center text-sm font-medium space-x-2">
-            <Link href="/" className="text-[#FE4D01] hover:underline">
-              {lang === "id" ? "Beranda" : "Home"}
-            </Link>
-            <span className="text-[#FE4D01]">{">"}</span>
-            <Link href="/informasi/berita" className="text-[#FE4D01] hover:underline">
-              {lang === "id" ? "Berita" : "News"}
-            </Link>
-            <span className="text-[#243771]">{">"}</span>
-            <span className="text-[#243771] truncate max-w-[200px] sm:max-w-[400px]">
-              {lang === "id" ? berita.title_id : berita.title_en}
-            </span>
-          </nav>
-        </div>
-      </section>
+  <div className="container mx-auto px-4">
+    <nav className="flex items-center text-sm font-medium space-x-2">
+      <Link href="/" className="text-[#FE4D01] hover:underline">
+        {lang === "id" ? "Beranda" : "Home"}
+      </Link>
+      <span className="text-[#FE4D01]">{">"}</span>
+      <Link href="/informasi/berita" className="text-[#FE4D01] hover:underline">
+        {lang === "id" ? "Informasi" : "Information"}
+      </Link>
+      <span className="text-[#FE4D01]">{">"}</span>
+      <Link href="/informasi/berita" className="text-[#FE4D01] hover:underline">
+        {lang === "id" ? "Berita" : "News"}
+      </Link>
+      <span className="text-[#243771]">{">"}</span>
+      <span className="text-[#243771] truncate max-w-[200px] sm:max-w-[400px]">
+        {lang === "id" ? berita.title_id : berita.title_en}
+      </span>
+    </nav>
+  </div>
+</section>
 
-      {/* === Konten utama === */}
+
       <div className="max-w-4xl mx-auto px-4 py-12">
         <div className="text-center mb-6">
           <h1 className="text-3xl sm:text-4xl font-bold text-[#243771] mb-2 leading-snug">
             {lang === "id" ? berita.title_id : berita.title_en}
           </h1>
           <p className="text-sm text-gray-500">
-            {new Date(berita.date).toLocaleDateString(
-              lang === "id" ? "id-ID" : "en-US",
-              { day: "numeric", month: "long", year: "numeric" }
-            )}
+            {new Date(berita.date).toLocaleDateString(lang === "id" ? "id-ID" : "en-US", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            })}
           </p>
         </div>
 
-        {/* Gambar berita */}
         {image && (
           <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden mb-8 shadow-md">
             <img
@@ -134,12 +148,10 @@ export default function DetailBerita() {
           </div>
         )}
 
-        {/* Isi berita */}
         <div className="text-gray-700 leading-relaxed text-justify text-lg whitespace-pre-line mb-10">
           {lang === "id" ? berita.desc_id : berita.desc_en}
         </div>
 
-        {/* Tombol kembali */}
         <div className="flex justify-center">
           <Link
             href="/informasi/berita"

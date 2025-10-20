@@ -1,27 +1,27 @@
 import { NextResponse } from "next/server";
-import api from "@/app/lib/api";
 
+// 🔒 Proxy GET /api/portal/facilities/public → Laravel HTTPS
 export async function GET() {
   try {
-    const res = await api.get("/facilities/public");
-    const facilities = res.data?.data || [];
+    const res = await fetch("https://api.smkprestasiprima.sch.id/api/facilities/public", {
+      cache: "no-store",
+    });
 
-    // Biarkan path gambar apa adanya, tanpa base URL/env
-    const data = facilities.map((f: any) => ({
-      ...f,
-      img_id: f.img_id?.startsWith("/storage") ? f.img_id : f.img_id,
-      img_en: f.img_en?.startsWith("/storage") ? f.img_en : f.img_en,
-    }));
+    if (!res.ok) {
+      console.error("❌ Gagal ambil data fasilitas:", res.status);
+      return NextResponse.json(
+        { success: false, message: "Gagal memuat data fasilitas" },
+        { status: res.status }
+      );
+    }
 
-    return NextResponse.json({ success: true, data });
+    const data = await res.json();
+    return NextResponse.json(data, { status: 200 });
   } catch (err: any) {
-    console.error(
-      "❌ FACILITIES PUBLIC ERROR:",
-      err.response?.data || err.message
-    );
+    console.error("❌ Proxy facilities error:", err);
     return NextResponse.json(
-      { success: false, message: "Gagal memuat data fasilitas publik." },
-      { status: err.response?.status || 500 }
+      { success: false, message: "Tidak dapat mengambil data fasilitas" },
+      { status: 500 }
     );
   }
 }

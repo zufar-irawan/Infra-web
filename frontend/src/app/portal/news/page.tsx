@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Swal from "sweetalert2";
 import { Plus, Pencil, Trash2, X } from "lucide-react";
-import api from "@/app/lib/api"; // ✅ langsung pakai API global (bukan route proxy)
+import api from "@/app/lib/api"; // ✅ pakai axios HTTPS global
 
 interface News {
   id: number;
@@ -23,12 +23,23 @@ export default function AdminNewsPage() {
   const [isModalOpen, setModalOpen] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
 
-  // === Fetch data dari API Laravel ===
+  // === Ambil data dari API Laravel HTTPS ===
   const fetchNews = async () => {
     try {
       const res = await api.get("/news");
       if (res.data.success || Array.isArray(res.data.data)) {
-        setNews(res.data.data || res.data);
+        const data = res.data.data || res.data;
+        const fixed = data.map((n: any) => ({
+          ...n,
+          image: n.image
+            ? n.image.startsWith("http://")
+              ? n.image.replace("http://", "https://")
+              : n.image.startsWith("https://")
+              ? n.image
+              : `https://api.smkprestasiprima.sch.id${n.image.startsWith("/") ? "" : "/"}${n.image}`
+            : "",
+        }));
+        setNews(fixed);
       } else {
         console.warn("⚠️ Format data berita tidak sesuai:", res.data);
       }
@@ -71,7 +82,6 @@ export default function AdminNewsPage() {
 
     try {
       if (editId) {
-        // Laravel biasanya pakai spoof _method=PUT
         formData.append("_method", "PUT");
         await api.post(`/news/${editId}`, formData, {
           headers: { "Content-Type": "multipart/form-data" },
@@ -132,7 +142,7 @@ export default function AdminNewsPage() {
     setModalOpen(true);
   };
 
-  // === Close modal if click outside / Esc ===
+  // === Tutup modal kalau klik di luar / tekan Esc ===
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
@@ -196,11 +206,7 @@ export default function AdminNewsPage() {
                     <td className="p-3 text-center">
                       {n.image ? (
                         <Image
-                          src={
-                            n.image.startsWith("http")
-                              ? n.image
-                              : `https://api.smkprestasiprima.sch.id${n.image}`
-                          }
+                          src={n.image}
                           alt={n.title_id}
                           width={100}
                           height={70}
@@ -308,9 +314,7 @@ export default function AdminNewsPage() {
                     src={
                       form.imageFile
                         ? URL.createObjectURL(form.imageFile)
-                        : form.image?.startsWith("http")
-                        ? form.image
-                        : `https://api.smkprestasiprima.sch.id${form.image}`
+                        : form.image || ""
                     }
                     alt="Preview"
                     width={300}

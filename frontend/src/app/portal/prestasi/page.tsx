@@ -9,6 +9,22 @@ interface Achievement {
   poster: string;
 }
 
+const getApiUrl = (path: string) => {
+  const isLocal =
+    typeof window !== "undefined" && window.location.origin.includes("localhost");
+
+  // hapus prefix "/api" supaya ga dobel
+  const cleanPath = path.replace(/^\/api/, "");
+
+  // kalau lokal → proxy ke Next.js
+  if (isLocal) {
+    return `/api/proxy${cleanPath}`; // hasil: /api/proxy/achievements ✅
+  }
+
+  // kalau production langsung ke backend Laravel
+  return `https://api.smkprestasiprima.sch.id/api${cleanPath}`;
+};
+
 export default function PrestasiPage() {
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [file, setFile] = useState<File | null>(null);
@@ -16,10 +32,10 @@ export default function PrestasiPage() {
   const [isModalOpen, setModalOpen] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
 
-  // === Ambil data dari API Next.js Proxy ===
+  // === Ambil data dari API ===
   const fetchAchievements = async () => {
     try {
-      const res = await fetch("/api/portal/prestasi", { cache: "no-store" });
+      const res = await fetch(getApiUrl("/api/achievements"), { cache: "no-store" });
       const json = await res.json();
 
       if (json.success) setAchievements(json.data);
@@ -34,7 +50,7 @@ export default function PrestasiPage() {
     fetchAchievements();
   }, []);
 
-  // === File upload handler ===
+  // === Upload handler ===
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
     if (!f) return;
@@ -45,7 +61,7 @@ export default function PrestasiPage() {
     setFile(f);
   };
 
-  // === Simpan data ===
+  // === Simpan (Create / Update) ===
   const handleSave = async () => {
     if (!file) {
       Swal.fire("Lengkapi Data", "Upload gambar terlebih dahulu.", "warning");
@@ -58,15 +74,13 @@ export default function PrestasiPage() {
     try {
       let res;
       if (editId) {
-        // UPDATE pakai spoof _method=PUT
         formData.append("_method", "PUT");
-        res = await fetch(`/api/portal/prestasi/${editId}`, {
+        res = await fetch(getApiUrl(`/api/achievements/${editId}`), {
           method: "POST",
           body: formData,
         });
       } else {
-        // CREATE baru
-        res = await fetch(`/api/portal/prestasi`, {
+        res = await fetch(getApiUrl("/api/achievements"), {
           method: "POST",
           body: formData,
         });
@@ -114,7 +128,7 @@ export default function PrestasiPage() {
     if (!result.isConfirmed) return;
 
     try {
-      const res = await fetch(`/api/portal/prestasi/${id}`, { method: "DELETE" });
+      const res = await fetch(getApiUrl(`/api/achievements/${id}`), { method: "DELETE" });
       const json = await res.json();
 
       if (json.success) {
@@ -128,7 +142,7 @@ export default function PrestasiPage() {
     }
   };
 
-  // === Tutup modal dengan klik luar / ESC ===
+  // === Tutup modal ESC / klik luar ===
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (modalRef.current && !modalRef.current.contains(e.target as Node))
@@ -194,14 +208,15 @@ export default function PrestasiPage() {
                     </td>
                     <td className="p-3 text-center">
                       <img
-                        src={
-                          a.poster.startsWith("http")
-                            ? a.poster
-                            : `/storage/${a.poster}`
-                        }
-                        alt={`Prestasi ${a.id}`}
-                        className="w-[100px] h-auto rounded-md border border-gray-200 object-contain mx-auto"
-                      />
+  src={
+    a.poster.startsWith("http")
+      ? a.poster.replace("http://", "https://") // 🔥 paksa HTTPS
+      : `https://api.smkprestasiprima.sch.id/storage/${a.poster}`
+  }
+  alt={`Prestasi ${a.id}`}
+  className="w-[100px] h-auto rounded-md border border-gray-200 object-contain mx-auto"
+/>
+
                     </td>
                     <td className="p-3 flex justify-center gap-2 flex-wrap">
                       <button

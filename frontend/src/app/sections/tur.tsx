@@ -21,93 +21,61 @@ export default function BeritaSection() {
   const [loading, setLoading] = useState(true);
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement | null>(null);
+  const API_BASE = "https://api.smkprestasiprima.sch.id";
 
-  const API_BASE = "https://api.smkprestasiprima.sch.id"; // masih HTTP
-  const fallbackImages = [
-    "/berita/expo.webp",
-    "/berita/ppdb.webp",
-    "/berita/kokurikuler.webp",
-  ];
-
-  // === Ambil berita terbaru dari API ===
+  // === Ambil berita terbaru dari proxy HTTPS ===
   useEffect(() => {
-    async function loadBerita() {
+    async function fetchBerita() {
       try {
         const res = await fetch("/api/portal/berita/public", { cache: "no-store" });
         const j = await res.json();
 
-        if (j.success && Array.isArray(j.data) && j.data.length > 0) {
-          // hanya ambil 3 berita terbaru
-          const fixed = j.data.slice(0, 3).map((b: BeritaItem, i: number) => ({
-            ...b,
-            image:
-              b.image?.startsWith("http") && !b.image.includes("https://")
-                ? b.image.replace("https://", "http://")
-                : `${API_BASE}${b.image}`,
-          }));
-          setBeritaList(fixed);
-        } else {
-          // fallback dummy
-          setBeritaList(
-            fallbackImages.map((img, i) => ({
-              id: i + 1,
-              title_id: "Berita Sekolah",
-              title_en: "School News",
-              desc_id:
-                "Berita sementara ditampilkan karena server API tidak dapat dijangkau.",
-              desc_en: "Temporary news shown because API is unreachable.",
-              date: "2025-10-19",
+        if (j.success && Array.isArray(j.data)) {
+          // ambil 3 berita terbaru, pastikan image selalu HTTPS
+          const mapped = j.data.slice(0, 3).map((b: any) => {
+            let img = b.image || "";
+            if (img.startsWith("http://")) img = img.replace("http://", "https://");
+            else if (!img.startsWith("https://"))
+              img = `${API_BASE}${img.startsWith("/") ? "" : "/"}${img}`;
+
+            return {
+              id: b.id,
+              title_id: b.title_id || "-",
+              title_en: b.title_en || "-",
+              desc_id: b.desc_id || "",
+              desc_en: b.desc_en || "",
+              date: b.date || "",
               image: img,
-            }))
-          );
+            };
+          });
+
+          setBeritaList(mapped);
+        } else {
+          setBeritaList([]);
         }
       } catch (err) {
         console.error("❌ Gagal ambil berita section:", err);
-        // fallback jika total gagal
-        setBeritaList(
-          fallbackImages.map((img, i) => ({
-            id: i + 1,
-            title_id: "Berita Sekolah",
-            title_en: "School News",
-            desc_id:
-              "Berita sementara ditampilkan karena server API tidak dapat dijangkau.",
-            desc_en: "Temporary news shown because API is unreachable.",
-            date: "2025-10-19",
-            image: img,
-          }))
-        );
+        setBeritaList([]);
       } finally {
         setLoading(false);
       }
     }
 
-    loadBerita();
+    fetchBerita();
   }, []);
 
-  // === Animasi saat muncul ===
+  // === Animasi saat muncul di viewport ===
   useEffect(() => {
     const obs = new IntersectionObserver(
-      (entries) =>
-        entries.forEach((entry) => entry.isIntersecting && setIsVisible(true)),
+      (entries) => entries.forEach((e) => e.isIntersecting && setIsVisible(true)),
       { threshold: 0.2 }
     );
     if (sectionRef.current) obs.observe(sectionRef.current);
     return () => obs.disconnect();
   }, []);
 
-  // === Fallback runtime kalau gambar gagal load ===
-  const handleImageError = (
-    e: React.SyntheticEvent<HTMLImageElement>,
-    idx: number
-  ) => {
-    e.currentTarget.src = fallbackImages[idx % fallbackImages.length];
-  };
-
   return (
-    <section
-      ref={sectionRef}
-      className="relative w-full bg-white py-20 overflow-hidden"
-    >
+    <section ref={sectionRef} className="relative w-full bg-white py-20 overflow-hidden">
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={isVisible ? { opacity: 1, y: 0 } : {}}
@@ -122,22 +90,30 @@ export default function BeritaSection() {
           <p className="text-center text-gray-500 italic">
             {lang === "id" ? "Memuat berita..." : "Loading news..."}
           </p>
+        ) : beritaList.length === 0 ? (
+          <p className="text-center text-gray-500 italic">
+            {lang === "id" ? "Belum ada berita." : "No news available."}
+          </p>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {beritaList.map((b, i) => (
+            {beritaList.map((b) => (
               <article
                 key={b.id}
                 className="bg-white rounded-2xl border border-gray-200 shadow-[0_10px_24px_rgba(17,24,32,0.06)] hover:shadow-[0_14px_32px_rgba(17,24,32,0.12)] transition-all duration-300 overflow-hidden"
               >
-                <div className="relative w-full h-48 md:h-52">
-                  <img
-                    src={b.image}
-                    alt={lang === "id" ? b.title_id : b.title_en}
-                    onError={(e) => handleImageError(e, i)}
-                    className="object-cover w-full h-full"
-                    loading="lazy"
-                  />
-                </div>
+                {b.image && (
+                  <div className="relative w-full h-48 md:h-52">
+                    <img
+                      src={b.image}
+                      alt={lang === "id" ? b.title_id : b.title_en}
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).style.display = "none";
+                      }}
+                      className="object-cover w-full h-full"
+                      loading="lazy"
+                    />
+                  </div>
+                )}
 
                 <div className="p-4 md:p-5">
                   <p className="text-xs md:text-sm font-semibold text-[#FE4D01] mb-2">
@@ -155,7 +131,10 @@ export default function BeritaSection() {
                   </p>
 
                   <Link
-                    href={`/informasi/berita/${b.id}`}
+                    href={{
+                      pathname: `/informasi/berita/${b.id}`,
+                      query: { img: b.image },
+                    }}
                     className="inline-block text-[13px] md:text-sm font-semibold text-[#FE4D01] hover:underline"
                   >
                     {lang === "id" ? "Baca Selengkapnya..." : "Read More..."}
