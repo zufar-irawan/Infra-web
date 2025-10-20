@@ -65,17 +65,17 @@ export default function ChatWidget() {
                     {/* Floating Button with Pulse Animation */}
                     <button
                         onClick={() => setOpen(!open)}
-                        className="z-50 fixed bottom-6 right-6 bg-gradient-to-br from-orange-500 to-orange-600 p-4 rounded-full shadow-2xl text-white hover:from-orange-600 hover:to-orange-700 transition-all duration-300 active:scale-95 group"
+                        className="z-50 fixed bottom-4 right-4 sm:bottom-6 sm:right-6 bg-gradient-to-br from-orange-500 to-orange-600 p-3 sm:p-4 rounded-full shadow-2xl text-white hover:from-orange-600 hover:to-orange-700 transition-all duration-300 active:scale-95 group"
                         style={{
                             boxShadow: '0 10px 40px rgba(249, 115, 22, 0.4)'
                         }}
                     >
                         {open ? (
-                            <X className="w-6 h-6 transition-transform group-hover:rotate-90 duration-300" />
+                            <X className="w-5 h-5 sm:w-6 sm:h-6 transition-transform group-hover:rotate-90 duration-300" />
                         ) : (
-                            <MessageCircle className="w-6 h-6 transition-transform group-hover:scale-110 duration-300" />
+                            <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 transition-transform group-hover:scale-110 duration-300" />
                         )}
-                        
+
                         {/* Pulse ring animation */}
                         {!open && (
                             <span className="absolute inset-0 rounded-full bg-orange-500 animate-ping opacity-20"></span>
@@ -84,18 +84,18 @@ export default function ChatWidget() {
 
                     {/* Chat Window */}
                     {open && (
-                        <div className="z-50 fixed bottom-24 right-6 w-[420px] h-[600px] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-orange-100 animate-slideUp">
+                        <div className="z-50 fixed bottom-20 left-2 right-2 w-auto h-[500px] max-h-[80vh] sm:bottom-24 sm:left-auto sm:right-6 sm:w-[420px] sm:h-[600px] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-orange-100 animate-slideUp">
                             {/* Header with Gradient */}
-                            <div className="bg-gradient-to-r from-orange-500 via-orange-600 to-orange-500 text-white p-5 relative overflow-hidden">
+                            <div className="bg-gradient-to-r from-orange-500 via-orange-600 to-orange-500 text-white p-4 sm:p-5 relative overflow-hidden">
                                 <div className="absolute inset-0 bg-white opacity-10"></div>
                                 <div className="relative flex items-center justify-between">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border-2 border-white/30">
-                                            <Bot className="w-6 h-6" />
+                                    <div className="flex items-center gap-2 sm:gap-3">
+                                        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border-2 border-white/30">
+                                            <Bot className="w-4 h-4 sm:w-6 sm:h-6" />
                                         </div>
                                         <div>
-                                            <h3 className="font-bold text-lg">Assistant AI</h3>
-                                            <p className="text-xs text-orange-100">Online • Siap membantu</p>
+                                            <h3 className="font-bold text-base sm:text-lg">Assistant AI</h3>
+                                            <p className="text-[11px] sm:text-xs text-orange-100">Online • Siap membantu</p>
                                         </div>
                                     </div>
                                     <button 
@@ -108,27 +108,27 @@ export default function ChatWidget() {
                             </div>
 
                             {/* Messages Area */}
-                            <div className="flex-1 p-4 space-y-4 overflow-y-auto bg-gradient-to-b from-orange-50/30 to-white custom-scrollbar">
+                            <div className="flex-1 p-3 sm:p-4 space-y-3 sm:space-y-4 overflow-y-auto bg-gradient-to-b from-orange-50/30 to-white custom-scrollbar">
                                 {messages.map((m, i) => (
                                     <div
                                         key={i}
-                                        className={`flex gap-2 ${m.sender === "user" ? "justify-end" : "justify-start"} animate-fadeIn`}
+                                        className={`flex gap-1 sm:gap-2 ${m.sender === "user" ? "justify-end" : "justify-start"} animate-fadeIn`}
                                     >
                                         {m.sender === "bot" && (
-                                            <div className="w-8 h-8 bg-gradient-to-br from-orange-400 to-orange-500 rounded-full flex items-center justify-center flex-shrink-0 shadow-md">
-                                                <Bot className="w-5 h-5 text-white" />
+                                            <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-orange-400 to-orange-500 rounded-full flex items-center justify-center flex-shrink-0 shadow-md">
+                                                <Bot className="w-3 h-3 sm:w-5 sm:h-5 text-white" />
                                             </div>
                                         )}
                                         
                                         <div
-                                            className={`max-w-[75%] p-3.5 rounded-2xl shadow-sm ${
+                                            className={`max-w-[75%] p-2.5 sm:p-3.5 rounded-2xl shadow-sm ${
                                                 m.sender === "user"
                                                     ? "bg-gradient-to-br from-orange-500 to-orange-600 text-white rounded-tr-sm"
                                                     : "bg-white text-gray-800 rounded-tl-sm border border-gray-100"
                                             }`}
                                         >
                                             {m.text.split("\n\n").map((para, idx) => (
-                                                <p key={idx} className="mb-2 last:mb-0 text-sm leading-relaxed">
+                                                <p key={idx} className="mb-2 last:mb-0 text-xs sm:text-sm leading-relaxed">
                                                     {para.split("\n").map((line, id) => (
                                                         <span key={id}>
                                                             {line}
@@ -140,8 +140,8 @@ export default function ChatWidget() {
                                         </div>
 
                                         {m.sender === "user" && (
-                                            <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-500 rounded-full flex items-center justify-center flex-shrink-0 shadow-md">
-                                                <User className="w-5 h-5 text-white" />
+                                            <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-blue-400 to-blue-500 rounded-full flex items-center justify-center flex-shrink-0 shadow-md">
+                                                <User className="w-3 h-3 sm:w-5 sm:h-5 text-white" />
                                             </div>
                                         )}
                                     </div>
@@ -149,11 +149,11 @@ export default function ChatWidget() {
 
                                 {/* Typing Indicator */}
                                 {isTyping && (
-                                    <div className="flex gap-2 items-end animate-fadeIn">
-                                        <div className="w-8 h-8 bg-gradient-to-br from-orange-400 to-orange-500 rounded-full flex items-center justify-center flex-shrink-0 shadow-md">
-                                            <Bot className="w-5 h-5 text-white" />
+                                    <div className="flex gap-1 sm:gap-2 items-end animate-fadeIn">
+                                        <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-orange-400 to-orange-500 rounded-full flex items-center justify-center flex-shrink-0 shadow-md">
+                                            <Bot className="w-3 h-3 sm:w-5 sm:h-5 text-white" />
                                         </div>
-                                        <div className="bg-white p-4 rounded-2xl rounded-tl-sm shadow-sm border border-gray-100">
+                                        <div className="bg-white p-3 sm:p-4 rounded-2xl rounded-tl-sm shadow-sm border border-gray-100">
                                             <div className="flex gap-1">
                                                 <span className="w-2 h-2 bg-orange-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
                                                 <span className="w-2 h-2 bg-orange-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
@@ -167,29 +167,29 @@ export default function ChatWidget() {
                             </div>
 
                             {/* Input Area */}
-                            <div className="p-4 border-t border-gray-100 bg-white">
+                            <div className="p-3 sm:p-4 border-t border-gray-100 bg-white">
                                 <div className="flex gap-2 items-end">
                                     <div className="flex-1 relative">
                                         <input
                                             value={input}
                                             onChange={(e) => setInput(e.target.value)}
                                             onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()}
-                                            className="w-full border-2 border-gray-200 rounded-2xl px-4 py-3 text-gray-900 text-sm focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition-all placeholder:text-gray-400"
+                                            className="w-full border-2 border-gray-200 rounded-2xl px-3 py-2 sm:px-4 sm:py-3 text-gray-900 text-xs sm:text-sm focus:outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition-all placeholder:text-gray-400"
                                             placeholder="Ketik pesan Anda..."
                                         />
                                     </div>
                                     <button
                                         onClick={sendMessage}
                                         disabled={!input.trim()}
-                                        className="bg-gradient-to-br from-orange-500 to-orange-600 p-3.5 rounded-2xl text-white hover:from-orange-600 hover:to-orange-700 transition-all active:scale-95 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:from-orange-500 disabled:hover:to-orange-600"
+                                        className="bg-gradient-to-br from-orange-500 to-orange-600 p-2.5 sm:p-3.5 rounded-2xl text-white hover:from-orange-600 hover:to-orange-700 transition-all active:scale-95 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:from-orange-500 disabled:hover:to-orange-600"
                                         style={{
                                             boxShadow: '0 4px 15px rgba(249, 115, 22, 0.3)'
                                         }}
                                     >
-                                        <Send className="w-5 h-5" />
+                                        <Send className="w-4 h-4 sm:w-5 sm:h-5" />
                                     </button>
                                 </div>
-                                <p className="text-xs text-gray-400 mt-2 text-center">
+                                <p className="text-[11px] sm:text-xs text-gray-400 mt-2 text-center">
                                     Powered by SMK Prestasi Prima AI
                                 </p>
                             </div>

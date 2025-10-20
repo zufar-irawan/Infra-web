@@ -22,7 +22,7 @@ export default function BeritaSection() {
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement | null>(null);
 
-  const API_BASE = "http://api.smkprestasiprima.sch.id"; // masih HTTP
+  const API_BASE = "https://api.smkprestasiprima.sch.id"; // masih HTTP
   const fallbackImages = [
     "/berita/expo.webp",
     "/berita/ppdb.webp",

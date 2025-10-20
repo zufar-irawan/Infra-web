@@ -19,7 +19,9 @@ export default function Main() {
 	return (
 		<div className="flex-1 w-full min-h-screen">
 			<Navbar />
-			<SocialBar />
+            <div className={`hidden sm:block`}>
+			    <SocialBar />
+            </div>
 
 			<Home />
 			<Sekilas />

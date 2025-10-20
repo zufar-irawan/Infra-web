@@ -108,34 +108,34 @@ export default function Prestasi() {
               transition={{ duration: 0.8, delay: 0.4 }}
               className="md:w-1/2 flex flex-col items-center md:items-end"
             >
-              <div className="flex flex-wrap gap-6 items-center justify-center md:justify-end">
-                {items.length > 0 ? (
-                  items.map((img, i) => (
-                    <div
-                      key={img.id}
-                      className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition w-[260px] h-[340px] sm:w-[280px] sm:h-[360px] md:w-[295px] md:h-[369px]"
-                    >
-                      <Image
-                        src={img.poster}
-                        alt={`Prestasi ${img.id}`}
-                        width={295}
-                        height={369}
-                        className="object-cover w-full h-full"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src =
-                            fallbackItems[i % fallbackItems.length].poster;
-                        }}
-                      />
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-gray-500 text-center">
-                    {lang === "id"
-                      ? "Memuat data prestasi..."
-                      : "Loading achievements..."}
-                  </p>
-                )}
-              </div>
+                <div className="flex flex-row md:flex-wrap gap-6 items-center justify-center md:justify-end overflow-x-auto md:overflow-visible px-2 -mx-2">
+                    {items.length > 0 ? (
+                        items.map((img, i) => (
+                            <div
+                                key={img.id}
+                                className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition flex-shrink-0 w-[180px] h-[240px] sm:w-[240px] sm:h-[320px] md:w-[295px] md:h-[369px]"
+                            >
+                                <Image
+                                    src={img.poster}
+                                    alt={`Prestasi ${img.id}`}
+                                    width={295}
+                                    height={369}
+                                    className="object-cover w-full h-full"
+                                    onError={(e) => {
+                                        (e.target as HTMLImageElement).src =
+                                            fallbackItems[i % fallbackItems.length].poster;
+                                    }}
+                                />
+                            </div>
+                        ))
+                    ) : (
+                        <p className="text-gray-500 text-center">
+                            {lang === "id"
+                                ? "Memuat data prestasi..."
+                                : "Loading achievements..."}
+                        </p>
+                    )}
+                </div>
 
               {/* Tombol Selengkapnya */}
               <div className="mt-8 w-full flex justify-center md:justify-end">

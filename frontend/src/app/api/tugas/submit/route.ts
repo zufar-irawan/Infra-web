@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
     const cookieToken = cookieStore.get("auth-token")?.value;
     const authHeader = incomingAuth || (cookieToken ? `Bearer ${cookieToken}` : undefined);
 
-    const upstream = await fetch("http://api.smkprestasiprima.sch.id/api/lms/assignment-submissions", {
+    const upstream = await fetch("https://api.smkprestasiprima.sch.id/api/lms/assignment-submissions", {
       method: "POST",
       headers: {
         ...(authHeader ? { Authorization: authHeader } : {}),
