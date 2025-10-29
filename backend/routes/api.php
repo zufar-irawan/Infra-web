@@ -116,6 +116,8 @@ Route::prefix('lms')->group(function () {
         // Assignments
         Route::apiResource('assignments', LmsAssignmentController::class);
         Route::apiResource('assignment-submissions', LmsAssignmentSubmissionController::class);
+        Route::get('assignments/{assignment}/files/{file}', [LmsAssignmentController::class, 'downloadFile']);
+        Route::get('assignments/{assignment}/files/{file}/view', [LmsAssignmentController::class, 'viewFile']);
 
         // Exams
         Route::apiResource('exams', LmsExamController::class);

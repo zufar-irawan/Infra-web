@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\LmsAssignment;
+use App\Models\LmsFile;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class LmsAssignmentController extends Controller
 {
@@ -73,5 +75,59 @@ class LmsAssignmentController extends Controller
     {
         $assignment->delete();
         return response()->json(null, 204);
+    }
+
+    /**
+     * Download or serve assignment file
+     */
+    public function downloadFile(LmsAssignment $assignment, $fileId)
+    {
+        $file = LmsFile::where('fileable_id', $assignment->id)
+            ->where('fileable_type', LmsAssignment::class)
+            ->where('id', $fileId)
+            ->firstOrFail();
+
+        // If it's a link type, redirect to it
+        if ($file->type === 'link') {
+            return redirect($file->path);
+        }
+
+        // For actual files stored in storage
+        if (!Storage::disk('public')->exists($file->path)) {
+            abort(404, 'File not found');
+        }
+
+        return Storage::disk('public')->download($file->path, $file->name ?? basename($file->path));
+    }
+
+    /**
+     * View assignment file inline (for iframe viewing)
+     */
+    public function viewFile(LmsAssignment $assignment, $fileId)
+    {
+        $file = LmsFile::where('fileable_id', $assignment->id)
+            ->where('fileable_type', LmsAssignment::class)
+            ->where('id', $fileId)
+            ->firstOrFail();
+
+        // If it's a link type, redirect to it
+        if ($file->type === 'link') {
+            return redirect($file->path);
+        }
+
+        // For actual files stored in storage
+        if (!Storage::disk('public')->exists($file->path)) {
+            abort(404, 'File not found');
+        }
+
+        // Get the file path and mime type
+        $filePath = Storage::disk('public')->path($file->path);
+        $mimeType = $file->mime ?? Storage::disk('public')->mimeType($file->path);
+
+        // Return file response with inline disposition (for viewing in browser)
+        return response()->file($filePath, [
+            'Content-Type' => $mimeType,
+            'Content-Disposition' => 'inline; filename="' . ($file->name ?? basename($file->path)) . '"',
+        ]);
     }
 }

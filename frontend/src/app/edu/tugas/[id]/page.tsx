@@ -5,7 +5,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import { useEduData } from "@/app/edu/context";
-import { Calendar, FileText, Link as LinkIcon, Loader2, Download, ExternalLink } from "lucide-react";
+import { Calendar, FileText, Link as LinkIcon, Loader2, Download, ExternalLink, Clock, CheckCircle2, XCircle, User } from "lucide-react";
 import TugasUploadModal from "@/app/components/subComponents/forTugas/TugasUploadModal";
 import Swal from "sweetalert2";
 
@@ -15,6 +15,8 @@ interface AssignmentFile {
   path: string; // e.g. "storage/assignments/filename.pdf" (may vary)
   name?: string | null;
   original_name?: string | null;
+  type?: 'file' | 'link' | string; // added: to distinguish between file and link
+  mime?: string | null;
 }
 
 interface AssignmentDetail {
@@ -55,10 +57,9 @@ function basename(p: string) {
   }
 }
 
-function buildFileUrl(path: string) {
-  // Keep the path as-is; don't try to fix potential typos like "asssignments".
-  const clean = path.replace(/^\/+/, "");
-  return `https://api.smkprestasiprima.sch.id/${clean}`;
+function buildAssignmentFileUrl(assignmentId: string | number, fileId: string | number) {
+  // Use frontend proxy API route to handle authentication
+  return `/api/tugas/files/${assignmentId}/${fileId}`;
 }
 
 export default function AssignmentDetailPage() {
@@ -218,32 +219,31 @@ export default function AssignmentDetailPage() {
 
   const handleOpen = (file: AssignmentFile) => {
     if (!file?.path) return;
-    const url = buildFileUrl(file.path);
-    window.open(url, "_blank", "noopener,noreferrer");
+
+    // If type is 'link', open the path directly
+    if (file.type === 'link') {
+      window.open(file.path, "_blank", "noopener,noreferrer");
+      return;
+    }
+
+    // For files, navigate to the viewer page
+    if (file.id && data?.id) {
+      router.push(`/edu/tugas/${data.id}/view/${file.id}`);
+    }
   };
 
   const handleDownload = async (file: AssignmentFile) => {
     if (!file?.path) return;
-    const url = buildFileUrl(file.path);
-    try {
-      const resp = await fetch(url);
-      if (!resp.ok) {
-        // If not ok, just open in a new tab as fallback instead of throwing
-        window.open(url, "_blank", "noopener,noreferrer");
-        return;
-      }
-      const blob = await resp.blob();
-      const dlUrl = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      const filename = file.name || file.original_name || basename(file.path);
-      a.href = dlUrl;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(dlUrl);
-    } catch (e) {
-      // Fallback to simply opening the URL if download fails
+
+    // If type is 'link', just open it (can't download external links)
+    if (file.type === 'link') {
+      window.open(file.path, "_blank", "noopener,noreferrer");
+      return;
+    }
+
+    // For files, use the correct API endpoint
+    if (file.id && data?.id) {
+      const url = buildAssignmentFileUrl(data.id, file.id);
       window.open(url, "_blank", "noopener,noreferrer");
     }
   };
@@ -389,202 +389,356 @@ export default function AssignmentDetailPage() {
   };
 
   return (
-    <div className="overflow-y-auto min-h-screen">
-      {/*<DashHeader user={user} student={student} />*/}
+    <div className="min-h-screen bg-gray-50">
+      {/* Google Classroom style header bar */}
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+          <button
+            onClick={() => router.back()}
+            className="flex items-center gap-2 text-gray-700 hover:bg-gray-100 px-3 py-2 rounded-lg transition-colors"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+            </svg>
+            <span className="font-medium">Kembali</span>
+          </button>
 
-      <div className="w-full min-h-screen p-4 flex items-center justify-center">
-        <div className="w-full max-w-4xl bg-white rounded-2xl p-6 shadow-md border border-gray-100">
-          {/* Header */}
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex-1 min-w-0">
-              <h1 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-1">
-                {data?.title || (loading ? "Memuat..." : "Detail Tugas")}
-              </h1>
-              {data?.teacher?.user?.name || data?.creator?.name ? (
-                <p className="text-sm text-gray-600">
-                  {data?.teacher?.user?.name || data?.creator?.name}
-                </p>
-              ) : null}
-              {data?.deadline && (
-                <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
-                  <Calendar className="w-3 h-3" /> Deadline: {formatDeadline(data.deadline)}
-                </p>
-              )}
-            </div>
-            <div className="flex items-center gap-2">
-              {user?.role === 'siswa' && (
-                hasSubmitted ? (
-                  myGrade != null ? (
-                    <span className="px-3 py-2 text-sm rounded-lg bg-emerald-100 text-emerald-700">
-                      Nilai Anda: {String(myGrade)}
-                    </span>
-                  ) : (
-                    <span className="px-3 py-2 text-sm rounded-lg bg-emerald-100 text-emerald-700">
-                      Sudah mengumpulkan
-                    </span>
-                  )
-                ) : (
-                  <button
-                    onClick={() => setIsUploadOpen(true)}
-                    className="px-3 py-2 text-sm bg-orange-500 text-white rounded-lg hover:bg-orange-600"
-                    disabled={!data?.id}
-                  >
-                    Upload Tugas
-                  </button>
-                )
-              )}
-              <button
-                onClick={() => router.back()}
-                className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50"
-              >
-                Kembali
-              </button>
-            </div>
-          </div>
-
-          {/* Loading / Error */}
-          {loading && (
-            <div className="flex items-center gap-2 text-gray-600 mt-4">
-              <Loader2 className="w-4 h-4 animate-spin" /> Memuat detail...
-            </div>
-          )}
-          {error && (
-            <div className="mt-4 p-3 rounded-lg bg-red-50 text-red-700 text-sm border border-red-200">
-              {error}
-            </div>
-          )}
-
-          {/* Description */}
-          {data?.description && (
-            <div className="mt-6">
-              <h2 className="text-sm font-semibold text-gray-700 mb-2">Deskripsi</h2>
-              <p className="text-gray-700 text-sm whitespace-pre-line">{data.description}</p>
-            </div>
-          )}
-
-          {/* Reference Links */}
-          {Array.isArray(displayLinks) && displayLinks.length > 0 && (
-            <div className="mt-6">
-              <h2 className="text-sm font-semibold text-gray-700 mb-2">Tautan Referensi</h2>
-              <ul className="space-y-2">
-                {displayLinks.map((lnk, idx) => (
-                  <li key={idx} className="flex items-center gap-2 text-sm">
-                    <LinkIcon className="w-4 h-4 text-blue-600" />
-                    <a
-                      href={lnk}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline break-all"
-                    >
-                      {lnk}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {/* Files */}
-          <div className="mt-6">
-            <h2 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-              <FileText className="w-4 h-4 text-orange-600" /> Lampiran Tugas
-            </h2>
-            {normalizedFiles.length > 0 ? (
-              <ul className="divide-y divide-gray-100 border border-gray-100 rounded-xl overflow-hidden">
-                {normalizedFiles.map((f, idx) => {
-                  const displayName = f.name || f.original_name || basename(f.path);
-                  const url = buildFileUrl(f.path);
-                  return (
-                    <li key={String(f.id ?? idx)} className="flex items-center justify-between gap-3 p-3">
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm text-gray-800 truncate">{displayName}</p>
-                        <p className="text-xs text-gray-500 truncate">{url}</p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => handleOpen(f)}
-                          className="px-3 py-1.5 text-xs bg-white border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center gap-1"
-                          title="Buka di tab baru"
-                        >
-                          <ExternalLink className="w-3.5 h-3.5" /> Buka
-                        </button>
-                        <button
-                          onClick={() => { void handleDownload(f); }}
-                          className="px-3 py-1.5 text-xs bg-orange-500 text-white rounded-lg hover:bg-orange-600 flex items-center gap-1"
-                          title="Unduh file"
-                        >
-                          <Download className="w-3.5 h-3.5" /> Unduh
-                        </button>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
-            ) : (
-              <div className="text-sm text-gray-500 border border-dashed border-gray-200 rounded-xl p-4">
-                Tidak ada lampiran.
-              </div>
-            )}
-          </div>
-
-          {/* Teacher view: list siswa & status pengerjaan */}
-          {user?.role === 'guru' && (
-            <div className="mt-6">
-              <h2 className="text-sm font-semibold text-gray-700 mb-3">Daftar Siswa</h2>
-              {!classId ? (
-                <div className="text-sm text-gray-500 border border-dashed border-gray-200 rounded-xl p-4">
-                  Kelas untuk tugas ini tidak ditemukan.
-                </div>
-              ) : classStudents.length === 0 ? (
-                <div className="text-sm text-gray-500 border border-dashed border-gray-200 rounded-xl p-4">
-                  Tidak ada data siswa untuk kelas ini.
-                </div>
-              ) : (
-                <ul className="divide-y divide-gray-100 border border-gray-100 rounded-xl overflow-hidden">
-                  {classStudents.map((s: any) => {
-                    const sid = s?.id;
-                    const submitted = sid != null && submittedIds.has(String(sid));
-                    const sub = submitted ? findSubmissionByStudent(sid) : null;
-                    const gradeVal = sub?.grade ?? sub?.score ?? sub?.value;
-                    return (
-                      <li key={String(sid)} className="flex items-center justify-between gap-3 p-3">
-                        <div className="min-w-0 flex-1">
-                          <p className="text-sm text-gray-800 truncate">{s?.user?.name ?? s?.name ?? `Siswa ${sid}`}</p>
-                          {s?.nis && (
-                            <p className="text-xs text-gray-500 truncate">NIS: {s.nis}</p>
-                          )}
-                          {submitted && gradeVal != null && (
-                            <p className="text-xs text-emerald-700 mt-1">Nilai: {String(gradeVal)}</p>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {submitted ? (
-                            <>
-                              <span className="inline-flex items-center gap-1 text-xs px-3 py-1 rounded-full bg-green-100 text-green-700">
-                                Sudah mengerjakan
-                              </span>
-                              <button
-                                onClick={() => { void handleGiveGrade(s); }}
-                                className="px-3 py-1.5 text-xs bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:opacity-50"
-                                disabled={gradingBusyId === String(sid)}
-                              >
-                                {gradingBusyId === String(sid) ? 'Menyimpan...' : (gradeVal != null ? 'Edit Nilai' : 'Beri Nilai')}
-                              </button>
-                            </>
-                          ) : (
-                            <span className="inline-flex items-center gap-1 text-xs px-3 py-1 rounded-full bg-orange-100 text-orange-700">
-                              Belum dikerjakan
-                            </span>
-                          )}
-                        </div>
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-            </div>
+          {user?.role === 'siswa' && !hasSubmitted && (
+            <button
+              onClick={() => setIsUploadOpen(true)}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-sm"
+              disabled={!data?.id}
+            >
+              Kumpulkan Tugas
+            </button>
           )}
         </div>
+      </div>
+
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 lg:py-8">
+        {/* Loading State */}
+        {loading && (
+          <div className="flex flex-col items-center justify-center py-12">
+            <Loader2 className="w-8 h-8 animate-spin text-blue-600 mb-3" />
+            <p className="text-gray-600">Memuat detail tugas...</p>
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg">
+            <div className="flex items-start">
+              <XCircle className="w-5 h-5 text-red-500 mt-0.5 mr-3" />
+              <div>
+                <h3 className="font-semibold text-red-800">Terjadi Kesalahan</h3>
+                <p className="text-red-700 text-sm mt-1">{error}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Main Content */}
+        {!loading && !error && data && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left Column - Main Content */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Assignment Header Card */}
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                {/* Header with gradient */}
+                <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-8 text-white">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <h1 className="text-2xl sm:text-3xl font-semibold mb-2">
+                        {data.title}
+                      </h1>
+                      {data.teacher?.user?.name || data.creator?.name ? (
+                        <p className="text-blue-100 flex items-center gap-2">
+                          <User className="w-4 h-4" />
+                          {data.teacher?.user?.name || data.creator?.name}
+                        </p>
+                      ) : null}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Description Section */}
+                {data.description && (
+                  <div className="px-6 py-5 border-b border-gray-200">
+                    <p className="text-gray-800 text-base leading-relaxed whitespace-pre-line">
+                      {data.description}
+                    </p>
+                  </div>
+                )}
+
+                {/* Reference Links */}
+                {Array.isArray(displayLinks) && displayLinks.length > 0 && (
+                  <div className="px-6 py-5 border-b border-gray-200">
+                    <h3 className="text-sm font-semibold text-gray-900 mb-3 uppercase tracking-wide">
+                      Tautan Referensi
+                    </h3>
+                    <div className="space-y-2">
+                      {displayLinks.map((lnk, idx) => (
+                        <a
+                          key={idx}
+                          href={lnk}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors group"
+                        >
+                          <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                            <LinkIcon className="w-5 h-5 text-blue-600" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-blue-600 group-hover:underline truncate">
+                              {lnk}
+                            </p>
+                          </div>
+                          <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-blue-600" />
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Files Section */}
+                <div className="px-6 py-5">
+                  <h3 className="text-sm font-semibold text-gray-900 mb-3 uppercase tracking-wide">
+                    Lampiran
+                  </h3>
+                  {normalizedFiles.length > 0 ? (
+                    <div className="space-y-2">
+                      {normalizedFiles.map((f, idx) => {
+                        const displayName = f.name || f.original_name || basename(f.path);
+                        return (
+                          <div
+                            key={String(f.id ?? idx)}
+                            className="flex items-center justify-between gap-3 p-3 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50/50 transition-all group"
+                          >
+                            <div className="flex items-center gap-3 min-w-0 flex-1">
+                              <div className="flex-shrink-0 w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                                <FileText className="w-5 h-5 text-red-600" />
+                              </div>
+                              <div className="min-w-0 flex-1">
+                                <p className="text-sm font-medium text-gray-900 truncate">
+                                  {displayName}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => handleOpen(f)}
+                                className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                title="Buka"
+                              >
+                                <ExternalLink className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => { void handleDownload(f); }}
+                                className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                title="Unduh"
+                              >
+                                <Download className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg border border-dashed border-gray-300">
+                      <FileText className="w-12 h-12 text-gray-400 mx-auto mb-2" />
+                      <p className="text-sm">Tidak ada lampiran</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Teacher View - Student List */}
+              {user?.role === 'guru' && (
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                  <div className="px-6 py-4 border-b border-gray-200">
+                    <h2 className="text-lg font-semibold text-gray-900">Daftar Siswa</h2>
+                    <p className="text-sm text-gray-600 mt-1">
+                      {submittedIds.size} dari {classStudents.length} siswa telah mengumpulkan
+                    </p>
+                  </div>
+
+                  <div className="divide-y divide-gray-200">
+                    {!classId ? (
+                      <div className="px-6 py-8 text-center text-gray-500">
+                        <p>Kelas untuk tugas ini tidak ditemukan.</p>
+                      </div>
+                    ) : classStudents.length === 0 ? (
+                      <div className="px-6 py-8 text-center text-gray-500">
+                        <p>Tidak ada data siswa untuk kelas ini.</p>
+                      </div>
+                    ) : (
+                      classStudents.map((s: any) => {
+                        const sid = s?.id;
+                        const submitted = sid != null && submittedIds.has(String(sid));
+                        const sub = submitted ? findSubmissionByStudent(sid) : null;
+                        const gradeVal = sub?.grade ?? sub?.score ?? sub?.value;
+
+                        return (
+                          <div key={String(sid)} className="px-6 py-4 hover:bg-gray-50 transition-colors">
+                            <div className="flex items-center justify-between gap-4">
+                              <div className="flex items-center gap-3 min-w-0 flex-1">
+                                <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold">
+                                  {(s?.user?.name ?? s?.name ?? '?').charAt(0).toUpperCase()}
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <p className="text-sm font-medium text-gray-900 truncate">
+                                    {s?.user?.name ?? s?.name ?? `Siswa ${sid}`}
+                                  </p>
+                                  {s?.nis && (
+                                    <p className="text-xs text-gray-500">NIS: {s.nis}</p>
+                                  )}
+                                </div>
+                              </div>
+
+                              <div className="flex items-center gap-3">
+                                {submitted ? (
+                                  <>
+                                    {gradeVal != null && (
+                                      <div className="text-right">
+                                        <p className="text-lg font-bold text-green-600">{String(gradeVal)}</p>
+                                        <p className="text-xs text-gray-500">/ 100</p>
+                                      </div>
+                                    )}
+                                    <button
+                                      onClick={() => { void handleGiveGrade(s); }}
+                                      className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                                      disabled={gradingBusyId === String(sid)}
+                                    >
+                                      {gradingBusyId === String(sid) ? 'Menyimpan...' : (gradeVal != null ? 'Edit Nilai' : 'Beri Nilai')}
+                                    </button>
+                                  </>
+                                ) : (
+                                  <span className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-orange-100 text-orange-700 font-medium">
+                                    <Clock className="w-3.5 h-3.5" />
+                                    Belum dikerjakan
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Right Column - Status & Info */}
+            <div className="lg:col-span-1">
+              <div className="sticky top-24 space-y-4">
+                {/* Student Status Card */}
+                {user?.role === 'siswa' && (
+                  <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                    <div className="px-5 py-4 border-b border-gray-200 bg-gray-50">
+                      <h3 className="font-semibold text-gray-900">Status Pengerjaan</h3>
+                    </div>
+                    <div className="px-5 py-5">
+                      {hasSubmitted ? (
+                        <div className="space-y-4">
+                          <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
+                            <CheckCircle2 className="w-6 h-6 text-green-600 flex-shrink-0" />
+                            <div>
+                              <p className="text-sm font-semibold text-green-800">Sudah Dikumpulkan</p>
+                              <p className="text-xs text-green-600 mt-0.5">
+                                {mySubmission?.submitted_at ? formatDeadline(mySubmission.submitted_at) : ''}
+                              </p>
+                            </div>
+                          </div>
+
+                          {myGrade != null && (
+                            <div className="text-center p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg border border-green-200">
+                              <p className="text-sm text-gray-600 mb-1">Nilai Anda</p>
+                              <p className="text-4xl font-bold text-green-600">{String(myGrade)}</p>
+                              <p className="text-xs text-gray-500 mt-1">/ 100</p>
+                            </div>
+                          )}
+
+                          {mySubmission?.feedback && (
+                            <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                              <p className="text-xs font-semibold text-blue-900 mb-2">Feedback Guru</p>
+                              <p className="text-sm text-blue-800">{mySubmission.feedback}</p>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          <div className="flex items-center gap-3 p-3 bg-orange-50 rounded-lg border border-orange-200">
+                            <Clock className="w-6 h-6 text-orange-600 flex-shrink-0" />
+                            <div>
+                              <p className="text-sm font-semibold text-orange-800">Belum Dikumpulkan</p>
+                              <p className="text-xs text-orange-600 mt-0.5">Segera kumpulkan tugas Anda</p>
+                            </div>
+                          </div>
+
+                          <button
+                            onClick={() => setIsUploadOpen(true)}
+                            className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-sm"
+                            disabled={!data?.id}
+                          >
+                            Kumpulkan Tugas
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Deadline Card */}
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                  <div className="px-5 py-4 border-b border-gray-200 bg-gray-50">
+                    <h3 className="font-semibold text-gray-900">Tenggat Waktu</h3>
+                  </div>
+                  <div className="px-5 py-5">
+                    <div className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                        <Calendar className="w-5 h-5 text-red-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">Deadline</p>
+                        <p className="text-base font-semibold text-gray-900 mt-0.5">
+                          {formatDeadline(data.deadline)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Teacher Info Card */}
+                {(data.teacher?.user?.name || data.creator?.name) && (
+                  <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                    <div className="px-5 py-4 border-b border-gray-200 bg-gray-50">
+                      <h3 className="font-semibold text-gray-900">Guru</h3>
+                    </div>
+                    <div className="px-5 py-5">
+                      <div className="flex items-center gap-3">
+                        <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold">
+                          {(data.teacher?.user?.name || data.creator?.name || '?').charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-gray-900">
+                            {data.teacher?.user?.name || data.creator?.name}
+                          </p>
+                          {data.teacher?.specialization && (
+                            <p className="text-xs text-gray-500 mt-0.5">
+                              {data.teacher.specialization}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Upload Modal for students */}
