@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useLang } from "../../components/LangContext";
 import { useEffect, useState } from "react";
+import { showError } from "@/lib/swalClient";
 
 interface Mitra {
   id: number;
@@ -47,7 +48,10 @@ export default function MitraIndustri() {
         if (j.success && Array.isArray(j.data)) setPartners(j.data);
         else console.warn("⚠️ Format data mitra tidak sesuai:", j);
       })
-      .catch((err) => console.error("❌ Gagal memuat data mitra:", err))
+      .catch((err) => {
+        console.error("❌ Gagal memuat data mitra:", err);
+        showError("Gagal memuat mitra", "Tidak dapat mengambil data mitra saat ini.");
+      })
       .finally(() => setLoading(false));
   }, []);
 

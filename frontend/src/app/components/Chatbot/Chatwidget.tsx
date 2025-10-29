@@ -2,6 +2,7 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import { Send, MessageCircle, X, Bot, User } from "lucide-react";
+import { showError } from "@/lib/swalClient";
 
 type Message = { sender: "user" | "bot"; text: string };
 
@@ -33,8 +34,11 @@ export default function ChatWidget() {
             setIsTyping(false);
             setMessages((prev) => [...prev, { sender: "bot", text: data.reply }]);
         } catch (err) {
+            console.error("❌ Chat send error:", err);
             setIsTyping(false);
             setMessages((prev) => [...prev, { sender: "bot", text: "⚠️ Error terhubung ke server." }]);
+            // Tampilkan notifikasi user-friendly untuk production
+            showError("Gagal mengirim pesan", "Tidak dapat terhubung ke server obrolan. Silakan coba lagi.");
         }
     };
 
@@ -84,7 +88,7 @@ export default function ChatWidget() {
 
                     {/* Chat Window */}
                     {open && (
-                        <div className="z-50 fixed bottom-20 left-2 right-2 w-auto h-[500px] max-h-[80vh] sm:bottom-24 sm:left-auto sm:right-6 sm:w-[420px] sm:h-[600px] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-orange-100 animate-slideUp">
+                        <div className="z-50 fixed bottom-16 left-4 right-4 w-auto h-[380px] max-h-[80vh] sm:bottom-24 sm:left-auto sm:right-6 sm:w-[420px] sm:h-[600px] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-orange-100 animate-slideUp">
                             {/* Header with Gradient */}
                             <div className="bg-gradient-to-r from-orange-500 via-orange-600 to-orange-500 text-white p-4 sm:p-5 relative overflow-hidden">
                                 <div className="absolute inset-0 bg-white opacity-10"></div>

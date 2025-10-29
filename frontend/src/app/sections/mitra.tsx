@@ -2,6 +2,7 @@
 
 import { useLang } from "../components/LangContext";
 import { useEffect, useState } from "react";
+import { showError } from "@/lib/swalClient";
 
 interface Mitra {
   id: number;
@@ -49,6 +50,7 @@ export default function Mitra() {
       })
       .catch((err) => {
         console.error("❌ Gagal memuat data mitra:", err);
+        showError("Gagal memuat mitra", "Tidak dapat mengambil data mitra saat ini.");
         setPartners([]);
       });
   }, []);
