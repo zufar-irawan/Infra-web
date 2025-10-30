@@ -1,0 +1,573 @@
+{
+  "version": 3,
+  "pages404": true,
+  "caseSensitive": false,
+  "basePath": "",
+  "redirects": [
+    {
+      "source": "/:path+/",
+      "destination": "/:path+",
+      "internal": true,
+      "statusCode": 308,
+      "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$"
+    }
+  ],
+  "headers": [],
+  "rewrites": {
+    "beforeFiles": [],
+    "afterFiles": [],
+    "fallback": []
+  },
+  "dynamicRoutes": [
+    {
+      "page": "/api/exam/[id]",
+      "regex": "^/api/exam/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/exam/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/exam-questions/[id]",
+      "regex": "^/api/exam\\-questions/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/exam\\-questions/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/exam-results/[id]",
+      "regex": "^/api/exam\\-results/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/exam\\-results/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/jadwal/[id]",
+      "regex": "^/api/jadwal/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/jadwal/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/portal/berita/[id]",
+      "regex": "^/api/portal/berita/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/portal/berita/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/portal/berita/[id]/public",
+      "regex": "^/api/portal/berita/([^/]+?)/public(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/portal/berita/(?<nxtPid>[^/]+?)/public(?:/)?$"
+    },
+    {
+      "page": "/api/portal/facilities/[id]",
+      "regex": "^/api/portal/facilities/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/portal/facilities/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/portal/faq/[id]",
+      "regex": "^/api/portal/faq/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/portal/faq/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/portal/kegiatan/[id]",
+      "regex": "^/api/portal/kegiatan/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/portal/kegiatan/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/portal/mitra/[id]",
+      "regex": "^/api/portal/mitra/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/portal/mitra/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/portal/prestasi/[id]",
+      "regex": "^/api/portal/prestasi/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/portal/prestasi/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/proxy/[...path]",
+      "regex": "^/api/proxy/(.+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPpath": "nxtPpath"
+      },
+      "namedRegex": "^/api/proxy/(?<nxtPpath>.+?)(?:/)?$"
+    },
+    {
+      "page": "/api/tugas/files/[assignmentId]/[fileId]",
+      "regex": "^/api/tugas/files/([^/]+?)/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPassignmentId": "nxtPassignmentId",
+        "nxtPfileId": "nxtPfileId"
+      },
+      "namedRegex": "^/api/tugas/files/(?<nxtPassignmentId>[^/]+?)/(?<nxtPfileId>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/api/tugas/files/[assignmentId]/[fileId]/view",
+      "regex": "^/api/tugas/files/([^/]+?)/([^/]+?)/view(?:/)?$",
+      "routeKeys": {
+        "nxtPassignmentId": "nxtPassignmentId",
+        "nxtPfileId": "nxtPfileId"
+      },
+      "namedRegex": "^/api/tugas/files/(?<nxtPassignmentId>[^/]+?)/(?<nxtPfileId>[^/]+?)/view(?:/)?$"
+    },
+    {
+      "page": "/api/tugas/[id]",
+      "regex": "^/api/tugas/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/tugas/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/edu/kelas/[id]",
+      "regex": "^/edu/kelas/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/edu/kelas/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/edu/tugas/[id]",
+      "regex": "^/edu/tugas/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/edu/tugas/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/edu/tugas/[id]/view/[fileId]",
+      "regex": "^/edu/tugas/([^/]+?)/view/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid",
+        "nxtPfileId": "nxtPfileId"
+      },
+      "namedRegex": "^/edu/tugas/(?<nxtPid>[^/]+?)/view/(?<nxtPfileId>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/edu/ujian/manage/[id]",
+      "regex": "^/edu/ujian/manage/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/edu/ujian/manage/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/edu/ujian/[id]",
+      "regex": "^/edu/ujian/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/edu/ujian/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/informasi/berita/[id]",
+      "regex": "^/informasi/berita/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/informasi/berita/(?<nxtPid>[^/]+?)(?:/)?$"
+    }
+  ],
+  "staticRoutes": [
+    {
+      "page": "/",
+      "regex": "^/(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/(?:/)?$"
+    },
+    {
+      "page": "/_not-found",
+      "regex": "^/_not\\-found(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_not\\-found(?:/)?$"
+    },
+    {
+      "page": "/berita",
+      "regex": "^/berita(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/berita(?:/)?$"
+    },
+    {
+      "page": "/edu/dashboard",
+      "regex": "^/edu/dashboard(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/edu/dashboard(?:/)?$"
+    },
+    {
+      "page": "/edu/guru",
+      "regex": "^/edu/guru(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/edu/guru(?:/)?$"
+    },
+    {
+      "page": "/edu/jadwal",
+      "regex": "^/edu/jadwal(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/edu/jadwal(?:/)?$"
+    },
+    {
+      "page": "/edu/kelas",
+      "regex": "^/edu/kelas(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/edu/kelas(?:/)?$"
+    },
+    {
+      "page": "/edu/laporan",
+      "regex": "^/edu/laporan(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/edu/laporan(?:/)?$"
+    },
+    {
+      "page": "/edu/login",
+      "regex": "^/edu/login(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/edu/login(?:/)?$"
+    },
+    {
+      "page": "/edu/nilai",
+      "regex": "^/edu/nilai(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/edu/nilai(?:/)?$"
+    },
+    {
+      "page": "/edu/perangkat",
+      "regex": "^/edu/perangkat(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/edu/perangkat(?:/)?$"
+    },
+    {
+      "page": "/edu/presensi",
+      "regex": "^/edu/presensi(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/edu/presensi(?:/)?$"
+    },
+    {
+      "page": "/edu/rfid",
+      "regex": "^/edu/rfid(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/edu/rfid(?:/)?$"
+    },
+    {
+      "page": "/edu/setelan",
+      "regex": "^/edu/setelan(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/edu/setelan(?:/)?$"
+    },
+    {
+      "page": "/edu/siswa",
+      "regex": "^/edu/siswa(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/edu/siswa(?:/)?$"
+    },
+    {
+      "page": "/edu/tugas",
+      "regex": "^/edu/tugas(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/edu/tugas(?:/)?$"
+    },
+    {
+      "page": "/edu/tugas/tugas_guru_example",
+      "regex": "^/edu/tugas/tugas_guru_example(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/edu/tugas/tugas_guru_example(?:/)?$"
+    },
+    {
+      "page": "/edu/tugas/tugas_siswa_example",
+      "regex": "^/edu/tugas/tugas_siswa_example(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/edu/tugas/tugas_siswa_example(?:/)?$"
+    },
+    {
+      "page": "/edu/ujian",
+      "regex": "^/edu/ujian(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/edu/ujian(?:/)?$"
+    },
+    {
+      "page": "/edu/ujian/manage",
+      "regex": "^/edu/ujian/manage(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/edu/ujian/manage(?:/)?$"
+    },
+    {
+      "page": "/informasi/berita",
+      "regex": "^/informasi/berita(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/informasi/berita(?:/)?$"
+    },
+    {
+      "page": "/informasi/faq",
+      "regex": "^/informasi/faq(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/informasi/faq(?:/)?$"
+    },
+    {
+      "page": "/informasi/kegiatan",
+      "regex": "^/informasi/kegiatan(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/informasi/kegiatan(?:/)?$"
+    },
+    {
+      "page": "/kegiatansiswa/acara",
+      "regex": "^/kegiatansiswa/acara(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/kegiatansiswa/acara(?:/)?$"
+    },
+    {
+      "page": "/kegiatansiswa/ekstrakurikuler",
+      "regex": "^/kegiatansiswa/ekstrakurikuler(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/kegiatansiswa/ekstrakurikuler(?:/)?$"
+    },
+    {
+      "page": "/kegiatansiswa/osis-mpk",
+      "regex": "^/kegiatansiswa/osis\\-mpk(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/kegiatansiswa/osis\\-mpk(?:/)?$"
+    },
+    {
+      "page": "/kegiatansiswa/penerimaansiswa",
+      "regex": "^/kegiatansiswa/penerimaansiswa(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/kegiatansiswa/penerimaansiswa(?:/)?$"
+    },
+    {
+      "page": "/kegiatansiswa/prestasi",
+      "regex": "^/kegiatansiswa/prestasi(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/kegiatansiswa/prestasi(?:/)?$"
+    },
+    {
+      "page": "/kegiatansiswa/study-tour",
+      "regex": "^/kegiatansiswa/study\\-tour(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/kegiatansiswa/study\\-tour(?:/)?$"
+    },
+    {
+      "page": "/kehidupan-siswa/ekstrakurikuler",
+      "regex": "^/kehidupan\\-siswa/ekstrakurikuler(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/kehidupan\\-siswa/ekstrakurikuler(?:/)?$"
+    },
+    {
+      "page": "/kehidupan-siswa/penerimaan",
+      "regex": "^/kehidupan\\-siswa/penerimaan(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/kehidupan\\-siswa/penerimaan(?:/)?$"
+    },
+    {
+      "page": "/kehidupan-siswa/prestasi",
+      "regex": "^/kehidupan\\-siswa/prestasi(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/kehidupan\\-siswa/prestasi(?:/)?$"
+    },
+    {
+      "page": "/kehidupan-siswa/testimoni",
+      "regex": "^/kehidupan\\-siswa/testimoni(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/kehidupan\\-siswa/testimoni(?:/)?$"
+    },
+    {
+      "page": "/portal",
+      "regex": "^/portal(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/portal(?:/)?$"
+    },
+    {
+      "page": "/portal/dashboard",
+      "regex": "^/portal/dashboard(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/portal/dashboard(?:/)?$"
+    },
+    {
+      "page": "/portal/ekstrakurikuler",
+      "regex": "^/portal/ekstrakurikuler(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/portal/ekstrakurikuler(?:/)?$"
+    },
+    {
+      "page": "/portal/faq",
+      "regex": "^/portal/faq(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/portal/faq(?:/)?$"
+    },
+    {
+      "page": "/portal/fasilitas",
+      "regex": "^/portal/fasilitas(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/portal/fasilitas(?:/)?$"
+    },
+    {
+      "page": "/portal/kegiatan",
+      "regex": "^/portal/kegiatan(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/portal/kegiatan(?:/)?$"
+    },
+    {
+      "page": "/portal/mitra",
+      "regex": "^/portal/mitra(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/portal/mitra(?:/)?$"
+    },
+    {
+      "page": "/portal/news",
+      "regex": "^/portal/news(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/portal/news(?:/)?$"
+    },
+    {
+      "page": "/portal/prestasi",
+      "regex": "^/portal/prestasi(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/portal/prestasi(?:/)?$"
+    },
+    {
+      "page": "/portal/staff",
+      "regex": "^/portal/staff(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/portal/staff(?:/)?$"
+    },
+    {
+      "page": "/portal/testimoni",
+      "regex": "^/portal/testimoni(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/portal/testimoni(?:/)?$"
+    },
+    {
+      "page": "/portal/verify",
+      "regex": "^/portal/verify(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/portal/verify(?:/)?$"
+    },
+    {
+      "page": "/profil/faq",
+      "regex": "^/profil/faq(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/profil/faq(?:/)?$"
+    },
+    {
+      "page": "/profil/fasilitas",
+      "regex": "^/profil/fasilitas(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/profil/fasilitas(?:/)?$"
+    },
+    {
+      "page": "/profil/manajemen",
+      "regex": "^/profil/manajemen(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/profil/manajemen(?:/)?$"
+    },
+    {
+      "page": "/profil/mitra",
+      "regex": "^/profil/mitra(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/profil/mitra(?:/)?$"
+    },
+    {
+      "page": "/profil/prestasi",
+      "regex": "^/profil/prestasi(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/profil/prestasi(?:/)?$"
+    },
+    {
+      "page": "/profil/tentang-kami",
+      "regex": "^/profil/tentang\\-kami(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/profil/tentang\\-kami(?:/)?$"
+    },
+    {
+      "page": "/profil/testimoni",
+      "regex": "^/profil/testimoni(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/profil/testimoni(?:/)?$"
+    },
+    {
+      "page": "/profil/visi-misi",
+      "regex": "^/profil/visi\\-misi(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/profil/visi\\-misi(?:/)?$"
+    },
+    {
+      "page": "/program",
+      "regex": "^/program(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/program(?:/)?$"
+    },
+    {
+      "page": "/tentang/fasilitas",
+      "regex": "^/tentang/fasilitas(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/tentang/fasilitas(?:/)?$"
+    },
+    {
+      "page": "/tentang/identitas",
+      "regex": "^/tentang/identitas(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/tentang/identitas(?:/)?$"
+    },
+    {
+      "page": "/tentang/manajemen",
+      "regex": "^/tentang/manajemen(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/tentang/manajemen(?:/)?$"
+    },
+    {
+      "page": "/tentang/mitra",
+      "regex": "^/tentang/mitra(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/tentang/mitra(?:/)?$"
+    },
+    {
+      "page": "/tentang/visi-misi",
+      "regex": "^/tentang/visi\\-misi(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/tentang/visi\\-misi(?:/)?$"
+    },
+    {
+      "page": "/virtual-tour",
+      "regex": "^/virtual\\-tour(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/virtual\\-tour(?:/)?$"
+    }
+  ],
+  "dataRoutes": [],
+  "rsc": {
+    "header": "rsc",
+    "varyHeader": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+    "prefetchHeader": "next-router-prefetch",
+    "didPostponeHeader": "x-nextjs-postponed",
+    "contentTypeHeader": "text/x-component",
+    "suffix": ".rsc",
+    "prefetchSuffix": ".prefetch.rsc",
+    "prefetchSegmentHeader": "next-router-segment-prefetch",
+    "prefetchSegmentSuffix": ".segment.rsc",
+    "prefetchSegmentDirSuffix": ".segments"
+  },
+  "rewriteHeaders": {
+    "pathHeader": "x-nextjs-rewritten-path",
+    "queryHeader": "x-nextjs-rewritten-query"
+  }
+}

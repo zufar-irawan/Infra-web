@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import axios from 'axios';
 import { Upload, X, File, Image, FileText, Video, Music, Archive, Trash2, CheckCircle, AlertCircle } from 'lucide-react';
-import {useEduData} from "@/app/edu/context";
+import { useEduData } from "@/app/edu/context";
 
 interface CreateTaskModalProps {
     isOpen: boolean;
@@ -191,26 +191,6 @@ export default function CreateTaskModal({ isOpen, onClose, onSuccess, teacher, s
         }
     };
 
-    const simulateUpload = async (fileItem: FileWithPreview) => {
-        return new Promise<void>((resolve) => {
-            let progress = 0;
-            const interval = setInterval(() => {
-                progress += Math.random() * 30;
-                if (progress >= 100) {
-                    progress = 100;
-                    clearInterval(interval);
-                    resolve();
-                }
-
-                setFiles(prev => prev.map(f =>
-                    f.id === fileItem.id
-                        ? { ...f, progress, status: progress === 100 ? 'completed' : 'uploading' }
-                        : f
-                ));
-            }, 200);
-        });
-    };
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -221,43 +201,27 @@ export default function CreateTaskModal({ isOpen, onClose, onSuccess, teacher, s
 
         setLoading(true);
         try {
-            // Upload files first if any
-            const uploadedFiles = [];
-            if (files.length > 0) {
-                for (const fileItem of files) {
-                    await simulateUpload(fileItem);
-                    // In real implementation, you would upload to server here
-                    uploadedFiles.push({
-                        type: "file",
-                        path: `storage/assignments/${fileItem.file.name}`,
-                        name: fileItem.file.name,
-                        mime: fileItem.file.type,
-                        size: fileItem.file.size
-                    });
-                }
-            }
+            setFiles(prev => prev.map(f => ({ ...f, status: 'uploading', progress: undefined })));
 
-            // Prepare links array
-            const linksArray = formData.links ? [formData.links] : [];
-
-            // Prepare the payload in the specified format
-            const payload = {
-                class_id: parseInt(formData.class_id),
-                title: formData.title,
-                description: formData.description || undefined,
-                deadline: formData.deadline,
-                created_by: teacher.user_id,
-                files: uploadedFiles.length > 0 ? uploadedFiles : undefined,
-                links: linksArray.length > 0 ? linksArray : undefined
-            };
-
-            // Remove undefined properties
-            Object.keys(payload).forEach(key => {
-                // @ts-ignore
-                if (payload[key] === undefined) { delete payload[key]; }
+            const payload = new FormData();
+            payload.append('created_by', String(teacher.user_id));
+            payload.append('class_id', formData.class_id);
+            if (formData.subject_id) payload.append('subject_id', formData.subject_id);
+            payload.append('title', formData.title);
+            if (formData.description) payload.append('description', formData.description);
+            if (formData.deadline) payload.append('deadline', formData.deadline);
+            if (formData.links) payload.append('links[]', formData.links);
+            files.forEach(fileItem => {
+                payload.append('files[]', fileItem.file);
             });
 
-            await axios.post('/api/tugas', payload);
+            await axios.post('/api/tugas', payload, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+
+            setFiles(prev => prev.map(f => ({ ...f, status: 'completed', progress: 100 })));
 
             alert('Tugas berhasil dibuat!');
             resetForm();
@@ -265,6 +229,7 @@ export default function CreateTaskModal({ isOpen, onClose, onSuccess, teacher, s
             onClose();
         } catch (error) {
             console.error('Error creating task:', error);
+            setFiles(prev => prev.map(f => ({ ...f, status: 'error', error: 'Gagal mengunggah file' })));
             alert('Gagal membuat tugas. Silakan coba lagi.');
         } finally {
             setLoading(false);
@@ -322,10 +287,10 @@ export default function CreateTaskModal({ isOpen, onClose, onSuccess, teacher, s
                                 <option value="">Pilih Mata Pelajaran</option>
                                 { // @ts-ignore
                                     subjects.map((subject) => (
-                                    <option key={subject.id} value={subject.id}>
-                                        {subject.name}
-                                    </option>
-                                ))}
+                                        <option key={subject.id} value={subject.id}>
+                                            {subject.name}
+                                        </option>
+                                    ))}
                             </select>
                         </div>
 
@@ -343,10 +308,10 @@ export default function CreateTaskModal({ isOpen, onClose, onSuccess, teacher, s
                                 <option value="">Pilih Kelas</option>
                                 { // @ts-ignore
                                     classes.map((cls) => (
-                                    <option key={cls.id} value={cls.id}>
-                                        {cls.name}
-                                    </option>
-                                ))}
+                                        <option key={cls.id} value={cls.id}>
+                                            {cls.name}
+                                        </option>
+                                    ))}
                             </select>
                         </div>
                     </div>
@@ -401,11 +366,10 @@ export default function CreateTaskModal({ isOpen, onClose, onSuccess, teacher, s
                         </label>
                         <div className="space-y-3">
                             <div
-                                className={`relative border-2 border-dashed rounded-xl p-6 text-center transition-all duration-300 ${
-                                    isDragOver
-                                        ? 'border-orange-400 bg-orange-50 scale-[1.02]'
-                                        : 'border-gray-300 hover:border-orange-300 hover:bg-orange-50/30'
-                                }`}
+                                className={`relative border-2 border-dashed rounded-xl p-6 text-center transition-all duration-300 ${isDragOver
+                                    ? 'border-orange-400 bg-orange-50 scale-[1.02]'
+                                    : 'border-gray-300 hover:border-orange-300 hover:bg-orange-50/30'
+                                    }`}
                                 onDragOver={handleDragOver}
                                 onDragLeave={handleDragLeave}
                                 onDrop={handleDrop}
@@ -421,12 +385,10 @@ export default function CreateTaskModal({ isOpen, onClose, onSuccess, teacher, s
                                 />
 
                                 <div className="flex flex-col items-center gap-3">
-                                    <div className={`p-3 rounded-full transition-colors ${
-                                        isDragOver ? 'bg-orange-100' : 'bg-gray-100'
-                                    }`}>
-                                        <Upload className={`w-6 h-6 ${
-                                            isDragOver ? 'text-orange-600' : 'text-gray-600'
-                                        }`} />
+                                    <div className={`p-3 rounded-full transition-colors ${isDragOver ? 'bg-orange-100' : 'bg-gray-100'
+                                        }`}>
+                                        <Upload className={`w-6 h-6 ${isDragOver ? 'text-orange-600' : 'text-gray-600'
+                                            }`} />
                                     </div>
 
                                     <div>
@@ -455,30 +417,27 @@ export default function CreateTaskModal({ isOpen, onClose, onSuccess, teacher, s
                                             return (
                                                 <div
                                                     key={fileItem.id}
-                                                    className={`bg-white border rounded-lg p-3 transition-all duration-200 ${
-                                                        fileItem.status === 'completed' 
-                                                            ? 'border-green-200 bg-green-50' 
-                                                            : fileItem.status === 'error'
+                                                    className={`bg-white border rounded-lg p-3 transition-all duration-200 ${fileItem.status === 'completed'
+                                                        ? 'border-green-200 bg-green-50'
+                                                        : fileItem.status === 'error'
                                                             ? 'border-red-200 bg-red-50'
                                                             : 'border-gray-200'
-                                                    }`}
+                                                        }`}
                                                 >
                                                     <div className="flex items-center gap-3">
                                                         <div className="flex-shrink-0">
-                                                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                                                                fileItem.status === 'completed' 
-                                                                    ? 'bg-green-100' 
-                                                                    : fileItem.status === 'error'
+                                                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${fileItem.status === 'completed'
+                                                                ? 'bg-green-100'
+                                                                : fileItem.status === 'error'
                                                                     ? 'bg-red-100'
                                                                     : 'bg-gray-100'
-                                                            }`}>
-                                                                <IconComponent className={`w-4 h-4 ${
-                                                                    fileItem.status === 'completed' 
-                                                                        ? 'text-green-600' 
-                                                                        : fileItem.status === 'error'
+                                                                }`}>
+                                                                <IconComponent className={`w-4 h-4 ${fileItem.status === 'completed'
+                                                                    ? 'text-green-600'
+                                                                    : fileItem.status === 'error'
                                                                         ? 'text-red-600'
                                                                         : 'text-gray-600'
-                                                                }`} />
+                                                                    }`} />
                                                             </div>
                                                         </div>
 

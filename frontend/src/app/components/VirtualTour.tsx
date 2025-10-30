@@ -1,10 +1,14 @@
 'use client';
 
-import {useEffect, useRef, useState} from 'react';
-import {Viewer} from '@photo-sphere-viewer/core';
-import {MarkersPlugin} from '@photo-sphere-viewer/markers-plugin';
-import {AutorotatePlugin} from '@photo-sphere-viewer/autorotate-plugin';
+import { useEffect, useRef, useState } from 'react';
+import { Viewer } from '@photo-sphere-viewer/core';
+import { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
+import { AutorotatePlugin } from '@photo-sphere-viewer/autorotate-plugin';
+
+// @ts-ignore
 import '@photo-sphere-viewer/core/index.css';
+
+// @ts-ignore
 import '@photo-sphere-viewer/markers-plugin/index.css';
 
 interface Marker {
@@ -30,6 +34,7 @@ export default function VirtualTour360() {
     const [isLoading, setIsLoading] = useState(true);
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [autoRotate, setAutoRotate] = useState(true);
+    const [isMobile, setIsMobile] = useState(false);
     const isInitialized = useRef(false);
 
     const scenes: Scene[] = [
@@ -41,17 +46,17 @@ export default function VirtualTour360() {
             markers: [
                 {
                     id: 'toCooperative',
-                    position: {yaw: 0.43, pitch: -0.01},
+                    position: { yaw: 0.43, pitch: -0.01 },
                     html: '<div class="select-none custom-marker">!</div>',
                     tooltip: 'To Cooperative',
-                    data: {targetScene: 'scene2'},
+                    data: { targetScene: 'scene2' },
                 },
                 {
                     id: 'toExc',
-                    position: {yaw: -0.01, pitch: 0.36},
+                    position: { yaw: -0.01, pitch: 0.36 },
                     html: '<div class="select-none custom-marker">!</div>',
                     tooltip: 'To Executive',
-                    data: {targetScene: 'scene5'},
+                    data: { targetScene: 'scene5' },
                 },
             ],
         },
@@ -63,17 +68,17 @@ export default function VirtualTour360() {
             markers: [
                 {
                     id: 'toField',
-                    position: {yaw: 0.83, pitch: -0.05},
+                    position: { yaw: 0.83, pitch: -0.05 },
                     html: '<div class="select-none custom-marker">←</div>',
                     tooltip: 'To Field',
-                    data: {targetScene: 'scene1'},
+                    data: { targetScene: 'scene1' },
                 },
                 {
                     id: 'toCafeteria',
-                    position: {yaw: 1.01, pitch: -0.05},
+                    position: { yaw: 1.01, pitch: -0.05 },
                     html: '<div class="select-none custom-marker">→</div>',
                     tooltip: 'To Cafeteria',
-                    data: {targetScene: 'scene3'},
+                    data: { targetScene: 'scene3' },
                 },
             ],
         },
@@ -85,10 +90,10 @@ export default function VirtualTour360() {
             markers: [
                 {
                     id: 'toCooperative',
-                    position: {yaw: -0.77, pitch: -0.07},
+                    position: { yaw: -0.77, pitch: -0.07 },
                     html: '<div class="select-none custom-marker">←</div>',
                     tooltip: 'To Cooperative',
-                    data: {targetScene: 'scene2'},
+                    data: { targetScene: 'scene2' },
                 },
             ],
         },
@@ -100,17 +105,17 @@ export default function VirtualTour360() {
             markers: [
                 {
                     id: 'toField',
-                    position: {yaw: 2.83, pitch: -0.3},
+                    position: { yaw: 2.83, pitch: -0.3 },
                     html: '<div class="select-none custom-marker">!</div>',
                     tooltip: 'To Field',
-                    data: {targetScene: 'scene1'},
+                    data: { targetScene: 'scene1' },
                 },
                 {
                     id: 'toExc',
-                    position: {yaw: 4.14, pitch: -0.02},
+                    position: { yaw: 4.14, pitch: -0.02 },
                     html: '<div class="select-none custom-marker">!</div>',
                     tooltip: 'To Executive',
-                    data: {targetScene: 'scene5'},
+                    data: { targetScene: 'scene5' },
                 },
             ],
         },
@@ -121,25 +126,25 @@ export default function VirtualTour360() {
             description: 'Executive of Prestasi Prima School',
             markers: [
                 {
-                  id: 'toField',
-                  position: { yaw: 1.17, pitch: 0 },
-                  html: '<div class="select-none custom-marker">!</div>',
-                  tooltip: 'To Field',
-                  data: { targetScene: 'scene1' },
+                    id: 'toField',
+                    position: { yaw: 1.17, pitch: 0 },
+                    html: '<div class="select-none custom-marker">!</div>',
+                    tooltip: 'To Field',
+                    data: { targetScene: 'scene1' },
                 },
                 {
-                  id: 'toExcClass',
-                  position: { yaw: 2.65, pitch: -0.1 },
-                  html: '<div class="select-none custom-marker">!</div>',
-                  tooltip: 'To Executive Class',
-                  data: { targetScene: 'scene6' },
+                    id: 'toExcClass',
+                    position: { yaw: 2.65, pitch: -0.1 },
+                    html: '<div class="select-none custom-marker">!</div>',
+                    tooltip: 'To Executive Class',
+                    data: { targetScene: 'scene6' },
                 },
                 {
-                  id: 'toCorridor',
-                  position: { yaw: -2.08, pitch: -0.05 },
-                  html: '<div class="select-none custom-marker">!</div>',
-                  tooltip: 'To Corridor',
-                  data: { targetScene: 'scene4' },
+                    id: 'toCorridor',
+                    position: { yaw: -2.08, pitch: -0.05 },
+                    html: '<div class="select-none custom-marker">!</div>',
+                    tooltip: 'To Corridor',
+                    data: { targetScene: 'scene4' },
                 },
             ],
         },
@@ -150,11 +155,11 @@ export default function VirtualTour360() {
             description: 'Executive Classroom of Prestasi Prima School',
             markers: [
                 {
-                  id: 'toExc',
-                  position: { yaw: 1.74, pitch: -0.16 },
-                  html: '<div class="select-none custom-marker">!</div>',
-                  tooltip: 'To Executive',
-                  data: { targetScene: 'scene5' },
+                    id: 'toExc',
+                    position: { yaw: 1.74, pitch: -0.16 },
+                    html: '<div class="select-none custom-marker">!</div>',
+                    tooltip: 'To Executive',
+                    data: { targetScene: 'scene5' },
                 },
             ]
         },
@@ -165,11 +170,11 @@ export default function VirtualTour360() {
             description: 'Executive Classroom of Prestasi Prima School',
             markers: [
                 {
-                  id: 'toExc',
-                  position: { yaw: 1.74, pitch: -0.16 },
-                  html: '<div class="select-none custom-marker">!</div>',
-                  tooltip: 'To Executive',
-                  data: { targetScene: 'scene5' },
+                    id: 'toExc',
+                    position: { yaw: 1.74, pitch: -0.16 },
+                    html: '<div class="select-none custom-marker">!</div>',
+                    tooltip: 'To Executive',
+                    data: { targetScene: 'scene5' },
                 },
             ]
         },
@@ -180,11 +185,11 @@ export default function VirtualTour360() {
             description: 'Executive Classroom of Prestasi Prima School',
             markers: [
                 {
-                  id: 'toExc',
-                  position: { yaw: 1.74, pitch: -0.16 },
-                  html: '<div class="select-none custom-marker">!</div>',
-                  tooltip: 'To Executive',
-                  data: { targetScene: 'scene5' },
+                    id: 'toExc',
+                    position: { yaw: 1.74, pitch: -0.16 },
+                    html: '<div class="select-none custom-marker">!</div>',
+                    tooltip: 'To Executive',
+                    data: { targetScene: 'scene5' },
                 },
             ]
         },
@@ -195,11 +200,11 @@ export default function VirtualTour360() {
             description: 'Regular Classroom of Prestasi Prima School',
             markers: [
                 {
-                  id: 'toExc',
-                  position: { yaw: 1.74, pitch: -0.16 },
-                  html: '<div class="select-none custom-marker">!</div>',
-                  tooltip: 'To Executive',
-                  data: { targetScene: 'scene5' },
+                    id: 'toExc',
+                    position: { yaw: 1.74, pitch: -0.16 },
+                    html: '<div class="select-none custom-marker">!</div>',
+                    tooltip: 'To Executive',
+                    data: { targetScene: 'scene5' },
                 },
             ]
         },
@@ -210,11 +215,11 @@ export default function VirtualTour360() {
             description: 'C Pathway of Prestasi Prima School',
             markers: [
                 {
-                  id: 'toExc',
-                  position: { yaw: 1.74, pitch: -0.16 },
-                  html: '<div class="select-none custom-marker">!</div>',
-                  tooltip: 'To Executive',
-                  data: { targetScene: 'scene5' },
+                    id: 'toExc',
+                    position: { yaw: 1.74, pitch: -0.16 },
+                    html: '<div class="select-none custom-marker">!</div>',
+                    tooltip: 'To Executive',
+                    data: { targetScene: 'scene5' },
                 },
             ]
         },
@@ -225,22 +230,44 @@ export default function VirtualTour360() {
             description: 'Library of Prestasi Prima School',
             markers: [
                 {
-                  id: 'toExc',
-                  position: { yaw: 1.74, pitch: -0.16 },
-                  html: '<div class="select-none custom-marker">!</div>',
-                  tooltip: 'To Executive',
-                  data: { targetScene: 'scene5' },
+                    id: 'toExc',
+                    position: { yaw: 1.74, pitch: -0.16 },
+                    html: '<div class="select-none custom-marker">!</div>',
+                    tooltip: 'To Executive',
+                    data: { targetScene: 'scene5' },
                 },
             ],
         },
     ];
 
     useEffect(() => {
-        if (!viewerContainer.current) return;
+        const updateBreakpoint = () => {
+            if (typeof window === 'undefined') return;
+            setIsMobile(window.matchMedia('(max-width: 1024px)').matches);
+        };
+        updateBreakpoint();
+        if (typeof window !== 'undefined') {
+            window.addEventListener('resize', updateBreakpoint);
+        }
+
+        if (!viewerContainer.current) {
+            return () => {
+                if (typeof window !== 'undefined') {
+                    window.removeEventListener('resize', updateBreakpoint);
+                }
+            };
+        }
+
         isInitialized.current = false;
 
         const scene1 = scenes.find(s => s.id === 'scene1');
-        if (!scene1) return;
+        if (!scene1) {
+            return () => {
+                if (typeof window !== 'undefined') {
+                    window.removeEventListener('resize', updateBreakpoint);
+                }
+            };
+        }
 
         const initializeViewer = () => {
             if (isInitialized.current || !viewerContainer.current) return;
@@ -292,6 +319,9 @@ export default function VirtualTour360() {
             if (viewerRef.current) viewerRef.current.destroy();
             viewerRef.current = null;
             isInitialized.current = false;
+            if (typeof window !== 'undefined') {
+                window.removeEventListener('resize', updateBreakpoint);
+            }
         };
     }, []);
 
@@ -353,8 +383,11 @@ export default function VirtualTour360() {
 
     return (
         <>
-            <div className="relative w-full h-screen bg-neutral-900 overflow-hidden select-none">
-                <div ref={viewerContainer} className="w-full h-full"/>
+            <div
+                className={`relative w-full bg-neutral-900 overflow-hidden select-none ${isMobile ? 'h-[calc(100vh-80px)] min-h-[480px]' : 'h-screen'
+                    }`}
+            >
+                <div ref={viewerContainer} className="w-full h-full" />
 
                 {/* Custom Loading */}
                 {isLoading && (
@@ -381,9 +414,14 @@ export default function VirtualTour360() {
 
                 {/* Scene Info */}
                 {!isLoading && currentSceneData && (
-                    <div className="absolute top-6 left-1/2 -translate-x-1/2 z-30 pointer-events-none">
+                    <div
+                        className={`absolute ${isMobile ? 'top-4 left-1/2 -translate-x-1/2' : 'top-6 left-1/2 -translate-x-1/2'
+                            } z-30 pointer-events-none w-[calc(100%-2rem)] max-w-xl`}
+                    >
                         <div
-                            className="bg-gradient-to-r from-[#1a0e00]/90 to-[#2b1600]/80 backdrop-blur-lg text-white px-8 py-4 rounded-2xl shadow-2xl border border-orange-500/30">
+                            className={`bg-gradient-to-r from-[#1a0e00]/90 to-[#2b1600]/80 backdrop-blur-lg text-white ${isMobile ? 'px-4 py-3 rounded-xl' : 'px-8 py-4 rounded-2xl'
+                                } shadow-2xl border border-orange-500/30`}
+                        >
                             <div className="flex items-center gap-3">
                                 <div className="relative">
                                     <div className="w-3 h-3 bg-orange-500 rounded-full animate-pulse"></div>
@@ -391,8 +429,12 @@ export default function VirtualTour360() {
                                         className="absolute inset-0 w-3 h-3 bg-orange-500 rounded-full animate-ping opacity-75"></div>
                                 </div>
                                 <div>
-                                    <div className="font-bold text-base text-orange-400">{currentSceneData.name}</div>
-                                    <div className="text-xs text-orange-200 mt-0.5">{currentSceneData.description}</div>
+                                    <div className={`font-bold ${isMobile ? 'text-sm' : 'text-base'} text-orange-400`}>
+                                        {currentSceneData.name}
+                                    </div>
+                                    <div className={`text-orange-200 mt-0.5 ${isMobile ? 'text-[11px]' : 'text-xs'}`}>
+                                        {currentSceneData.description}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -401,17 +443,18 @@ export default function VirtualTour360() {
 
                 {/* Auto Rotate Button */}
                 {!isLoading && (
-                    <div className="absolute top-6 right-6 z-30">
+                    <div
+                        className={`absolute z-30 ${isMobile ? 'bottom-4 right-4' : 'top-6 right-6'
+                            }`}
+                    >
                         <button
                             onClick={toggleAutoRotate}
-                            className={`bg-black/70 backdrop-blur-md rounded-full p-3 shadow-lg transition-all duration-300 hover:bg-black/80 ${
-                                autoRotate ? 'ring-2 ring-orange-500' : ''
-                            }`}
+                            className={`bg-black/70 backdrop-blur-md rounded-full p-3 shadow-lg transition-all duration-300 hover:bg-black/80 ${autoRotate ? 'ring-2 ring-orange-500' : ''
+                                }`}
                         >
                             <svg
-                                className={`w-6 h-6 transition-all duration-300 ${
-                                    autoRotate ? 'text-orange-400 animate-spin-slow' : 'text-white/70'
-                                }`}
+                                className={`w-6 h-6 transition-all duration-300 ${autoRotate ? 'text-orange-400 animate-spin-slow' : 'text-white/70'
+                                    }`}
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
@@ -429,43 +472,77 @@ export default function VirtualTour360() {
 
                 {/* Navigation Panel */}
                 {!isLoading && (
-                    <div className="absolute top-6 left-6 z-30">
+                    <div
+                        className={`absolute z-30 ${isMobile
+                            ? 'left-1/2 -translate-x-1/2 bottom-4 w-[calc(100%-2rem)] max-w-md'
+                            : 'top-6 left-6'
+                            }`}
+                    >
                         <div
-                            className="bg-gradient-to-br from-[#1a0e00]/90 to-[#2b1600]/80 backdrop-blur-lg rounded-2xl p-5 shadow-2xl border border-orange-500/30">
-                            <div className="flex items-center gap-2 mb-4">
-                                <svg className="w-4 h-4 text-orange-400" fill="currentColor" viewBox="0 0 20 20">
+                            className={`bg-gradient-to-br from-[#1a0e00]/90 to-[#2b1600]/80 backdrop-blur-lg rounded-2xl shadow-2xl border border-orange-500/30 ${isMobile ? 'p-4' : 'p-5'
+                                }`}
+                        >
+                            <div className={`flex items-center gap-2 ${isMobile ? 'mb-3' : 'mb-4'}`}>
+                                <svg className={`text-orange-400 ${isMobile ? 'w-3.5 h-3.5' : 'w-4 h-4'}`} fill="currentColor" viewBox="0 0 20 20">
                                     <path
-                                        d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"/>
+                                        d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
                                 </svg>
-                                <h3 className="text-orange-400 text-xs font-bold uppercase tracking-wider">Navigasi</h3>
+                                <h3 className={`text-orange-400 font-bold uppercase tracking-wider ${isMobile ? 'text-[10px]' : 'text-xs'}`}>
+                                    Navigasi
+                                </h3>
                             </div>
-                            <div className="flex flex-col gap-2">
-                                {scenes.map((scene) => (
-                                    <button
-                                        key={scene.id}
-                                        onClick={() => changeScene(scene.id)}
+                            {isMobile ? (
+                                <div className="relative">
+                                    <select
+                                        value={currentScene}
+                                        onChange={(event) => changeScene(event.target.value)}
                                         disabled={isTransitioning}
-                                        className={`relative px-5 py-3 w-50 rounded-xl text-sm font-semibold transition-all duration-300 overflow-hidden cursor-pointer ${
-                                            currentScene === scene.id
-                                                ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg scale-105'
-                                                : 'bg-white/5 text-orange-200 hover:bg-orange-500/20 hover:text-orange-100'
-                                        }`}
+                                        className="w-full appearance-none bg-white/10 text-orange-100 border border-orange-500/20 rounded-xl px-4 py-3 text-sm font-medium backdrop-blur focus:outline-none focus:ring-2 focus:ring-orange-500"
                                     >
-                    <span className="flex items-center justify-between">
-                      {scene.name}
-                        {currentScene === scene.id && (
-                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                <path
-                                    fillRule="evenodd"
-                                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                    clipRule="evenodd"
-                                />
-                            </svg>
-                        )}
-                    </span>
-                                    </button>
-                                ))}
-                            </div>
+                                        {scenes.map((scene) => (
+                                            <option key={scene.id} value={scene.id} className="bg-[#1a0e00] text-orange-100">
+                                                {scene.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <span className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-orange-300">
+                                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                            <path
+                                                fillRule="evenodd"
+                                                d="M5.23 7.21a.75.75 0 011.06.02L10 10.648l3.71-3.417a.75.75 0 111.04 1.08l-4.24 3.904a.75.75 0 01-1.04 0L5.21 8.29a.75.75 0 01.02-1.08z"
+                                                clipRule="evenodd"
+                                            />
+                                        </svg>
+                                    </span>
+                                </div>
+                            ) : (
+                                <div className="flex flex-col gap-2">
+                                    {scenes.map((scene) => (
+                                        <button
+                                            key={scene.id}
+                                            onClick={() => changeScene(scene.id)}
+                                            disabled={isTransitioning}
+                                            className={`relative rounded-xl font-semibold transition-all duration-300 overflow-hidden cursor-pointer ${currentScene === scene.id
+                                                ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg'
+                                                : 'bg-white/5 text-orange-200 hover:bg-orange-500/20 hover:text-orange-100'
+                                                } px-5 py-3 text-sm w-50`}
+                                        >
+                                            <span className="flex items-center justify-between gap-2">
+                                                {scene.name}
+                                                {currentScene === scene.id && (
+                                                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path
+                                                            fillRule="evenodd"
+                                                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                            clipRule="evenodd"
+                                                        />
+                                                    </svg>
+                                                )}
+                                            </span>
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </div>
                 )}
@@ -536,6 +613,31 @@ export default function VirtualTour360() {
 
                 .psv-container {
                     background: #0a0500 !important;
+                }
+
+                .no-scrollbar {
+                    -ms-overflow-style: none;
+                    scrollbar-width: none;
+                }
+
+                .no-scrollbar::-webkit-scrollbar {
+                    display: none;
+                }
+
+                @media (max-width: 768px) {
+                    .custom-marker {
+                        width: 38px !important;
+                        height: 38px !important;
+                        font-size: 18px !important;
+                        box-shadow: 0 6px 20px rgba(254, 77, 1, 0.35) !important;
+                    }
+
+                    .info-marker {
+                        width: 32px !important;
+                        height: 32px !important;
+                        font-size: 16px !important;
+                        box-shadow: 0 6px 18px rgba(255, 150, 0, 0.4) !important;
+                    }
                 }
             `}</style>
         </>

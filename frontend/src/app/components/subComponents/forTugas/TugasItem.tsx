@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useMemo, useState } from 'react';
-import { Upload, CheckCircle, Clock, User, Calendar, Users } from 'lucide-react';
+import { Upload, CheckCircle, Clock, User, Calendar, Users, Paperclip, FileText, ExternalLink, Download } from 'lucide-react';
 import TugasUploadModal from './TugasUploadModal';
-import {useEduData} from "@/app/edu/context";
+import { useEduData } from "@/app/edu/context";
 import { useRouter } from "next/navigation";
 
 interface TugasItemProps {
@@ -12,11 +12,29 @@ interface TugasItemProps {
     student?: any;
 }
 
+type SubmissionFileSummary = {
+    id?: number | string;
+    path?: string | null;
+    url?: string | null;
+    name?: string | null;
+    original_name?: string | null;
+    filename?: string | null;
+};
+
+type SubmissionSummary = {
+    key: string;
+    studentName: string;
+    files: SubmissionFileSummary[];
+    submittedAt?: string | null;
+};
+
 export default function TugasItem({ student, tugas, isCompleted = false }: TugasItemProps) {
     const { user, students } = useEduData();
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const router = useRouter();
+
+    const STORAGE_BASE_URL = "https://api.smkprestasiprima.sch.id/storage";
 
     const formatDeadline = (dateString: string) => {
         const date = new Date(dateString);
@@ -142,6 +160,45 @@ export default function TugasItem({ student, tugas, isCompleted = false }: Tugas
         router.push(`/edu/tugas/${id}`);
     };
 
+    const buildSubmissionFileUrl = (file: SubmissionFileSummary) => {
+        const raw = file?.url ?? file?.path ?? "";
+        if (!raw) return "";
+        if (/^https?:\/\//i.test(raw)) return raw;
+        const trimmed = raw.replace(/^\/+/, "");
+        const withoutStorage = trimmed.startsWith("storage/") ? trimmed.slice("storage/".length) : trimmed;
+        return `${STORAGE_BASE_URL}/${withoutStorage}`;
+    };
+
+    const submissionSummaries = useMemo<SubmissionSummary[]>(() => {
+        if (!isTeacher) return [];
+        const subs = Array.isArray(tugas?.submissions) ? tugas.submissions : [];
+        return subs.map((sub: any, idx: number): SubmissionSummary => {
+            const studentName = sub?.student?.user?.name ?? sub?.student?.name ?? `Siswa ${sub?.student_id ?? idx + 1}`;
+            const filesRaw = Array.isArray(sub?.files) ? sub.files : [];
+            const normalizedFiles = filesRaw
+                .map((file: any, fileIdx: number): SubmissionFileSummary | null => {
+                    if (!file) return null;
+                    if (typeof file === "string") {
+                        return { id: fileIdx, path: file };
+                    }
+                    if (typeof file === "object") return file;
+                    return null;
+                }) // @ts-ignore
+                .filter((file): file is SubmissionFileSummary => !!file && (!!file.path || !!file.url));
+            return {
+                key: String(sub?.id ?? sub?.submission_id ?? `${idx}`),
+                studentName,
+                files: normalizedFiles,
+                submittedAt: sub?.submitted_at ?? sub?.created_at ?? null,
+            };
+        }).filter((entry: SubmissionSummary) => entry.files.length > 0);
+    }, [isTeacher, tugas?.submissions]);
+
+    const openSubmissionFile = (url: string) => {
+        if (!url) return;
+        window.open(url, "_blank", "noopener,noreferrer");
+    };
+
     return (
         <>
             {/* Uploading overlay */}
@@ -189,17 +246,16 @@ export default function TugasItem({ student, tugas, isCompleted = false }: Tugas
                             </p>
                         )}
                     </div>
-                    
+
                     <div className="flex items-center gap-2">
                         {!isTeacher ? (
                             // Student status badge
-                            <div className={`px-3 py-1 rounded-full text-xs font-medium ${
-                                isCompleted 
-                                    ? 'bg-green-100 text-green-700' 
-                                    : isOverdue()
+                            <div className={`px-3 py-1 rounded-full text-xs font-medium ${isCompleted
+                                ? 'bg-green-100 text-green-700'
+                                : isOverdue()
                                     ? 'bg-red-100 text-red-700'
                                     : 'bg-orange-100 text-orange-700'
-                            }`}>
+                                }`}>
                                 {isCompleted ? (
                                     <div className="flex items-center gap-1">
                                         <CheckCircle className="w-3 h-3" />
@@ -232,7 +288,7 @@ export default function TugasItem({ student, tugas, isCompleted = false }: Tugas
                         )}
                     </div>
                 </div>
-                
+
                 {!isTeacher && (
                     <div className="flex flex-col sm:flex-row items-center gap-2">
                         {isCompleted ? (
@@ -243,11 +299,10 @@ export default function TugasItem({ student, tugas, isCompleted = false }: Tugas
                         ) : (
                             <button
                                 onClick={() => setIsUploadModalOpen(true)}
-                                className={`text-sm px-4 py-2 rounded-lg flex items-center gap-2 hover:shadow transition-all duration-200 ${
-                                    isOverdue()
-                                        ? 'bg-red-500 text-white hover:bg-red-600'
-                                        : 'bg-orange-500 text-white hover:bg-orange-600'
-                                }`}
+                                className={`text-sm px-4 py-2 rounded-lg flex items-center gap-2 hover:shadow transition-all duration-200 ${isOverdue()
+                                    ? 'bg-red-500 text-white hover:bg-red-600'
+                                    : 'bg-orange-500 text-white hover:bg-orange-600'
+                                    }`}
                             >
                                 <Upload className="w-4 h-4" />
                                 {isOverdue() ? 'Upload (Terlambat)' : 'Upload Tugas'}
@@ -267,6 +322,68 @@ export default function TugasItem({ student, tugas, isCompleted = false }: Tugas
                     deadline={tugas.deadline}
                     onUploadComplete={(files) => { void handleUploadComplete(files as any[]); }}
                 />
+            )}
+
+            {isTeacher && submissionSummaries.length > 0 && (
+                <div className="mt-3 rounded-xl border border-blue-100 bg-blue-50/60 px-4 py-3">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-blue-700 flex items-center gap-2">
+                        <Paperclip className="w-3.5 h-3.5" />
+                        Lampiran Pengumpulan
+                    </p>
+                    <div className="mt-2 space-y-3">
+                        {submissionSummaries.map((submission: SubmissionSummary) => (
+                            <div key={submission.key} className="rounded-lg border border-blue-100 bg-white px-3 py-2 shadow-sm">
+                                <div className="flex items-center justify-between gap-3">
+                                    <div className="min-w-0">
+                                        <p className="text-sm font-semibold text-gray-800 truncate">{submission.studentName}</p>
+                                        {submission.submittedAt && (
+                                            <p className="text-xs text-gray-500">{formatDeadline(submission.submittedAt)}</p>
+                                        )}
+                                    </div>
+                                </div>
+                                <div className="mt-2 space-y-1.5">
+                                    {submission.files.map((file: SubmissionFileSummary, idx: number) => {
+                                        const url = buildSubmissionFileUrl(file);
+                                        const name = file?.name || file?.original_name || file?.filename || file?.path || `Lampiran ${idx + 1}`;
+                                        return (
+                                            <div key={String(file?.id ?? `${submission.key}-${idx}`)} className="flex items-center justify-between gap-3 rounded-lg border border-blue-100 bg-blue-50/60 px-3 py-2 text-sm">
+                                                <div className="flex items-center gap-2 min-w-0 flex-1">
+                                                    <FileText className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                                                    <a
+                                                        href={url || undefined}
+                                                        target={url ? "_blank" : undefined}
+                                                        rel={url ? "noopener noreferrer" : undefined}
+                                                        className="truncate font-medium text-blue-700 hover:underline"
+                                                    >
+                                                        {name}
+                                                    </a>
+                                                </div>
+                                                <div className="flex items-center gap-1">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => openSubmissionFile(url)}
+                                                        className="p-1.5 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-full transition-colors"
+                                                        title="Buka lampiran"
+                                                    >
+                                                        <ExternalLink className="w-4 h-4" />
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => openSubmissionFile(url)}
+                                                        className="p-1.5 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-full transition-colors"
+                                                        title="Unduh"
+                                                    >
+                                                        <Download className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
             )}
         </>
     );

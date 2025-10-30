@@ -5,7 +5,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import { useEduData } from "@/app/edu/context";
-import { Calendar, FileText, Link as LinkIcon, Loader2, Download, ExternalLink, Clock, CheckCircle2, XCircle, User } from "lucide-react";
+import { Calendar, FileText, Link as LinkIcon, Loader2, Download, ExternalLink, Clock, CheckCircle2, XCircle, User, Paperclip } from "lucide-react";
 import TugasUploadModal from "@/app/components/subComponents/forTugas/TugasUploadModal";
 import Swal from "sweetalert2";
 
@@ -17,6 +17,16 @@ interface AssignmentFile {
   original_name?: string | null;
   type?: 'file' | 'link' | string; // added: to distinguish between file and link
   mime?: string | null;
+}
+
+interface SubmissionFile {
+  id?: number | string;
+  path?: string | null;
+  url?: string | null;
+  name?: string | null;
+  original_name?: string | null;
+  mime?: string | null;
+  size?: number | null;
 }
 
 interface AssignmentDetail {
@@ -57,9 +67,20 @@ function basename(p: string) {
   }
 }
 
+const STORAGE_BASE_URL = "https://api.smkprestasiprima.sch.id/storage";
+
 function buildAssignmentFileUrl(assignmentId: string | number, fileId: string | number) {
   // Use frontend proxy API route to handle authentication
   return `/api/tugas/files/${assignmentId}/${fileId}`;
+}
+
+function buildSubmissionFileUrl(file: SubmissionFile) {
+  const raw = file?.url ?? file?.path ?? "";
+  if (!raw) return "";
+  if (/^https?:\/\//i.test(raw)) return raw;
+  const trimmed = raw.replace(/^\/+/, "");
+  const withoutStorage = trimmed.startsWith("storage/") ? trimmed.slice("storage/".length) : trimmed;
+  return `${STORAGE_BASE_URL}/${withoutStorage}`;
 }
 
 export default function AssignmentDetailPage() {
@@ -94,6 +115,19 @@ export default function AssignmentDetailPage() {
   const myGrade = useMemo(() => {
     const g = mySubmission?.grade ?? mySubmission?.score ?? mySubmission?.value;
     return g !== undefined && g !== null && g !== "" ? g : null;
+  }, [mySubmission]);
+
+  const mySubmissionFiles = useMemo<SubmissionFile[]>(() => {
+    if (!mySubmission) return [];
+    const filesRaw = Array.isArray(mySubmission?.files) ? mySubmission.files : [];
+    return filesRaw
+      .map((file: any, idx: number): SubmissionFile | null => {
+        if (!file) return null;
+        if (typeof file === "string") return { id: idx, path: file };
+        if (typeof file === "object") return file as SubmissionFile;
+        return null;
+      })
+      .filter((file: SubmissionFile | null): file is SubmissionFile => !!file && (!!file.path || !!file.url));
   }, [mySubmission]);
 
   // Handle real upload after modal simulates progress
@@ -246,6 +280,11 @@ export default function AssignmentDetailPage() {
       const url = buildAssignmentFileUrl(data.id, file.id);
       window.open(url, "_blank", "noopener,noreferrer");
     }
+  };
+
+  const openSubmissionFile = (url: string) => {
+    if (!url) return;
+    window.open(url, "_blank", "noopener,noreferrer");
   };
 
   // Compute class students and submission status (teacher view)
@@ -578,6 +617,21 @@ export default function AssignmentDetailPage() {
                         const submitted = sid != null && submittedIds.has(String(sid));
                         const sub = submitted ? findSubmissionByStudent(sid) : null;
                         const gradeVal = sub?.grade ?? sub?.score ?? sub?.value;
+                        const submissionFilesRaw = submitted ? sub?.files : null;
+                        const submissionFiles = Array.isArray(submissionFilesRaw) ? submissionFilesRaw : [];
+                        const normalizedSubmissionFiles = submissionFiles
+                          .map((file: any, fileIdx: number) => {
+                            if (!file) return null;
+                            if (typeof file === "string") {
+                              return { id: fileIdx, path: file } as SubmissionFile;
+                            }
+                            if (typeof file === "object") {
+                              return file as SubmissionFile;
+                            }
+                            return null;
+                          })
+                          .filter((file): file is SubmissionFile => !!file && (!!file.path || !!file.url));
+                        const hasSubmissionFiles = normalizedSubmissionFiles.length > 0;
 
                         return (
                           <div key={String(sid)} className="px-6 py-4 hover:bg-gray-50 transition-colors">
@@ -621,6 +675,56 @@ export default function AssignmentDetailPage() {
                                 )}
                               </div>
                             </div>
+                            {submitted && hasSubmissionFiles && (
+                              <div className="mt-3 rounded-xl border border-blue-100 bg-blue-50/60 px-4 py-3">
+                                <p className="text-xs font-semibold uppercase tracking-wide text-blue-700 flex items-center gap-2">
+                                  <Paperclip className="w-3.5 h-3.5" />
+                                  Lampiran Pengumpulan
+                                </p>
+                                <div className="mt-2 space-y-2">
+                                  {normalizedSubmissionFiles.map((file, fileIdx) => {
+                                    const displayName = file.name || file.original_name || basename(file.path || file.url || "");
+                                    const url = buildSubmissionFileUrl(file);
+                                    return (
+                                      <div
+                                        key={String(file.id ?? `${sid}-${fileIdx}`)}
+                                        className="flex items-center justify-between gap-3 rounded-lg border border-blue-100 bg-white px-3 py-2 text-sm shadow-sm"
+                                      >
+                                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                                          <FileText className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                                          <a
+                                            href={url || undefined}
+                                            target={url ? "_blank" : undefined}
+                                            rel={url ? "noopener noreferrer" : undefined}
+                                            className="truncate font-medium text-blue-700 hover:underline"
+                                          >
+                                            {displayName || "Lampiran"}
+                                          </a>
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                          <button
+                                            type="button"
+                                            onClick={() => openSubmissionFile(url)}
+                                            className="p-1.5 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-full transition-colors"
+                                            title="Buka lampiran"
+                                          >
+                                            <ExternalLink className="w-4 h-4" />
+                                          </button>
+                                          <button
+                                            type="button"
+                                            onClick={() => openSubmissionFile(url)}
+                                            className="p-1.5 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-full transition-colors"
+                                            title="Unduh"
+                                          >
+                                            <Download className="w-4 h-4" />
+                                          </button>
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            )}
                           </div>
                         );
                       })
@@ -651,6 +755,56 @@ export default function AssignmentDetailPage() {
                               </p>
                             </div>
                           </div>
+                          {mySubmissionFiles.length > 0 && (
+                            <div className="rounded-lg border border-blue-100 bg-blue-50/60 px-4 py-3">
+                              <p className="text-xs font-semibold uppercase tracking-wide text-blue-700 flex items-center gap-2">
+                                <Paperclip className="w-3.5 h-3.5" />
+                                Lampiran Pengumpulan Anda
+                              </p>
+                              <div className="mt-2 space-y-2">
+                                {mySubmissionFiles.map((file, idx) => {
+                                  const displayName = file.name || file.original_name || basename(file.path || file.url || "");
+                                  const url = buildSubmissionFileUrl(file);
+                                  return (
+                                    <div
+                                      key={String(file.id ?? `me-${idx}`)}
+                                      className="flex items-center justify-between gap-3 rounded-lg border border-blue-100 bg-white px-3 py-2 text-sm shadow-sm"
+                                    >
+                                      <div className="flex items-center gap-2 min-w-0 flex-1">
+                                        <FileText className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                                        <a
+                                          href={url || undefined}
+                                          target={url ? "_blank" : undefined}
+                                          rel={url ? "noopener noreferrer" : undefined}
+                                          className="truncate font-medium text-blue-700 hover:underline"
+                                        >
+                                          {displayName || `Lampiran ${idx + 1}`}
+                                        </a>
+                                      </div>
+                                      <div className="flex items-center gap-1">
+                                        <button
+                                          type="button"
+                                          onClick={() => openSubmissionFile(url)}
+                                          className="p-1.5 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-full transition-colors"
+                                          title="Buka lampiran"
+                                        >
+                                          <ExternalLink className="w-4 h-4" />
+                                        </button>
+                                        <button
+                                          type="button"
+                                          onClick={() => openSubmissionFile(url)}
+                                          className="p-1.5 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-full transition-colors"
+                                          title="Unduh"
+                                        >
+                                          <Download className="w-4 h-4" />
+                                        </button>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          )}
 
                           {myGrade != null && (
                             <div className="text-center p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg border border-green-200">

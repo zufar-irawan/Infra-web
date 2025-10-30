@@ -1,15 +1,15 @@
 import api from "@/app/lib/api";
-import {NextResponse} from "next/server";
-import { cookies} from "next/headers";
+import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 
-export async function POST(req: Request){
-    const {email, password} = await req.json();
+export async function POST(req: Request) {
+    const { email, password } = await req.json();
 
     try {
         const cookieStore = await cookies()
-        const res = await api.post("/lms/auth/login", {email, password});
+        const res = await api.post("/lms/auth/login", { email, password });
 
-        if(res.status === 200){
+        if (res.status === 200) {
             const token: string | undefined = res?.data?.data?.token;
             const user = res?.data?.data?.user;
 
@@ -32,7 +32,7 @@ export async function POST(req: Request){
             });
         }
     } catch (e: any) {
-        if (e.response.status === 401 || e.response.status === 400){
+        if (e.response.status === 401 || e.response.status === 400) {
             return NextResponse.json({ login: false, message: "Email atau pasword salah! Silahkan coba lagi!" });
         } else {
             return NextResponse.json({ login: false, message: e });

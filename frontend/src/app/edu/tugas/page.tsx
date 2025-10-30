@@ -22,7 +22,7 @@ export default function Tugas() {
     const [filterMataPelajaran, setFilterMataPelajaran] = useState("all")
     const [filterStatus, setFilterStatus] = useState("all")
 
-    const classId = useMemo(() => student?.class?.id ?? student?.class_id ?? student?.classId ?? teacher?.class_id ??    null, [student])
+    const classId = useMemo(() => student?.class?.id ?? student?.class_id ?? student?.classId ?? teacher?.class_id ?? null, [student])
 
     useEffect(() => {
         if (!tugas) return;
@@ -153,8 +153,8 @@ export default function Tugas() {
                                             </svg>
                                         </button>
                                         <span className="text-xs text-gray-500">
-                                    {currentIndex + 1} / {tugasPending.length}
-                                </span>
+                                            {currentIndex + 1} / {tugasPending.length}
+                                        </span>
                                         <button
                                             onClick={nextSlide}
                                             className="p-1 rounded-full hover:bg-gray-100 transition-colors"
@@ -254,7 +254,7 @@ export default function Tugas() {
                                         <option value="all">Semua Mata Pelajaran</option>
                                         {getUniqueMataPelajaran().map((mataPelajaran) => (
                                             <option key={mataPelajaran} value={mataPelajaran}>
-                                                { mataPelajaran }
+                                                {mataPelajaran}
                                             </option>
                                         ))}
                                     </select>
@@ -322,27 +322,27 @@ export default function Tugas() {
                                                 <p className="text-black/60 text-sm">{
                                                     // @ts-ignore
                                                     tugasList.length} Tugas • {tugasList[0]?.teacher?.user?.name || 'Guru'
-                                                }</p>
+                                                    }</p>
                                             </div>
                                             <span
                                                 className="p-1 rounded hover:bg-gray-100 transition"
                                                 aria-label={openSubjects[specialization] ? "Tutup" : "Buka"}
                                             >
-                                        {openSubjects[specialization] ?
-                                            <ChevronUp className="w-5 h-5" /> :
-                                            <ChevronDown className="w-5 h-5" />
-                                        }
-                                    </span>
+                                                {openSubjects[specialization] ?
+                                                    <ChevronUp className="w-5 h-5" /> :
+                                                    <ChevronDown className="w-5 h-5" />
+                                                }
+                                            </span>
                                         </div>
 
                                         {openSubjects[specialization] && (
                                             <div className="divide-y divide-black/10 transition-all duration-300">
                                                 { // @ts-ignore
                                                     tugasList.map((item) => (
-                                                        <TugasItem 
+                                                        <TugasItem
                                                             student={student}
-                                                            key={item.id} 
-                                                            tugas={item} 
+                                                            key={item.id}
+                                                            tugas={item}
                                                             isCompleted={item.submissions && item.submissions.length > 0}
                                                         />
                                                     ))}
@@ -367,7 +367,7 @@ export default function Tugas() {
                     <div className="w-full p-4 flex flex-col lg:flex-row gap-4">
                         {/* CREATE TASK BUTTON */}
                         <div className="lg:flex-1 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl p-6 shadow-md border border-orange-400 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 flex flex-col justify-center items-center text-center h-[200px] cursor-pointer group"
-                             onClick={() => setIsCreateModalOpen(true)}>
+                            onClick={() => setIsCreateModalOpen(true)}>
                             <div className="bg-white/20 p-4 rounded-full mb-4 group-hover:scale-110 transition-transform duration-300">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-10 h-10 text-white">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -426,7 +426,7 @@ export default function Tugas() {
                                 </div>
 
                                 {/* Filter Mata Pelajaran */}
-                                <div className="w-full sm:w-auto">
+                                {/* <div className="w-full sm:w-auto">
                                     <select
                                         value={filterMataPelajaran}
                                         onChange={(e) => setFilterMataPelajaran(e.target.value)}
@@ -439,7 +439,7 @@ export default function Tugas() {
                                             </option>
                                         ))}
                                     </select>
-                                </div>
+                                </div> */}
 
                                 {/* Filter Status */}
                                 <div className="w-full sm:w-auto">
@@ -503,17 +503,17 @@ export default function Tugas() {
                                                 <p className="text-black/60 text-sm">{
                                                     // @ts-ignore
                                                     tugasList.length} Tugas • {tugasList[0]?.teacher?.user?.name || 'Guru'
-                                                }</p>
+                                                    }</p>
                                             </div>
                                             <span
                                                 className="p-1 rounded hover:bg-gray-100 transition"
                                                 aria-label={openSubjects[specialization] ? "Tutup" : "Buka"}
                                             >
-                                        {openSubjects[specialization] ?
-                                            <ChevronUp className="w-5 h-5" /> :
-                                            <ChevronDown className="w-5 h-5" />
-                                        }
-                                    </span>
+                                                {openSubjects[specialization] ?
+                                                    <ChevronUp className="w-5 h-5" /> :
+                                                    <ChevronDown className="w-5 h-5" />
+                                                }
+                                            </span>
                                         </div>
 
                                         {openSubjects[specialization] && (

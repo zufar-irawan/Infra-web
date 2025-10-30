@@ -1,9 +1,10 @@
 import React from "react";
-import {format, parseISO} from "date-fns";
-import {id} from "date-fns/locale";
+import Link from "next/link";
+import { format, parseISO } from "date-fns";
+import { id } from "date-fns/locale";
 
 export default function ExamCard(
-    {exams} : {exams: any}
+    { exams }: { exams: any }
 ) {
     const date = exams.date
     const formattedDate = format(parseISO(date), 'dd MMM yyyy', { locale: id });
@@ -19,12 +20,16 @@ export default function ExamCard(
             </div>
             <div className="flex flex-col sm:flex-row items-center gap-2">
 
-                <a href="" className="text-sm bg-orange-500 text-white px-3 py-2 rounded-sm flex items-center gap-1 hover:bg-orange-400 hover:shadow transition">
+                <Link
+                    href={`/edu/ujian/${encodeURIComponent(String(exams?.id ?? ""))}`}
+                    className="text-sm bg-orange-500 text-white px-3 py-2 rounded-sm flex items-center gap-1 hover:bg-orange-400 hover:shadow transition"
+                    prefetch={false}
+                >
                     Kerjakan
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3 h-3">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
                     </svg>
-                </a>
+                </Link>
             </div>
         </div>
     )
