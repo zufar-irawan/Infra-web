@@ -26,7 +26,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/": {
+    "/edu/jadwal": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -39,104 +39,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/",
-      "dataRoute": "/index.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
-    "/edu/nilai": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/edu/nilai",
-      "dataRoute": "/edu/nilai.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
-    "/edu/guru": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/edu/guru",
-      "dataRoute": "/edu/guru.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
-    "/edu/perangkat": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/edu/perangkat",
-      "dataRoute": "/edu/perangkat.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
-    "/edu/presensi": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/edu/presensi",
-      "dataRoute": "/edu/presensi.rsc",
+      "srcRoute": "/edu/jadwal",
+      "dataRoute": "/edu/jadwal.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -194,7 +98,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/edu/kelas": {
+    "/edu/presensi": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -207,8 +111,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/edu/kelas",
-      "dataRoute": "/edu/kelas.rsc",
+      "srcRoute": "/edu/presensi",
+      "dataRoute": "/edu/presensi.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -218,7 +122,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/edu/dashboard": {
+    "/edu/nilai": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -231,8 +135,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/edu/dashboard",
-      "dataRoute": "/edu/dashboard.rsc",
+      "srcRoute": "/edu/nilai",
+      "dataRoute": "/edu/nilai.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -266,7 +170,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/edu/setelan": {
+    "/edu/tugas/tugas_guru_example": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -279,8 +183,56 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/edu/setelan",
-      "dataRoute": "/edu/setelan.rsc",
+      "srcRoute": "/edu/tugas/tugas_guru_example",
+      "dataRoute": "/edu/tugas/tugas_guru_example.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
+    "/": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/",
+      "dataRoute": "/index.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
+    "/edu/kelas": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/edu/kelas",
+      "dataRoute": "/edu/kelas.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -314,126 +266,6 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/edu/tugas/tugas_guru_example": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/edu/tugas/tugas_guru_example",
-      "dataRoute": "/edu/tugas/tugas_guru_example.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
-    "/edu/laporan": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/edu/laporan",
-      "dataRoute": "/edu/laporan.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
-    "/edu/tugas/tugas_siswa_example": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/edu/tugas/tugas_siswa_example",
-      "dataRoute": "/edu/tugas/tugas_siswa_example.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
-    "/edu/tugas": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/edu/tugas",
-      "dataRoute": "/edu/tugas.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
-    "/edu/ujian": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/edu/ujian",
-      "dataRoute": "/edu/ujian.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
     "/informasi/berita": {
       "experimentalBypassFor": [
         {
@@ -449,6 +281,30 @@
       "initialRevalidateSeconds": false,
       "srcRoute": "/informasi/berita",
       "dataRoute": "/informasi/berita.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
+    "/edu/perangkat": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/edu/perangkat",
+      "dataRoute": "/edu/perangkat.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -482,7 +338,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/edu/jadwal": {
+    "/edu/login": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -495,8 +351,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/edu/jadwal",
-      "dataRoute": "/edu/jadwal.rsc",
+      "srcRoute": "/edu/login",
+      "dataRoute": "/edu/login.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -530,7 +386,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/kegiatansiswa/osis-mpk": {
+    "/edu/guru": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -543,8 +399,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/kegiatansiswa/osis-mpk",
-      "dataRoute": "/kegiatansiswa/osis-mpk.rsc",
+      "srcRoute": "/edu/guru",
+      "dataRoute": "/edu/guru.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -578,7 +434,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/kegiatansiswa/penerimaansiswa": {
+    "/kegiatansiswa/osis-mpk": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -591,8 +447,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/kegiatansiswa/penerimaansiswa",
-      "dataRoute": "/kegiatansiswa/penerimaansiswa.rsc",
+      "srcRoute": "/kegiatansiswa/osis-mpk",
+      "dataRoute": "/kegiatansiswa/osis-mpk.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -602,7 +458,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/kegiatansiswa/study-tour": {
+    "/edu/tugas/tugas_siswa_example": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -615,8 +471,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/kegiatansiswa/study-tour",
-      "dataRoute": "/kegiatansiswa/study-tour.rsc",
+      "srcRoute": "/edu/tugas/tugas_siswa_example",
+      "dataRoute": "/edu/tugas/tugas_siswa_example.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -650,7 +506,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/kehidupan-siswa/testimoni": {
+    "/kegiatansiswa/study-tour": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -663,8 +519,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/kehidupan-siswa/testimoni",
-      "dataRoute": "/kehidupan-siswa/testimoni.rsc",
+      "srcRoute": "/kegiatansiswa/study-tour",
+      "dataRoute": "/kegiatansiswa/study-tour.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -698,7 +554,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/kegiatansiswa/acara": {
+    "/edu/setelan": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -711,8 +567,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/kegiatansiswa/acara",
-      "dataRoute": "/kegiatansiswa/acara.rsc",
+      "srcRoute": "/edu/setelan",
+      "dataRoute": "/edu/setelan.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -746,6 +602,126 @@
         "x-next-revalidate-tag-token"
       ]
     },
+    "/kegiatansiswa/penerimaansiswa": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/kegiatansiswa/penerimaansiswa",
+      "dataRoute": "/kegiatansiswa/penerimaansiswa.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
+    "/edu/tugas": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/edu/tugas",
+      "dataRoute": "/edu/tugas.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
+    "/kegiatansiswa/acara": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/kegiatansiswa/acara",
+      "dataRoute": "/kegiatansiswa/acara.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
+    "/kehidupan-siswa/testimoni": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/kehidupan-siswa/testimoni",
+      "dataRoute": "/kehidupan-siswa/testimoni.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
+    "/edu/laporan": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/edu/laporan",
+      "dataRoute": "/edu/laporan.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
     "/kehidupan-siswa/prestasi": {
       "experimentalBypassFor": [
         {
@@ -761,6 +737,30 @@
       "initialRevalidateSeconds": false,
       "srcRoute": "/kehidupan-siswa/prestasi",
       "dataRoute": "/kehidupan-siswa/prestasi.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
+    "/edu/ujian": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/edu/ujian",
+      "dataRoute": "/edu/ujian.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -794,7 +794,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/profil/tentang-kami": {
+    "/edu/dashboard": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -807,80 +807,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/profil/tentang-kami",
-      "dataRoute": "/profil/tentang-kami.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
-    "/edu/login": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/edu/login",
-      "dataRoute": "/edu/login.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
-    "/profil/fasilitas": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/profil/fasilitas",
-      "dataRoute": "/profil/fasilitas.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
-    "/profil/testimoni": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/profil/testimoni",
-      "dataRoute": "/profil/testimoni.rsc",
+      "srcRoute": "/edu/dashboard",
+      "dataRoute": "/edu/dashboard.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -914,7 +842,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/profil/visi-misi": {
+    "/profil/prestasi": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -927,8 +855,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/profil/visi-misi",
-      "dataRoute": "/profil/visi-misi.rsc",
+      "srcRoute": "/profil/prestasi",
+      "dataRoute": "/profil/prestasi.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -962,7 +890,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/tentang/manajemen": {
+    "/profil/fasilitas": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -975,56 +903,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/tentang/manajemen",
-      "dataRoute": "/tentang/manajemen.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
-    "/profil/prestasi": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/profil/prestasi",
-      "dataRoute": "/profil/prestasi.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
-    },
-    "/tentang/fasilitas": {
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/tentang/fasilitas",
-      "dataRoute": "/tentang/fasilitas.rsc",
+      "srcRoute": "/profil/fasilitas",
+      "dataRoute": "/profil/fasilitas.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -1058,7 +938,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/tentang/visi-misi": {
+    "/tentang/fasilitas": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -1071,8 +951,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/tentang/visi-misi",
-      "dataRoute": "/tentang/visi-misi.rsc",
+      "srcRoute": "/tentang/fasilitas",
+      "dataRoute": "/tentang/fasilitas.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",
@@ -1130,6 +1010,102 @@
         "x-next-revalidate-tag-token"
       ]
     },
+    "/profil/visi-misi": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/profil/visi-misi",
+      "dataRoute": "/profil/visi-misi.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
+    "/profil/testimoni": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/profil/testimoni",
+      "dataRoute": "/profil/testimoni.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
+    "/tentang/manajemen": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/tentang/manajemen",
+      "dataRoute": "/tentang/manajemen.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
+    "/profil/tentang-kami": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/profil/tentang-kami",
+      "dataRoute": "/profil/tentang-kami.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
     "/edu/ujian/manage": {
       "experimentalBypassFor": [
         {
@@ -1145,6 +1121,30 @@
       "initialRevalidateSeconds": false,
       "srcRoute": "/edu/ujian/manage",
       "dataRoute": "/edu/ujian/manage.rsc",
+      "allowHeader": [
+        "host",
+        "x-matched-path",
+        "x-prerender-revalidate",
+        "x-prerender-revalidate-if-generated",
+        "x-next-revalidated-tags",
+        "x-next-revalidate-tag-token"
+      ]
+    },
+    "/tentang/visi-misi": {
+      "experimentalBypassFor": [
+        {
+          "type": "header",
+          "key": "next-action"
+        },
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": "multipart/form-data;.*"
+        }
+      ],
+      "initialRevalidateSeconds": false,
+      "srcRoute": "/tentang/visi-misi",
+      "dataRoute": "/tentang/visi-misi.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",

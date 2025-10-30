@@ -18,6 +18,14 @@ export default function Footer() {
     tiktok: "https://www.tiktok.com/@smkprestasiprima",
   };
 
+  const supportedLogos = [
+    { src: "/1infra.png", alt: "Infra Competition" },
+    { src: "/2jagoan.png", alt: "Jagoan Hosting" },
+    { src: "/3komdigi.png", alt: "Komdigi" },
+    { src: "/4maspion.png", alt: "Maspion IT" },
+    { src: "/5garuda.png", alt: "Garuda Spark" },
+  ];
+
   return (
     <footer className="bg-[#0f1b3d] text-white py-12 mt-auto scroll-smooth">
       <div className="w-full max-w-7xl mx-auto px-4">
@@ -96,18 +104,6 @@ export default function Footer() {
                 </a>
               </li>
             </ul>
-
-            {/* === SUPPORTED BY === */}
-            <div className="mt-5 bg-white p-3 text-center w-fit mx-auto shadow-md">
-              <p className="text-xs md:text-sm font-medium text-[#0f1b3d] mb-2">
-                Supported by :
-              </p>
-              <img
-                src="/4logo.png"
-                alt="Logo Prestasi Prima Group"
-                className="w-[180px] sm:w-[220px] md:w-[250px] lg:w-[280px] mx-auto object-contain"
-              />
-            </div>
           </div>
 
           {/* === MENU === */}
@@ -241,6 +237,32 @@ export default function Footer() {
                   />
                 </a>
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* SUPPORTED BY */}
+        <div className="mb-10">
+          <div className="w-full bg-white/5 border border-white/15 rounded-2xl px-4 py-4 sm:px-6 sm:py-5 shadow-lg flex flex-col items-center gap-4">
+            <span className="text-[11px] md:text-xs font-semibold tracking-[0.18em] uppercase text-orange-200">
+              Supported By
+            </span>
+            <div className="w-full flex flex-wrap items-center justify-center gap-3 sm:gap-4 md:gap-6">
+              {supportedLogos.map((logo) => (
+                <div
+                  key={logo.src}
+                  className="flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 bg-white rounded-full shadow-lg"
+                >
+                  <Image
+                    src={logo.src}
+                    alt={logo.alt}
+                    width={220}
+                    height={120}
+                    className="w-16 sm:w-20 md:w-24 h-auto object-contain"
+                    sizes="(max-width: 640px) 160px, (max-width: 1024px) 200px, 240px"
+                  />
+                </div>
+              ))}
             </div>
           </div>
         </div>
